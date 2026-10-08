@@ -1,0 +1,10 @@
+# Respaldos y datos personales: no publicar en el repositorio.
+camicas-respaldo-*.json
+*.csv
+.env
+.env.*
+node_modules/
+work/
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,4792 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f7f5fa" />
+    <meta
+      name="description"
+      content="Agenda, pacientes y economía de tu consultorio. Versión local de Camicas."
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Camicas" />
+    <title>Camicas · Consultorio</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f5fa;
+        --surface: #fff;
+        --surface2: #f1edf6;
+        --ink: #353044;
+        --muted: #756e82;
+        --line: #e7e1ee;
+        --primary: #7960a2;
+        --primary-hover: #664b90;
+        --soft: #f0eafb;
+        --peach: #f5e4d7;
+        --peach-ink: #925939;
+        --red: #ac4d53;
+        --red-soft: #faecec;
+        --blue: #476681;
+        --blue-soft: #edf2f8;
+        --shadow: 0 16px 60px #3724451a;
+        --radius: 20px;
+      }
+      [data-theme="dark"] {
+        color-scheme: dark;
+        --bg: #1e1927;
+        --surface: #2b2336;
+        --surface2: #342b40;
+        --ink: #f2edf7;
+        --muted: #b8acc6;
+        --line: #493c56;
+        --primary: #c1a4e6;
+        --primary-hover: #d0b7ed;
+        --soft: #3b2b50;
+        --peach: #493629;
+        --peach-ink: #e7b99a;
+        --red: #efa1a5;
+        --red-soft: #442d31;
+        --blue: #afc6e0;
+        --blue-soft: #2d3a49;
+        --shadow: 0 16px 60px #0005;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 16px;
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        line-height: 1.5;
+        background: var(--bg);
+        color: var(--ink);
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+      button,
+      a,
+      input,
+      select,
+      textarea {
+        -webkit-tap-highlight-color: transparent;
+      }
+      button,
+      a {
+        touch-action: manipulation;
+      }
+      button {
+        cursor: pointer;
+      }
+      button {
+        border: 0;
+      }
+      a {
+        color: inherit;
+      }
+      svg.icon {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex-shrink: 0;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: 2rem;
+        font-weight: 650;
+        letter-spacing: -1.1px;
+        line-height: 1.2;
+      }
+      h2 {
+        font-size: 1.14rem;
+        letter-spacing: -0.35px;
+        font-weight: 650;
+      }
+      h3 {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      small,
+      .small {
+        font-size: 0.875rem;
+      }
+      strong {
+        font-weight: 650;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .eyebrow {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1.8px;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .skip {
+        position: fixed;
+        top: -60px;
+        left: 10px;
+        z-index: 99;
+        background: var(--primary);
+        color: var(--bg);
+        padding: 12px;
+      }
+      .skip:focus {
+        top: 10px;
+      }
+      :focus-visible {
+        outline: 3px solid var(--peach-ink);
+        outline-offset: 3px;
+      }
+      .sidebar {
+        display: none;
+      }
+      .workspace {
+        min-width: 0;
+      }
+      .topbar {
+        height: 74px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        gap: 12px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--line);
+      }
+      .mobile-brand {
+        font-size: 1.55rem;
+        font-weight: 700;
+        letter-spacing: -1px;
+        text-decoration: none;
+      }
+      .mobile-brand span {
+        color: var(--peach-ink);
+      }
+      .global-search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: transparent;
+        color: var(--muted);
+        padding: 12px;
+        min-height: 44px;
+      }
+      .global-search .search-label,
+      .search-shortcut {
+        display: none;
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .icon-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        color: var(--ink);
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 12px;
+        font-size: 1.5rem;
+      }
+      .icon-button:hover {
+        background: var(--surface2);
+      }
+      .profile-button {
+        height: 38px;
+        width: 38px;
+        border-radius: 50%;
+        background: var(--peach);
+        color: var(--peach-ink);
+        font-weight: 650;
+      }
+      .page-footer {
+        padding: 0 20px 120px;
+        color: var(--muted);
+        font-size: 0.75rem;
+        text-align: center;
+      }
+      .page-footer span {
+        padding: 0 8px;
+      }
+      main {
+        padding: 26px 18px 32px;
+        max-width: 1450px;
+        margin: auto;
+        outline: none;
+      }
+      .page-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 26px;
+      }
+      .page-heading p {
+        font-size: 0.875rem;
+        color: var(--muted);
+        margin-top: 7px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 46px;
+        padding: 11px 17px;
+        border-radius: 12px;
+        color: var(--ink);
+        background: var(--surface2);
+        font-weight: 600;
+        font-size: 0.875rem;
+        line-height: 1.35;
+        text-decoration: none;
+      }
+      .btn:hover {
+        filter: brightness(0.97);
+      }
+      .btn.primary {
+        background: var(--primary);
+        color: var(--surface);
+      }
+      [data-theme="dark"] .btn.primary {
+        color: #251632;
+      }
+      .btn.outline {
+        background: var(--surface);
+        border: 1px solid var(--line);
+      }
+      .btn.danger {
+        background: var(--red-soft);
+        color: var(--red);
+      }
+      .btn.small {
+        min-height: 40px;
+        padding: 8px 12px;
+      }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .text-button {
+        background: transparent;
+        color: var(--primary);
+        padding: 8px 0;
+        min-height: 40px;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 22px;
+        min-width: 0;
+      }
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .card-head h2 {
+        flex: 1;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .stat {
+        text-align: left;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        padding: 18px;
+        border-radius: 16px;
+        color: var(--ink);
+        transition:
+          transform 0.18s,
+          border-color 0.18s;
+        min-width: 0;
+      }
+      .stat:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary);
+      }
+      .stat-top {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.875rem;
+        gap: 7px;
+      }
+      .stat .number {
+        font-size: 1.6rem;
+        font-weight: 650;
+        letter-spacing: -0.8px;
+        margin-top: 12px;
+        overflow-wrap: anywhere;
+      }
+      .stat small {
+        display: block;
+        color: var(--muted);
+        margin-top: 4px;
+        font-size: 0.75rem;
+      }
+      .stat .icon {
+        color: var(--primary);
+      }
+      .dashboard-grid {
+        display: grid;
+        gap: 18px;
+      }
+      .stack {
+        display: grid;
+        gap: 18px;
+        align-content: start;
+      }
+      .next-card {
+        background: var(--soft);
+        border-color: transparent;
+      }
+      .next-card .eyebrow {
+        color: var(--primary);
+      }
+      .next-time {
+        font-size: 2.7rem;
+        line-height: 1;
+        font-weight: 650;
+        letter-spacing: -1.5px;
+        margin: 20px 0 7px;
+      }
+      .next-card h3 {
+        font-size: 1.3rem;
+      }
+      .next-card .actions {
+        margin-top: 22px;
+      }
+      .next-meta {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 0.875rem;
+        margin-top: 8px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 7px;
+        background: var(--surface2);
+        color: var(--muted);
+        padding: 4px 9px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        white-space: normal;
+      }
+      .pill.Agendado {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      .pill.Realizado {
+        background: var(--soft);
+        color: var(--primary);
+      }
+      .pill.Cancelado,
+      .pill.Ausente {
+        background: var(--red-soft);
+        color: var(--red);
+      }
+      .pill.pending {
+        background: var(--peach);
+        color: var(--peach-ink);
+      }
+      .day-list {
+        display: grid;
+        gap: 0;
+      }
+      .session-row {
+        display: grid;
+        grid-template-columns: 54px 1fr auto;
+        align-items: start;
+        gap: 12px;
+        padding: 18px 0;
+        border-top: 1px solid var(--line);
+      }
+      .session-row:first-child {
+        border-top: 0;
+      }
+      .session-time {
+        font-size: 0.9rem;
+        font-weight: 650;
+        line-height: 1.6;
+      }
+      .session-time small {
+        font-size: 0.75rem;
+        display: block;
+        font-weight: 400;
+        color: var(--muted);
+      }
+      .session-main {
+        min-width: 0;
+      }
+      .session-name {
+        color: var(--ink);
+        font-size: 0.94rem;
+        font-weight: 600;
+        background: transparent;
+        text-align: left;
+        padding: 0;
+        overflow-wrap: anywhere;
+        min-height: 28px;
+      }
+      .session-info {
+        font-size: 0.8125rem;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .session-status {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .row-actions {
+        display: flex;
+        gap: 4px;
+      }
+      .empty {
+        text-align: center;
+        padding: 24px 10px;
+        color: var(--muted);
+      }
+      .empty .empty-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        margin: 0 auto 14px;
+        background: var(--surface2);
+        color: var(--primary);
+      }
+      .empty h3 {
+        color: var(--ink);
+        margin-bottom: 7px;
+      }
+      .empty p {
+        font-size: 0.875rem;
+        max-width: 330px;
+        margin: 0 auto 16px;
+      }
+      .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 9px;
+      }
+      .quick-grid button {
+        background: var(--surface2);
+        color: var(--ink);
+        border-radius: 13px;
+        min-height: 86px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        font-size: 0.875rem;
+      }
+      .quick-grid button:hover {
+        background: var(--soft);
+      }
+      .week-mini {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 5px;
+      }
+      .week-day {
+        background: transparent;
+        color: var(--muted);
+        border-radius: 12px;
+        padding: 10px 2px;
+        min-height: 95px;
+        font-size: 0.75rem;
+      }
+      .week-day.today {
+        background: var(--soft);
+        color: var(--primary);
+      }
+      .week-day b {
+        display: block;
+        font-size: 1rem;
+        margin: 3px 0 10px;
+      }
+      .mini-count {
+        display: block;
+        background: var(--surface2);
+        border-radius: 5px;
+        font-size: 0.75rem;
+        margin: 0 3px;
+        padding: 2px;
+      }
+      .task-row {
+        display: flex;
+        gap: 11px;
+        align-items: flex-start;
+        padding: 13px 0;
+        border-top: 1px solid var(--line);
+      }
+      .task-row:first-child {
+        border: 0;
+      }
+      .task-row input {
+        width: 21px;
+        height: 21px;
+        margin-top: 2px;
+        accent-color: var(--primary);
+      }
+      .task-row label {
+        flex: 1;
+        font-size: 0.875rem;
+        overflow-wrap: anywhere;
+      }
+      .task-row.done label {
+        text-decoration: line-through;
+        color: var(--muted);
+      }
+      .task-row small {
+        display: block;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        border-radius: 12px;
+        padding: 13px 15px;
+        background: var(--peach);
+        color: var(--peach-ink);
+        font-size: 0.875rem;
+        margin: 12px 0;
+      }
+      .alert.info {
+        background: var(--soft);
+        color: var(--primary);
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .toolbar > * {
+        max-width: 100%;
+      }
+      .toolbar .grow {
+        flex: 1;
+        min-width: 140px;
+      }
+      .input,
+      .toolbar input,
+      .toolbar select {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 11px 13px;
+        min-height: 46px;
+        color: var(--ink);
+        width: 100%;
+        min-width: 0;
+      }
+      .toolbar select {
+        width: auto;
+        max-width: 230px;
+      }
+      .segmented {
+        display: flex;
+        padding: 4px;
+        border-radius: 12px;
+        background: var(--surface2);
+        gap: 2px;
+        flex-wrap: wrap;
+      }
+      .segmented button {
+        color: var(--muted);
+        background: transparent;
+        min-height: 40px;
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 9px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .segmented button.active {
+        background: var(--surface);
+        color: var(--primary);
+        box-shadow: 0 2px 6px #00000008;
+      }
+      .date-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 5px;
+        margin-bottom: 18px;
+      }
+      .date-nav strong {
+        font-size: 0.95rem;
+        text-align: center;
+      }
+      .date-nav .input {
+        width: auto;
+        max-width: 170px;
+        font-size: 0.875rem;
+      }
+      .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        border-top: 1px solid var(--line);
+        border-left: 1px solid var(--line);
+        overflow: hidden;
+        border-radius: 14px;
+      }
+      .calendar-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 12px 2px;
+        text-align: center;
+        background: var(--surface2);
+        border-right: 1px solid var(--line);
+      }
+      .month-cell {
+        min-height: 74px;
+        position: relative;
+        padding: 6px 3px;
+        border-bottom: 1px solid var(--line);
+        border-right: 1px solid var(--line);
+        min-width: 0;
+        background: var(--surface);
+      }
+      .month-cell.outside {
+        opacity: 0.45;
+      }
+      .month-cell.today {
+        background: var(--soft);
+      }
+      .month-cell.selected {
+        box-shadow: inset 0 0 0 2px var(--primary);
+      }
+      .day-number {
+        background: transparent;
+        color: var(--ink);
+        padding: 3px 5px;
+        min-width: 28px;
+        min-height: 30px;
+        font-size: 0.875rem;
+      }
+      .month-event {
+        display: none;
+      }
+      .mobile-count {
+        font-size: 0.75rem;
+        display: block;
+        text-align: center;
+        color: var(--primary);
+        cursor: pointer;
+      }
+      .calendar-detail {
+        margin-top: 22px;
+      }
+      .week-columns {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 9px;
+      }
+      .week-column {
+        padding: 12px 8px;
+        background: var(--surface2);
+        border-radius: 14px;
+        min-width: 0;
+        min-height: 220px;
+      }
+      .week-column header {
+        text-align: center;
+        font-size: 0.875rem;
+        margin-bottom: 14px;
+      }
+      .week-column header b {
+        display: block;
+        font-size: 1.2rem;
+      }
+      .week-column.today {
+        background: var(--soft);
+      }
+      .week-event {
+        display: block;
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--blue);
+        padding: 10px 8px;
+        border-radius: 9px;
+        text-align: left;
+        color: var(--ink);
+        font-size: 0.875rem;
+        overflow-wrap: anywhere;
+        margin-bottom: 8px;
+        cursor: grab;
+      }
+      .week-event.Realizado {
+        border-left-color: var(--primary);
+      }
+      .week-event.Cancelado,
+      .week-event.Ausente {
+        border-left-color: var(--red);
+        opacity: 0.75;
+      }
+      .week-event.pending {
+        border-left-color: var(--peach-ink);
+      }
+      .week-event small {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin: 4px 0;
+      }
+      .day-create {
+        font-size: 0.75rem;
+        color: var(--primary);
+        min-height: 40px;
+        background: transparent;
+        width: 100%;
+        text-align: center;
+      }
+      .drop-over {
+        outline: 2px dashed var(--primary);
+        outline-offset: -3px;
+      }
+      .mobile-week {
+        display: block;
+      }
+      .desktop-week {
+        display: none;
+      }
+      .list-heading {
+        font-size: 0.875rem;
+        color: var(--muted);
+        font-weight: 600;
+        padding: 14px 0 2px;
+      }
+      .patient-grid {
+        display: grid;
+        gap: 14px;
+      }
+      .patient-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        padding: 20px;
+        text-align: left;
+        color: var(--ink);
+        transition:
+          transform 0.18s,
+          border-color 0.18s;
+        min-width: 0;
+      }
+      .patient-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+      }
+      .patient-top {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+      .avatar {
+        background: var(--soft);
+        color: var(--primary);
+        width: 47px;
+        height: 47px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        flex-shrink: 0;
+        font-size: 0.875rem;
+        font-weight: 650;
+      }
+      .patient-top h2 {
+        font-size: 1rem;
+        overflow-wrap: anywhere;
+      }
+      .patient-top small {
+        display: block;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .patient-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid var(--line);
+        font-size: 0.875rem;
+      }
+      .patient-details {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin: 20px 0;
+      }
+      .patient-details small {
+        color: var(--muted);
+        display: block;
+        margin-bottom: 3px;
+      }
+      .patient-details p {
+        overflow-wrap: anywhere;
+        font-size: 0.875rem;
+      }
+      .balance-title {
+        font-size: 2rem;
+        font-weight: 650;
+        letter-spacing: -1px;
+        margin: 8px 0;
+      }
+      .period-card {
+        background: var(--soft);
+      }
+      .summary-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin: 13px 0;
+        font-size: 0.875rem;
+      }
+      .summary-line.total {
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+        font-weight: 650;
+      }
+      .economy-grid {
+        display: grid;
+        gap: 18px;
+        margin-bottom: 20px;
+      }
+      .ledger-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 0;
+        border-top: 1px solid var(--line);
+      }
+      .ledger-row:first-child {
+        border: 0;
+      }
+      .ledger-left {
+        flex: 1;
+        min-width: 0;
+      }
+      .ledger-left strong {
+        display: block;
+        font-size: 0.9rem;
+        overflow-wrap: anywhere;
+      }
+      .ledger-left small {
+        color: var(--muted);
+        display: block;
+        margin-top: 4px;
+      }
+      .ledger-amount {
+        font-size: 0.95rem;
+        font-weight: 650;
+        white-space: nowrap;
+      }
+      .positive {
+        color: var(--primary);
+      }
+      .negative {
+        color: var(--red);
+      }
+      .chart {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 5px;
+        min-height: 150px;
+        align-items: end;
+        padding-top: 14px;
+      }
+      .chart-month {
+        background: transparent;
+        color: var(--muted);
+        padding: 0 1px;
+        min-width: 0;
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-end;
+        font-size: 0.75rem;
+      }
+      .chart-bars {
+        height: 100px;
+        display: flex;
+        gap: 3px;
+        align-items: flex-end;
+        justify-content: center;
+        border-bottom: 1px solid var(--line);
+      }
+      .bar {
+        width: 40%;
+        border-radius: 4px 4px 0 0;
+        background: var(--primary);
+        min-height: 2px;
+      }
+      .bar.expense {
+        background: var(--peach-ink);
+      }
+      .chart-month.active {
+        color: var(--primary);
+        font-weight: 700;
+        background: var(--soft);
+      }
+      .chart-month span {
+        padding-top: 9px;
+      }
+      .legend {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 0.75rem;
+        margin-top: 15px;
+      }
+      .legend i {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--primary);
+        margin-right: 5px;
+      }
+      .legend i.expense {
+        background: var(--peach-ink);
+      }
+      .settings-grid {
+        display: grid;
+        gap: 18px;
+      }
+      .setting-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 0;
+        border-bottom: 1px solid var(--line);
+        gap: 16px;
+        font-size: 0.875rem;
+      }
+      .setting-line:last-child {
+        border: 0;
+      }
+      .setting-line small {
+        color: var(--muted);
+        display: block;
+      }
+      .download-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: calc(72px + env(safe-area-inset-bottom));
+        padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+        background: var(--surface);
+        border-top: 1px solid var(--line);
+        display: flex;
+        z-index: 20;
+        box-shadow: 0 -5px 20px #00000003;
+      }
+      .bottom-nav button {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--muted);
+        background: transparent;
+        font-size: 0.75rem;
+        border-radius: 11px;
+        min-width: 0;
+      }
+      .bottom-nav button.active {
+        color: var(--primary);
+        background: var(--soft);
+      }
+      .fab {
+        position: fixed;
+        bottom: calc(89px + env(safe-area-inset-bottom));
+        right: 20px;
+        border-radius: 18px;
+        background: var(--primary);
+        color: var(--surface);
+        box-shadow: 0 8px 24px #3a245335;
+        width: 54px;
+        height: 54px;
+        z-index: 19;
+        font-size: 2rem;
+        line-height: 1;
+      }
+      .fab:hover {
+        transform: translateY(-2px);
+      }
+      [data-theme="dark"] .fab {
+        color: #251632;
+      }
+      dialog {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 0;
+        background: var(--surface);
+        color: var(--ink);
+        width: min(620px, calc(100% - 24px));
+        max-height: calc(100dvh - 40px);
+        box-shadow: var(--shadow);
+        overscroll-behavior: contain;
+      }
+      dialog::backdrop {
+        background: #24152e65;
+        backdrop-filter: blur(4px);
+      }
+      dialog[open] {
+        animation: appear 0.2s ease;
+      }
+      .modal-head {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+        padding: 16px 20px;
+      }
+      .modal-head h2 {
+        font-size: 1.2rem;
+      }
+      #modal-body {
+        padding: 20px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.875rem;
+        color: var(--ink);
+        min-width: 0;
+      }
+      .field small {
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 12px;
+        color: var(--ink);
+        width: 100%;
+        min-height: 46px;
+        min-width: 0;
+      }
+      .field textarea {
+        resize: vertical;
+        min-height: 86px;
+      }
+      .field.full {
+        grid-column: 1/-1;
+      }
+      .form-actions {
+        margin-top: 23px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      .form-error {
+        background: var(--red-soft);
+        color: var(--red);
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        margin: 16px 0;
+        overflow-wrap: anywhere;
+      }
+      .form-error:empty {
+        display: none;
+      }
+      .detail-hero {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        margin: 2px 0 18px;
+      }
+      .detail-hero .avatar {
+        width: 58px;
+        height: 58px;
+        font-size: 1.1rem;
+      }
+      .detail-title {
+        font-size: 1.25rem;
+        font-weight: 650;
+        overflow-wrap: anywhere;
+      }
+      .detail-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .detail-stat {
+        background: var(--surface2);
+        border-radius: 12px;
+        padding: 12px;
+        min-width: 0;
+      }
+      .detail-stat small {
+        display: block;
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+      .detail-stat b {
+        font-size: 1rem;
+        display: block;
+        margin-top: 4px;
+        overflow-wrap: anywhere;
+      }
+      .detail-section {
+        margin-top: 24px;
+      }
+      .detail-section h3 {
+        margin-bottom: 12px;
+      }
+      .search-results {
+        margin-top: 15px;
+      }
+      .search-result {
+        display: flex;
+        gap: 12px;
+        width: 100%;
+        align-items: center;
+        text-align: left;
+        background: transparent;
+        border-bottom: 1px solid var(--line);
+        padding: 15px 0;
+        color: var(--ink);
+      }
+      .search-result small {
+        display: block;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .search-result:hover {
+        background: var(--soft);
+      }
+      .quick-menu {
+        display: grid;
+        gap: 9px;
+      }
+      .quick-menu .btn {
+        justify-content: flex-start;
+        padding: 15px;
+        font-size: 1rem;
+      }
+      #notices {
+        position: fixed;
+        bottom: calc(155px + env(safe-area-inset-bottom));
+        left: 16px;
+        right: 16px;
+        z-index: 50;
+        pointer-events: none;
+        display: grid;
+        gap: 8px;
+        justify-items: center;
+      }
+      .toast {
+        background: var(--ink);
+        color: var(--surface);
+        padding: 12px 18px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        font-size: 0.875rem;
+        max-width: 500px;
+        animation: appear 0.2s ease;
+      }
+      .toast.error {
+        background: var(--red);
+        color: #fff;
+      }
+      .import-report {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 15px;
+        font-size: 0.875rem;
+        line-height: 1.8;
+        margin: 15px 0;
+      }
+      .hidden {
+        display: none !important;
+      }
+      @keyframes appear {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @media (min-width: 540px) {
+        main {
+          padding: 32px 28px;
+        }
+        .form-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .patient-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .global-search .search-label {
+          display: inline;
+        }
+        .global-search {
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          background: var(--surface);
+          font-size: 0.875rem;
+          max-width: 430px;
+          flex: 1;
+        }
+        .month-cell {
+          min-height: 110px;
+          padding: 8px;
+        }
+        .mobile-count {
+          display: none;
+        }
+        .month-event {
+          display: block;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+          background: var(--blue-soft);
+          color: var(--blue);
+          padding: 3px 5px;
+          font-size: 0.75rem;
+          text-align: left;
+          border-radius: 5px;
+          width: 100%;
+          margin-bottom: 4px;
+          min-height: 25px;
+        }
+        .month-event.Realizado {
+          background: var(--soft);
+          color: var(--primary);
+        }
+        .month-event.Cancelado,
+        .month-event.Ausente {
+          background: var(--red-soft);
+          color: var(--red);
+        }
+        .month-event.pending {
+          background: var(--peach);
+          color: var(--peach-ink);
+        }
+      }
+      @media (min-width: 900px) {
+        .sidebar {
+          display: flex;
+          flex-direction: column;
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 228px;
+          background: var(--surface);
+          border-right: 1px solid var(--line);
+          padding: 35px 22px;
+        }
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 11px;
+          text-decoration: none;
+          font-size: 1.85rem;
+          letter-spacing: -1.2px;
+          font-weight: 700;
+        }
+        .brand small {
+          font-size: 0.65rem;
+          letter-spacing: 2.2px;
+          color: var(--muted);
+          display: block;
+          font-weight: 500;
+          margin-top: -3px;
+        }
+        .brand-mark {
+          background: var(--primary);
+          color: var(--surface);
+          border-radius: 14px;
+          width: 42px;
+          height: 44px;
+          text-align: center;
+          font-size: 2rem;
+          line-height: 1.15;
+          font-weight: 500;
+        }
+        [data-theme="dark"] .brand-mark {
+          color: #251632;
+        }
+        #desktop-nav {
+          display: grid;
+          gap: 7px;
+          margin-top: 45px;
+        }
+        #desktop-nav button {
+          display: flex;
+          align-items: center;
+          gap: 13px;
+          min-height: 48px;
+          padding: 12px 14px;
+          border-radius: 12px;
+          background: transparent;
+          color: var(--muted);
+          font-size: 0.9rem;
+          text-align: left;
+        }
+        #desktop-nav button.active {
+          background: var(--soft);
+          color: var(--primary);
+          font-weight: 600;
+        }
+        .sidebar-bottom {
+          margin-top: auto;
+          font-size: 0.8125rem;
+          color: var(--muted);
+          line-height: 1.7;
+          padding: 16px 8px 0;
+        }
+        .sidebar-bottom small {
+          display: block;
+          font-size: 0.75rem;
+          margin: 8px 0 4px;
+        }
+        .local-dot {
+          display: inline-block;
+          width: 7px;
+          height: 7px;
+          background: var(--primary);
+          border-radius: 50%;
+          margin-right: 5px;
+        }
+        .workspace {
+          margin-left: 228px;
+        }
+        .topbar {
+          padding: 0 36px;
+          height: 87px;
+        }
+        .mobile-brand {
+          display: none;
+        }
+        .global-search {
+          max-width: 425px;
+        }
+        .search-shortcut {
+          display: block;
+          font-size: 0.75rem;
+          background: var(--surface2);
+          border-radius: 5px;
+          padding: 2px 5px;
+          margin-left: auto;
+        }
+        .bottom-nav {
+          display: none;
+        }
+        main {
+          padding: 34px 36px 46px;
+        }
+        .page-heading {
+          margin-bottom: 30px;
+        }
+        h1 {
+          font-size: 2.3rem;
+        }
+        .stats {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px;
+        }
+        .dashboard-grid {
+          grid-template-columns: minmax(0, 1.65fr) minmax(290px, 1fr);
+          gap: 22px;
+        }
+        .economy-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .settings-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .desktop-week {
+          display: block;
+        }
+        .mobile-week {
+          display: none;
+        }
+        .week-columns {
+          gap: 6px;
+        }
+        .week-event {
+          font-size: 0.8125rem;
+        }
+        .fab {
+          bottom: 28px;
+          right: 30px;
+        }
+        .page-footer {
+          padding-bottom: 35px;
+          text-align: left;
+          padding-left: 36px;
+        }
+        #notices {
+          bottom: 35px;
+          left: 248px;
+          right: 95px;
+        }
+        .stat .number {
+          font-size: 1.75rem;
+        }
+        .toolbar .grow {
+          max-width: 420px;
+        }
+        .date-nav strong {
+          font-size: 1.05rem;
+        }
+        .month-cell {
+          min-height: 125px;
+        }
+        .patient-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (min-width: 1300px) {
+        .sidebar {
+          width: 250px;
+          padding: 35px 28px;
+        }
+        .workspace {
+          margin-left: 250px;
+        }
+        main {
+          padding: 42px 48px;
+        }
+        .topbar {
+          padding: 0 48px;
+        }
+        .patient-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .week-columns {
+          gap: 10px;
+        }
+        .week-column {
+          padding: 15px 10px;
+        }
+        .stats {
+          gap: 20px;
+        }
+        .stat {
+          padding: 23px;
+        }
+        .stat .number {
+          font-size: 2rem;
+        }
+        .dashboard-grid {
+          gap: 24px;
+        }
+        #notices {
+          left: 270px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+      @media print {
+        .sidebar,
+        .topbar,
+        .bottom-nav,
+        .fab,
+        .page-footer,
+        .page-heading .actions,
+        .toolbar,
+        .row-actions {
+          display: none !important;
+        }
+        .workspace {
+          margin: 0;
+        }
+        body {
+          background: white;
+          color: black;
+        }
+        main {
+          padding: 0;
+        }
+        .card,
+        .stat {
+          break-inside: avoid;
+          box-shadow: none;
+          border-color: #ccc;
+        }
+        .dashboard-grid,
+        .economy-grid {
+          display: block;
+        }
+        dialog {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 539px) {
+        .date-nav {
+          flex-wrap: wrap;
+        }
+        .date-nav strong {
+          order: -1;
+          flex-basis: 100%;
+          text-align: left;
+          margin: 0 0 5px;
+        }
+        .date-nav .actions {
+          flex-wrap: nowrap;
+          gap: 4px;
+        }
+        .date-nav .input {
+          width: 145px;
+          max-width: 145px;
+        }
+        .month-cell .day-number {
+          width: 100%;
+          min-height: 44px;
+          padding: 4px 0;
+        }
+        .calendar {
+          margin-left: -8px;
+          margin-right: -8px;
+        }
+        .mobile-count {
+          border: 0;
+          background: transparent;
+          font-size: 0.75rem;
+          min-height: 24px;
+          width: 100%;
+          padding: 0;
+        }
+        .week-mini {
+          gap: 2px;
+        }
+        .week-day {
+          min-height: 90px;
+        }
+        .card {
+          padding: 20px;
+        }
+        .page-heading h1 {
+          font-size: 1.8rem;
+        }
+        .page-heading .btn {
+          padding: 11px 13px;
+        }
+      }
+
+      /* Discreet floral details, violet geometry and a dismissible welcome. */
+      .brand-flower {
+        font-size: 0.85rem;
+        color: var(--primary);
+        margin-left: 3px;
+        letter-spacing: 0;
+      }
+      .mobile-brand .mobile-flower {
+        font-size: 0.9rem;
+        margin-left: 6px;
+        vertical-align: middle;
+        color: var(--primary);
+      }
+      .flower-button {
+        background: var(--soft);
+        color: var(--primary);
+        font-size: 1.55rem;
+        min-width: 44px;
+        min-height: 44px;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+      .flower-button:hover {
+        background: var(--surface2);
+        transform: rotate(12deg);
+      }
+      .next-card {
+        position: relative;
+        overflow: hidden;
+      }
+      .next-card::after {
+        content: "";
+        position: absolute;
+        right: 19px;
+        top: 17px;
+        width: 48px;
+        height: 48px;
+        border: 1px dotted var(--primary);
+        border-radius: 50%;
+        opacity: 0.13;
+        box-shadow:
+          0 0 0 5px var(--soft),
+          0 0 0 6px var(--primary),
+          0 0 0 11px var(--soft),
+          0 0 0 12px var(--primary);
+        pointer-events: none;
+      }
+      .next-card > * {
+        position: relative;
+        z-index: 1;
+      }
+      .next-card > .eyebrow {
+        padding-right: 70px;
+      }
+      .welcome-card {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        padding: 19px 56px 17px 20px;
+        margin-bottom: 28px;
+        min-width: 0;
+      }
+      .welcome-flower {
+        font-size: 1.75rem;
+        line-height: 1.3;
+        color: var(--primary);
+        opacity: 0.65;
+        flex-shrink: 0;
+        margin-top: 4px;
+      }
+      .welcome-content {
+        min-width: 0;
+      }
+      .welcome-label {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        color: var(--primary);
+        margin-bottom: 7px;
+      }
+      .welcome-card blockquote {
+        font-size: 1rem;
+        line-height: 1.65;
+        margin: 0 0 8px;
+        color: var(--ink);
+        font-weight: 500;
+      }
+      .welcome-credit {
+        font-size: 0.75rem;
+        color: var(--muted);
+        line-height: 1.8;
+      }
+      .welcome-credit span {
+        padding: 0 3px;
+      }
+      .welcome-credit a {
+        color: var(--primary);
+        text-underline-offset: 3px;
+      }
+      .welcome-close {
+        position: absolute;
+        right: 7px;
+        top: 7px;
+      }
+      .welcome-disable {
+        background: transparent;
+        color: var(--muted);
+        min-height: 40px;
+        font-size: 0.75rem;
+        padding: 5px 0 0;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      @media (max-width: 539px) {
+        .welcome-card {
+          gap: 10px;
+          padding: 16px 43px 12px 14px;
+          margin-bottom: 22px;
+        }
+        .welcome-flower {
+          font-size: 1.2rem;
+        }
+        .welcome-card blockquote {
+          font-size: 0.9rem;
+        }
+        .welcome-credit {
+          font-size: 0.75rem;
+        }
+        .welcome-close {
+          right: 0;
+          top: 1px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .flower-button:hover {
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Ir al contenido</a>
+    <aside class="sidebar">
+      <a class="brand" href="#hoy" aria-label="Camicas, inicio"
+        ><span class="brand-mark">c</span
+        ><span
+          >camicas<small
+            >CONSULTORIO <span class="brand-flower" aria-hidden="true">✿</span></small
+          ></span
+        ></a
+      >
+      <nav id="desktop-nav" aria-label="Navegación principal"></nav>
+      <div class="sidebar-bottom">
+        <span class="local-dot"></span> En este dispositivo<small id="sidebar-backup"
+          >Guardá una copia de respaldo</small
+        ><button class="text-button" data-act="export">Descargar respaldo</button>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <a class="mobile-brand" href="#hoy"
+          >camicas<span class="mobile-flower" aria-hidden="true">✿</span></a
+        ><button class="global-search" data-act="search">
+          <span class="search-label">Buscar pacientes o turnos</span
+          ><span class="search-shortcut">Ctrl K</span>
+        </button>
+        <div class="header-actions">
+          <button
+            class="icon-button"
+            id="theme-toggle"
+            data-act="theme"
+            aria-label="Cambiar a modo oscuro"
+          ></button
+          ><button
+            class="profile-button flower-button"
+            data-nav="mas"
+            aria-label="Abrir preferencias"
+            title="Preferencias"
+          >
+            <span aria-hidden="true">✿</span>
+          </button>
+        </div>
+      </header>
+      <main id="main" tabindex="-1"></main>
+      <footer class="page-footer">
+        Camicas 2.0 <span>·</span> Datos guardados en este navegador
+      </footer>
+    </div>
+    <nav class="bottom-nav" id="mobile-nav" aria-label="Navegación móvil"></nav>
+    <button class="fab" data-act="quick" aria-label="Abrir acciones rápidas">+</button>
+    <dialog id="modal" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <h2 id="modal-title"></h2>
+        <button class="icon-button" data-act="close" aria-label="Cerrar ventana">×</button>
+      </div>
+      <div id="modal-body"></div>
+    </dialog>
+    <div id="notices" role="status" aria-live="polite"></div>
+    <script>
+      "use strict";
+      // Camicas 2.0 — standalone data layer. No network requests or external libraries.
+      const STORE = "camicas.v2.data",
+        PREVIOUS = "camicas.v2.previous",
+        VERSION = 2;
+      const storageGet = (k) => {
+        try {
+          return localStorage.getItem(k);
+        } catch {
+          return null;
+        }
+      };
+      const TABLES = [
+        "patients",
+        "appointments",
+        "payments",
+        "payment_allocations",
+        "other_income",
+        "expenses",
+        "savings",
+        "balance_items",
+        "balance_movements",
+        "categories",
+        "settings",
+        "tasks",
+      ];
+      const uuid = () =>
+        globalThis.crypto?.randomUUID?.() ||
+        "cx-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+      const clone = (x) => JSON.parse(JSON.stringify(x));
+      const cents = (x) => Math.round((Number(x) || 0) * 100),
+        amount = (x) => Math.round(x) / 100;
+      const sum = (rows, key = "amount") => amount(rows.reduce((s, r) => s + cents(r[key]), 0));
+      const iso = (d) =>
+        [
+          d.getUTCFullYear(),
+          String(d.getUTCMonth() + 1).padStart(2, "0"),
+          String(d.getUTCDate()).padStart(2, "0"),
+        ].join("-");
+      const dateObj = (s) => new Date(s + "T12:00:00Z");
+      const addDays = (s, n) => {
+        const d = dateObj(s);
+        d.setUTCDate(d.getUTCDate() + n);
+        return iso(d);
+      };
+      const addMonths = (s, n) => {
+        const d = dateObj(s),
+          day = d.getUTCDate();
+        d.setUTCDate(1);
+        d.setUTCMonth(d.getUTCMonth() + n);
+        const end = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+        d.setUTCDate(Math.min(day, end));
+        return iso(d);
+      };
+      const today = () =>
+        new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/Argentina/Cordoba",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date());
+      const monthOf = (s) => String(s || "").slice(0, 7);
+      const weekStart = (s) => {
+        const day = dateObj(s).getUTCDay();
+        return addDays(s, -((day + 6) % 7));
+      };
+      const validDate = (s) =>
+        typeof s === "string" &&
+        /^\d{4}-\d{2}-\d{2}$/.test(s) &&
+        !Number.isNaN(dateObj(s).getTime()) &&
+        iso(dateObj(s)) === s;
+      const validMonth = (s) => typeof s === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(s);
+      const validTime = (s) => typeof s === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
+      const fmtDate = (s, opts = { day: "numeric", month: "short" }) =>
+        validDate(s)
+          ? new Intl.DateTimeFormat("es-AR", { ...opts, timeZone: "UTC" }).format(dateObj(s))
+          : "—";
+      const money = (n) =>
+        new Intl.NumberFormat("es-AR", {
+          style: "currency",
+          currency: "ARS",
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 0,
+        }).format(Number(n) || 0);
+      const esc = (s) =>
+        String(s ?? "").replace(
+          /[&<>"']/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+        );
+      const normalize = (s) =>
+        String(s || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+      const DEFAULTS = {
+        app_name: "camicas",
+        default_duration: 50,
+        default_fee: 40000,
+        modalities: ["Presencial", "Virtual"],
+        frequencies: ["Semanal", "Quincenal", "Mensual"],
+        payment_methods: ["Mercado Pago", "Efectivo", "Transferencia", "Tarjeta", "Débito"],
+      };
+      function emptyData() {
+        const data = Object.fromEntries(TABLES.map((t) => [t, []]));
+        data.categories = [
+          "Consultorio",
+          "Servicios e impuestos",
+          "Formación",
+          "Personal",
+          "Otros",
+        ].map((name) => ({ id: uuid(), name, active: 1, group_name: "Otros" }));
+        return {
+          app: "camicas",
+          version: VERSION,
+          revision: 0,
+          updatedAt: null,
+          lastBackup: null,
+          data,
+        };
+      }
+      function getSetting(key, store = db) {
+        const row = store.data.settings.find((x) => x.key === key);
+        if (!row) return DEFAULTS[key];
+        let value = row.value;
+        try {
+          value = JSON.parse(value);
+        } catch {}
+        return value ?? DEFAULTS[key];
+      }
+      function setSetting(store, key, value) {
+        const row = store.data.settings.find((x) => x.key === key);
+        const val = typeof value === "string" ? value : JSON.stringify(value);
+        if (row) {
+          row.value = val;
+          row.updated_at = new Date().toISOString();
+        } else
+          store.data.settings.push({
+            id: uuid(),
+            key,
+            value: val,
+            updated_at: new Date().toISOString(),
+          });
+      }
+      function listSetting(key) {
+        const v = getSetting(key);
+        return Array.isArray(v) && v.length ? v : DEFAULTS[key];
+      }
+      const patients = (store = db) => store.data.patients;
+      const appointments = (store = db) => store.data.appointments;
+      const patient = (id, store = db) => patients(store).find((x) => x.id === id);
+      const appointment = (id, store = db) => appointments(store).find((x) => x.id === id);
+      const activePayments = (store = db) => store.data.payments.filter((x) => !x.reversed);
+      function allocations(store = db) {
+        const ids = new Set(activePayments(store).map((x) => x.id));
+        return store.data.payment_allocations.filter((x) => ids.has(x.payment_id));
+      }
+      function paid(a, store = db) {
+        return sum(allocations(store).filter((x) => x.appointment_id === a.id));
+      }
+      function charge(a) {
+        return a.appointment_status === "Cancelado" || a.financial_status === "Bonificado"
+          ? 0
+          : Number(a.fee) || 0;
+      }
+      function pending(a, store = db) {
+        return amount(Math.max(0, cents(charge(a)) - cents(paid(a, store))));
+      }
+      function credit(a, store = db) {
+        return amount(Math.max(0, cents(paid(a, store)) - cents(charge(a))));
+      }
+      function patientDebt(id, store = db) {
+        return amount(
+          appointments(store)
+            .filter((a) => a.patient_id === id)
+            .reduce((s, a) => s + cents(pending(a, store)), 0),
+        );
+      }
+      function patientCredit(id, store = db) {
+        return amount(
+          appointments(store)
+            .filter((a) => a.patient_id === id)
+            .reduce((s, a) => s + cents(credit(a, store)), 0),
+        );
+      }
+      function totals(month, store = db) {
+        const a = appointments(store).filter((x) => monthOf(x.date) === month),
+          p = activePayments(store).filter((x) => monthOf(x.date) === month),
+          other = store.data.other_income.filter((x) => !x.deleted && monthOf(x.date) === month),
+          e = store.data.expenses.filter((x) => !x.deleted && monthOf(x.date) === month),
+          s = store.data.savings.filter((x) => !x.deleted && monthOf(x.date) === month),
+          incoming = store.data.savings.filter(
+            (x) => !x.deleted && x.type === "Traspaso" && x.destination_month === month,
+          );
+        const collected = sum(p),
+          extra = sum(other),
+          expenses = sum(e.filter((x) => x.status === "Pagado")),
+          saving = sum(s),
+          transfers = sum(incoming),
+          expected = amount(a.reduce((n, x) => n + cents(charge(x)), 0)),
+          due = amount(a.reduce((n, x) => n + cents(pending(x, store)), 0));
+        return {
+          collected,
+          extra,
+          expenses,
+          saving,
+          transfers,
+          expected,
+          due,
+          result: amount(cents(collected) + cents(extra) - cents(expenses)),
+          available: amount(
+            cents(collected) + cents(extra) - cents(expenses) - cents(saving) + cents(transfers),
+          ),
+          planned: sum(e.filter((x) => x.status !== "Pagado")),
+          count: a.filter((x) => x.appointment_status !== "Cancelado").length,
+          completed: a.filter((x) => x.appointment_status === "Realizado").length,
+        };
+      }
+      const sorted = (rows) =>
+        [...rows].sort((a, b) =>
+          (a.date + " " + a.start_time).localeCompare(b.date + " " + b.start_time),
+        );
+      const minutes = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+      function collision(proposed, existing, exclude = new Set()) {
+        const all = [
+          ...existing.filter((x) => !exclude.has(x.id) && x.appointment_status !== "Cancelado"),
+          ...proposed.filter((x) => x.appointment_status !== "Cancelado"),
+        ];
+        for (let i = 0; i < all.length; i++)
+          for (let j = i + 1; j < all.length; j++) {
+            const a = all[i],
+              b = all[j];
+            if (!proposed.some((x) => x.id === a.id || x.id === b.id)) continue;
+            if (
+              a.date === b.date &&
+              minutes(a.start_time) < minutes(b.start_time) + Number(b.duration_minutes) &&
+              minutes(b.start_time) < minutes(a.start_time) + Number(a.duration_minutes)
+            )
+              return { date: a.date, time: a.start_time };
+          }
+        return null;
+      }
+      function recurDates(start, frequency, count) {
+        return Array.from({ length: count }, (_, i) =>
+          frequency === "monthly"
+            ? addMonths(start, i)
+            : addDays(start, i * (frequency === "biweekly" ? 14 : 7)),
+        );
+      }
+      function financialSync(a, store) {
+        if (a.financial_status === "Bonificado") return;
+        a.financial_status =
+          pending(a, store) > 0 ? (paid(a, store) > 0 ? "Parcial" : "Pendiente") : "Cobrado";
+      }
+      function cashEffect(
+        store,
+        { date, method, delta, description, paymentId = null, appointmentId = null, sourceKey },
+      ) {
+        if (!cents(delta)) return;
+        const m = monthOf(date);
+        let item = store.data.balance_items.find(
+          (x) => x.kind === "Activo" && x.month === m && normalize(x.name) === normalize(method),
+        );
+        if (!item) {
+          item = {
+            id: uuid(),
+            kind: "Activo",
+            month: m,
+            name: method,
+            amount: 0,
+            note: "",
+            automatic_key: "v2:" + method,
+            created_at: new Date().toISOString(),
+          };
+          store.data.balance_items.push(item);
+        }
+        item.amount = amount(cents(item.amount) + cents(delta));
+        store.data.balance_movements.push({
+          id: uuid(),
+          balance_item_id: item.id,
+          payment_id: paymentId,
+          appointment_id: appointmentId,
+          date,
+          amount: Math.abs(delta),
+          signed_delta: delta,
+          movement_type: delta >= 0 ? "Ingreso" : "Egreso",
+          description,
+          origin: "camicas-v2",
+          source_key: sourceKey,
+          created_at: new Date().toISOString(),
+        });
+      }
+      function undoCash(store, sourceKey) {
+        const movements = store.data.balance_movements.filter(
+          (x) => x.source_key === sourceKey && x.origin === "camicas-v2" && !x.reversed,
+        );
+        for (const movement of movements) {
+          const item = store.data.balance_items.find((x) => x.id === movement.balance_item_id);
+          if (item) item.amount = amount(cents(item.amount) - cents(movement.signed_delta));
+          movement.reversed = true;
+        }
+      }
+      function registerPayment(store, { appointmentId, amount: value, date, method }) {
+        const a = appointment(appointmentId, store);
+        if (!a) throw Error("Elegí un turno válido.");
+        if (a.appointment_status === "Cancelado" || a.financial_status === "Bonificado")
+          throw Error("Este turno no admite un nuevo cobro.");
+        if (!validDate(date)) throw Error("Revisá la fecha del cobro.");
+        if (cents(value) <= 0 || cents(value) > cents(pending(a, store)))
+          throw Error("El importe debe ser mayor a cero y no superar el saldo del turno.");
+        const p = {
+          id: uuid(),
+          patient_id: a.patient_id,
+          amount: amount(cents(value)),
+          date,
+          method,
+          created_at: new Date().toISOString(),
+          note: "",
+        };
+        store.data.payments.push(p);
+        store.data.payment_allocations.push({
+          id: uuid(),
+          payment_id: p.id,
+          appointment_id: a.id,
+          amount: p.amount,
+          created_at: p.created_at,
+        });
+        cashEffect(store, {
+          date,
+          method,
+          delta: p.amount,
+          description: "Cobro de sesión",
+          paymentId: p.id,
+          appointmentId: a.id,
+          sourceKey: "payment:" + p.id,
+        });
+        financialSync(a, store);
+        return p;
+      }
+      function reversePayment(store, id) {
+        const p = store.data.payments.find((x) => x.id === id);
+        if (!p || p.reversed) throw Error("El cobro ya fue anulado.");
+        const own = store.data.balance_movements.some(
+          (x) => x.source_key === "payment:" + id && x.origin === "camicas-v2",
+        );
+        if (own) undoCash(store, "payment:" + id);
+        else {
+          for (const m of store.data.balance_movements.filter(
+            (x) => x.payment_id === id && !x.reversed,
+          )) {
+            const item = store.data.balance_items.find((x) => x.id === m.balance_item_id);
+            if (item) item.amount = amount(cents(item.amount) - cents(m.amount));
+            m.reversed = true;
+          }
+        }
+        p.reversed = true;
+        p.reversed_at = new Date().toISOString();
+        for (const link of store.data.payment_allocations.filter((x) => x.payment_id === id)) {
+          const a = appointment(link.appointment_id, store);
+          if (a) financialSync(a, store);
+        }
+      }
+      function assertImport(input) {
+        if (!input || typeof input !== "object" || Array.isArray(input))
+          throw Error("El archivo no es una copia de Camicas.");
+        if (input.version != null && input.version !== VERSION)
+          throw Error("La versión de esta copia no es compatible.");
+        const raw = input.data;
+        if (
+          !raw ||
+          typeof raw !== "object" ||
+          !Array.isArray(raw.patients) ||
+          !Array.isArray(raw.appointments) ||
+          !Array.isArray(raw.payments) ||
+          !Array.isArray(raw.payment_allocations)
+        )
+          throw Error("Faltan las tablas de pacientes, turnos, cobros o asignaciones.");
+        const result = {
+          ...clone(input),
+          app: "camicas",
+          version: VERSION,
+          data: { ...clone(raw) },
+        };
+        for (const table of TABLES) {
+          const rows = raw[table] ?? [];
+          if (!Array.isArray(rows)) throw Error("La tabla " + table + " debe ser una lista.");
+          if (rows.length > 100000) throw Error("La tabla " + table + " es demasiado grande.");
+          result.data[table] = clone(rows);
+          const ids = new Set();
+          for (const row of rows) {
+            if (
+              !row ||
+              typeof row !== "object" ||
+              typeof row.id !== "string" ||
+              !row.id.trim() ||
+              ids.has(row.id)
+            )
+              throw Error("Hay un identificador ausente o duplicado en " + table + ".");
+            ids.add(row.id);
+            for (const key of ["amount", "fee", "default_fee", "signed_delta"])
+              if (
+                row[key] != null &&
+                (!Number.isFinite(Number(row[key])) ||
+                  Math.abs(Number(row[key])) > 1e12 ||
+                  (!["balance_items", "balance_movements"].includes(table) && Number(row[key]) < 0))
+              )
+                throw Error("Hay un importe inválido en " + table + ".");
+            if (row.date != null && !validDate(row.date))
+              throw Error("Hay una fecha inválida en " + table + ".");
+          }
+        }
+        const ids = (t) => new Set(result.data[t].map((x) => x.id)),
+          pid = ids("patients"),
+          aid = ids("appointments"),
+          payid = ids("payments"),
+          bid = ids("balance_items");
+        for (const p of result.data.patients)
+          if (
+            typeof p.name !== "string" ||
+            !p.name.trim() ||
+            !["Activo", "Inactivo"].includes(p.status)
+          )
+            throw Error("Hay una ficha sin nombre o con estado inválido.");
+        for (const a of result.data.appointments)
+          if (
+            !pid.has(a.patient_id) ||
+            !validDate(a.date) ||
+            !validTime(a.start_time) ||
+            !Number.isFinite(Number(a.duration_minutes)) ||
+            Number(a.duration_minutes) < 5 ||
+            minutes(a.start_time) + Number(a.duration_minutes) > 1440 ||
+            !["Agendado", "Realizado", "Ausente", "Cancelado"].includes(a.appointment_status) ||
+            a.fee == null
+          )
+            throw Error("Hay un turno con datos inválidos o paciente inexistente.");
+        for (const p of result.data.payments)
+          if (
+            !pid.has(p.patient_id) ||
+            !validDate(p.date) ||
+            p.amount == null ||
+            typeof p.method !== "string"
+          )
+            throw Error("Hay un cobro con datos incompletos o paciente inexistente.");
+        for (const x of result.data.payment_allocations) {
+          const p = result.data.payments.find((p) => p.id === x.payment_id),
+            a = result.data.appointments.find((a) => a.id === x.appointment_id);
+          if (
+            !payid.has(x.payment_id) ||
+            !aid.has(x.appointment_id) ||
+            p.patient_id !== a.patient_id ||
+            x.amount == null
+          )
+            throw Error("Hay una asignación de cobro sin referencias válidas.");
+        }
+        for (const p of result.data.payments)
+          if (
+            cents(sum(result.data.payment_allocations.filter((x) => x.payment_id === p.id))) >
+            cents(p.amount)
+          )
+            throw Error("Una asignación supera el importe del cobro.");
+        for (const x of result.data.balance_items)
+          if (
+            !validMonth(x.month) ||
+            !["Activo", "Pasivo"].includes(x.kind) ||
+            typeof x.name !== "string" ||
+            x.amount == null
+          )
+            throw Error("Hay una cuenta patrimonial inválida.");
+        for (const x of result.data.balance_movements) {
+          if (!bid.has(x.balance_item_id))
+            throw Error("Un movimiento se refiere a una cuenta inexistente.");
+          if (
+            x.origin === "camicas-v2" &&
+            (x.signed_delta == null || !Number.isFinite(Number(x.signed_delta)))
+          )
+            throw Error("Un movimiento de Camicas 2.0 no incluye su efecto en el saldo.");
+        }
+        for (const x of result.data.settings)
+          if (typeof x.key !== "string" || typeof x.value !== "string")
+            throw Error("Hay una preferencia inválida.");
+        for (const x of result.data.expenses)
+          if (
+            !validDate(x.date) ||
+            typeof x.concept !== "string" ||
+            !["Pagado", "A pagar", "Planificado"].includes(x.status) ||
+            x.amount == null
+          )
+            throw Error(
+              "El formato de un gasto no pudo verificarse. Conservá esa copia para revisarla.",
+            );
+        for (const x of result.data.savings)
+          if (
+            !validDate(x.date) ||
+            typeof x.concept !== "string" ||
+            !["Ahorro/Reserva", "Traspaso"].includes(x.type) ||
+            x.amount == null ||
+            (x.type === "Traspaso" && !validMonth(x.destination_month ?? x.destinationMonth))
+          )
+            throw Error(
+              "El formato de un ahorro no pudo verificarse. Conservá esa copia para revisarla.",
+            );
+        for (const x of result.data.savings)
+          x.destination_month = x.destination_month ?? x.destinationMonth;
+        for (const x of result.data.other_income)
+          if (
+            !validDate(x.date) ||
+            typeof x.concept !== "string" ||
+            !x.concept.trim() ||
+            x.amount == null ||
+            typeof x.method !== "string"
+          )
+            throw Error("Hay un ingreso con datos incompletos.");
+        for (const x of result.data.tasks)
+          if (
+            typeof x.title !== "string" ||
+            !x.title.trim() ||
+            (x.due != null && x.due !== "" && !validDate(x.due)) ||
+            (x.done != null && typeof x.done !== "boolean")
+          )
+            throw Error("Hay un recordatorio con datos inválidos.");
+        for (const key of ["updatedAt", "lastBackup"])
+          if (
+            input[key] != null &&
+            (!["string", "number"].includes(typeof input[key]) ||
+              Number.isNaN(new Date(input[key]).getTime()))
+          )
+            throw Error("Hay una fecha de respaldo inválida.");
+        result.revision = Number.isSafeInteger(input.revision) ? input.revision : 0;
+        result.updatedAt = input.updatedAt || null;
+        result.lastBackup = input.lastBackup || null;
+        return result;
+      }
+      let db = emptyData(),
+        loadError = null;
+      try {
+        const saved = localStorage.getItem(STORE);
+        if (saved) db = assertImport(JSON.parse(saved));
+      } catch (e) {
+        loadError =
+          "No se pudo leer el guardado local. Tus datos no fueron reemplazados. Importá una copia de respaldo o revisá el almacenamiento del navegador.";
+      }
+      let storageBlocked = Boolean(loadError);
+      function mutate(fn, success = "Cambios guardados") {
+        if (storageBlocked) {
+          toast("El guardado está bloqueado. Recuperá una copia desde Más.", true);
+          return false;
+        }
+        try {
+          if (typeof modalRevision !== "undefined" && modal.open && modalRevision !== db.revision)
+            throw Error(
+              "Los datos cambiaron desde que abriste esta ventana. Cerrala y volvé a abrirla para guardar sobre la versión actual.",
+            );
+          const saved = localStorage.getItem(STORE);
+          if (saved) {
+            const live = JSON.parse(saved);
+            if (live.revision !== db.revision) {
+              toast("Hay cambios de otra pestaña. La vista se actualizó; volvé a intentar.", true);
+              db = assertImport(live);
+              render();
+              return false;
+            }
+          }
+          const next = clone(db);
+          fn(next);
+          next.revision = db.revision + 1;
+          next.updatedAt = new Date().toISOString();
+          const checked = assertImport(next);
+          localStorage.setItem(STORE, JSON.stringify(checked));
+          db = checked;
+          render();
+          toast(success);
+          return true;
+        } catch (e) {
+          showError(e.message || "No se pudo guardar. Conservamos los datos anteriores.");
+          return false;
+        }
+      }
+
+      // UI views are generated from the saved records. Empty by default, never seeded.
+      const paths = {
+        home: "M3 10 12 3l9 7M5 9v12h14V9M9 21v-7h6v7",
+        calendar:
+          "M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2ZM3 10h18M8 3v4M16 3v4",
+        users:
+          "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M20 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
+        wallet:
+          "M3 6h16v4M3 6a2 2 0 0 1 2-2h12M3 6v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9H3M21 13h-5v4h5",
+        settings:
+          "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2",
+        search: "M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0",
+        moon: "M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10",
+        sun: "M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
+        plus: "M12 5v14M5 12h14",
+        check: "M5 12l4 4 10-10",
+        clock: "M12 8v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0",
+        coins: "M5 8c0 2 14 2 14 0s-14-2-14 0ZM5 8v9c0 3 14 3 14 0V8M5 12c0 3 14 3 14 0",
+        more: "M5 12h.01M12 12h.01M19 12h.01",
+        download: "M12 3v12M7 10l5 5 5-5M4 16v5h16v-5",
+        task: "M8 6h12M8 12h12M8 18h12M3 6h.01M3 12h.01M3 18h.01",
+        bell: "M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4",
+        phone: "M7 3H3c-1 10 8 19 18 18v-4l-5-2-2 2c-4-2-5-3-7-7l2-2-2-5",
+        edit: "M15 5l4 4M4 20l4-1L20 7a2 2 0 0 0-4-4L4 15v5",
+        chevron: "M9 5l7 7-7 7",
+        left: "M15 5l-7 7 7 7",
+        video: "M15 8l6-3v14l-6-3M3 5h12v14H3z",
+        copy: "M8 8h12v12H8zM4 16H3V3h13v1",
+        upload: "M12 16V3M7 8l5-5 5 5M4 16v5h16v-5",
+      };
+      const icon = (name) =>
+        `<svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="${paths[name] || paths.more}"/></svg>`;
+      const navItems = [
+        ["hoy", "Hoy", "home"],
+        ["agenda", "Agenda", "calendar"],
+        ["pacientes", "Pacientes", "users"],
+        ["economia", "Economía", "wallet"],
+        ["mas", "Más", "settings"],
+      ];
+      let view = {
+        page: ["hoy", "agenda", "pacientes", "economia", "mas"].includes(location.hash.slice(1))
+          ? location.hash.slice(1)
+          : "hoy",
+        agendaMode: "week",
+        date: today(),
+        month: monthOf(today()),
+        patientQuery: "",
+        patientFilter: "Activo",
+        agendaPatient: "",
+        agendaStatus: "",
+        economyTab: "actividad",
+        economyType: "all",
+        searchQuery: "",
+        showDone: false,
+      };
+      const main = document.getElementById("main"),
+        modal = document.getElementById("modal");
+      let currentModal = null,
+        returnFocus = null,
+        modalBack = null,
+        stagedImport = null,
+        modalRevision = null;
+      function badge(text, cls = text) {
+        return `<span class="pill ${esc(cls)}">${esc(text)}</span>`;
+      }
+      function btn(text, act, style = "", id = "", ico = "") {
+        return `<button type="button" class="btn ${style}" data-act="${act}"${id ? ` data-id="${esc(id)}"` : ""}>${ico ? icon(ico) : ""}${text}</button>`;
+      }
+      function empty(title, text, action = "", act = "", ico = "calendar") {
+        return `<div class="empty"><div class="empty-icon">${icon(ico)}</div><h3>${title}</h3><p>${text}</p>${action ? btn(action, act, "primary") : ""}</div>`;
+      }
+      function heading(title, sub = "", actions = "") {
+        return `<div class="page-heading"><div><div class="eyebrow">${view.page === "hoy" ? esc(fmtDate(today(), { weekday: "long", day: "numeric", month: "long" })) : "Tu consultorio"}</div><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div><div class="actions">${actions}</div></div>`;
+      }
+      function stat(label, value, sub, ico, act, attrs = "") {
+        const tag = act === "noop" ? "div" : "button";
+        return `<${tag} class="stat" ${act === "noop" ? "" : `data-act="${act}"`} ${attrs}><div class="stat-top"><span>${label}</span>${icon(ico)}</div><div class="number">${value}</div><small>${sub}</small></${tag}>`;
+      }
+      function sessionRow(a, { date = false } = {}) {
+        const p = patient(a.patient_id);
+        return `<article class="session-row"><div class="session-time">${esc(a.start_time)}<small>${date ? esc(fmtDate(a.date)) : esc(a.duration_minutes) + " min"}</small></div><div class="session-main"><button class="session-name" data-act="session" data-id="${esc(a.id)}">${esc(p?.name || "Paciente sin ficha")}</button><div class="session-info">${esc(a.modality)} <span>·</span> ${money(a.fee)}</div><div class="session-status">${badge(a.appointment_status)}${a.financial_status === "Bonificado" ? badge("Bonificado") : pending(a) > 0 ? badge(money(pending(a)) + " pendiente", "pending") : charge(a) > 0 ? badge("Cobrado", "Realizado") : ""}${credit(a) > 0 ? badge(money(credit(a)) + " a favor", "pending") : ""}</div></div><div class="row-actions"><button class="icon-button" data-act="session" data-id="${esc(a.id)}" aria-label="Opciones del turno de ${esc(p?.name)}">${icon("more")}</button></div></article>`;
+      }
+      function taskRows(limit = 50) {
+        let rows = db.data.tasks
+          .filter((t) => view.showDone || !t.done)
+          .sort((a, b) => (a.due || "9999").localeCompare(b.due || "9999"))
+          .slice(0, limit);
+        return rows.length
+          ? rows
+              .map(
+                (t) =>
+                  `<div class="task-row ${t.done ? "done" : ""}"><input type="checkbox" data-task="${esc(t.id)}" id="task-${esc(t.id)}" ${t.done ? "checked" : ""}><label for="task-${esc(t.id)}">${esc(t.title)}${t.due ? `<small>${esc(fmtDate(t.due))}${t.due < today() && !t.done ? " · Vencido" : ""}</small>` : ""}</label><button class="icon-button" data-act="task" data-id="${esc(t.id)}" aria-label="Editar recordatorio">${icon("edit")}</button></div>`,
+              )
+              .join("")
+          : empty(
+              "Sin tareas pendientes",
+              "Podés dejar acá tus recordatorios administrativos.",
+              "",
+              "",
+              "task",
+            );
+      }
+      function todayView() {
+        const day = sorted(appointments().filter((a) => a.date === today())),
+          week = appointments().filter(
+            (a) =>
+              a.date >= weekStart(today()) &&
+              a.date <= addDays(weekStart(today()), 6) &&
+              a.appointment_status !== "Cancelado",
+          ),
+          m = totals(monthOf(today())),
+          next = sorted(
+            appointments().filter((a) => a.date >= today() && a.appointment_status === "Agendado"),
+          ).find(
+            (a) =>
+              a.date > today() ||
+              a.start_time >=
+                new Intl.DateTimeFormat("en-GB", {
+                  timeZone: "America/Argentina/Cordoba",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                }).format(new Date()),
+          ),
+          overdue = appointments().filter(
+            (a) => a.date < today() && a.appointment_status === "Agendado",
+          );
+        return (
+          heading(
+            "Hoy",
+            day.length
+              ? `${day.length} ${day.length === 1 ? "turno" : "turnos"} · ${day.filter((a) => a.appointment_status === "Realizado").length} realizados`
+              : "Tu agenda está libre para empezar.",
+            btn("Nuevo turno", "appointment", "primary", "", "plus"),
+          ) +
+          `<div class="stats">${stat("Sesiones de hoy", day.filter((a) => a.appointment_status !== "Cancelado").length, `${day.filter((a) => a.appointment_status === "Agendado").length} pendientes · ${day.filter((a) => a.appointment_status === "Cancelado").length} cancelados`, "calendar", "go-day")}${stat("Esta semana", week.length, `${week.filter((a) => a.appointment_status === "Realizado").length} realizados`, "clock", "go-week")}${stat("Cobrado este mes", money(m.collected), "Según la fecha de cada cobro", "coins", "go-economy")}${stat("Pendiente del mes", money(m.due), "Según la fecha de cada sesión", "wallet", "go-debt")}</div><div class="dashboard-grid"><div class="stack"><section class="card next-card"><div class="eyebrow">Próximo turno</div>${next ? `<div class="card-head" style="margin-bottom:0"><div><div class="next-time">${esc(next.start_time)}</div><h3>${esc(patient(next.patient_id)?.name)}</h3><div class="next-meta"><span>${esc(fmtDate(next.date, { weekday: "long", day: "numeric", month: "short" }))}</span><span>${esc(next.modality)}</span><span>${next.duration_minutes} min</span></div></div>${badge(next.appointment_status)}</div><div class="actions">${btn("Ver sesión", "session", "primary", next.id)}${btn("Preparar mensaje", "whatsapp", "outline", next.id, "phone")}</div>` : empty("Un espacio para tu próximo turno", "Creá una sesión y la vas a encontrar acá.", "Agendar turno", "appointment")}</section><section class="card"><div class="card-head"><h2>Agenda del día</h2><button class="text-button" data-act="go-day">Ver agenda</button></div>${day.length ? `<div class="day-list">${day.map((a) => sessionRow(a)).join("")}</div>` : empty("Por ahora, sin turnos", "Agendá una sesión o revisá los próximos días.")}</section><section class="card"><div class="card-head"><h2>La semana, de un vistazo</h2><button class="text-button" data-act="go-week">Ver semana</button></div><div class="week-mini">${Array.from(
+            { length: 7 },
+            (_, i) => {
+              const date = addDays(weekStart(today()), i),
+                count = week.filter((a) => a.date === date).length;
+              return `<button class="week-day ${date === today() ? "today" : ""}" data-act="select-day" data-date="${date}">${esc(fmtDate(date, { weekday: "short" }))}<b>${date.slice(-2)}</b><span class="mini-count">${count}</span></button>`;
+            },
+          ).join(
+            "",
+          )}</div><div class="legend">${week.length} sesiones · ${week.filter((a) => a.appointment_status === "Realizado").length} realizadas</div></section></div><div class="stack"><section class="card"><div class="card-head"><h2>A un toque</h2></div><div class="quick-grid"><button data-act="payment">${icon("coins")}Cobro</button><button data-act="expense">${icon("wallet")}Gasto</button><button data-act="patient">${icon("users")}Paciente</button></div></section><section class="card"><div class="card-head"><h2>Recordatorios</h2><button class="icon-button" data-act="task" aria-label="Agregar recordatorio">${icon("plus")}</button></div>${overdue.length ? `<button class="alert" data-act="overdue">${icon("bell")}<span>${overdue.length} ${overdue.length === 1 ? "sesión pasada sin registrar" : "sesiones pasadas sin registrar"} asistencia.</span></button>` : ""}${m.due > 0 ? `<button class="alert info" data-act="go-debt">${icon("wallet")}<span>${money(m.due)} por cobrar de sesiones de este mes.</span></button>` : ""}${taskRows(5)}</section><section class="card"><div class="card-head"><h2>Disponible del mes</h2></div><div class="balance-title">${money(m.available)}</div><div class="summary-line"><span class="muted">Ingresos registrados</span><span>${money(m.collected + m.extra)}</span></div><div class="summary-line"><span class="muted">Gastos pagados</span><span>− ${money(m.expenses)}</span></div><div class="summary-line"><span class="muted">Ahorro y traspasos</span><span>− ${money(m.saving)}</span></div>${m.transfers ? `<div class="summary-line"><span class="muted">Traspasos recibidos</span><span>+ ${money(m.transfers)}</span></div>` : ""}<button class="text-button" data-act="go-economy">Consultar economía</button></section></div></div>`
+        );
+      }
+      function filteredAgenda() {
+        return sorted(
+          appointments().filter(
+            (a) =>
+              (!view.agendaPatient || a.patient_id === view.agendaPatient) &&
+              (!view.agendaStatus ||
+                (view.agendaStatus === "debt"
+                  ? pending(a) > 0
+                  : view.agendaStatus === "overdue"
+                    ? a.date < today() && a.appointment_status === "Agendado"
+                    : a.appointment_status === view.agendaStatus)),
+          ),
+        );
+      }
+      function agendaView() {
+        const rows = filteredAgenda(),
+          mode = view.agendaMode,
+          date = view.date,
+          start = weekStart(date),
+          end = addDays(start, 6),
+          month = monthOf(date);
+        let content = "";
+        const list = (items) =>
+          items.length
+            ? items.map((a) => sessionRow(a)).join("")
+            : empty(
+                "Sin turnos en este período",
+                "Probá otra fecha o agregá una sesión.",
+                "Crear turno",
+                "appointment",
+              );
+        if (mode === "day")
+          content = `<section class="card">${list(rows.filter((a) => a.date === date))}</section>`;
+        if (mode === "list") {
+          const items = rows
+            .filter(
+              (a) =>
+                view.agendaStatus === "overdue" ||
+                (a.date >= date &&
+                  (view.agendaStatus === "Cancelado" || a.appointment_status !== "Cancelado")),
+            )
+            .slice(0, 300);
+          let prev = "";
+          content = `<section class="card">${
+            items.length
+              ? items
+                  .map((a) => {
+                    const head =
+                      a.date !== prev
+                        ? `<div class="list-heading">${esc(fmtDate(a.date, { weekday: "long", day: "numeric", month: "long" }))}</div>`
+                        : "";
+                    prev = a.date;
+                    return head + sessionRow(a);
+                  })
+                  .join("")
+              : list([])
+          }</section>`;
+        }
+        if (mode === "week") {
+          content = `<section class="card"><div class="desktop-week"><div class="week-columns">${Array.from(
+            { length: 7 },
+            (_, i) => {
+              const d = addDays(start, i),
+                items = rows.filter((a) => a.date === d);
+              return `<div class="week-column ${d === today() ? "today" : ""}" data-drop-date="${d}"><header>${esc(fmtDate(d, { weekday: "short" }))}<b>${d.slice(-2)}</b></header>${items.map((a) => `<button draggable="true" class="week-event ${a.appointment_status} ${a.appointment_status === "Realizado" && pending(a) > 0 ? "pending" : ""}" data-drag-id="${esc(a.id)}" data-act="session" data-id="${esc(a.id)}"><b>${a.start_time}</b><small>${esc(patient(a.patient_id)?.name)}</small>${esc(a.modality)}</button>`).join("")}<button class="day-create" data-act="appointment" data-date="${d}">+ Turno</button></div>`;
+            },
+          ).join(
+            "",
+          )}</div><div class="legend">Arrastrá un turno a otro día para reprogramarlo. También podés editar su fecha.</div></div><div class="mobile-week"><div class="week-mini">${Array.from(
+            { length: 7 },
+            (_, i) => {
+              const d = addDays(start, i),
+                count = rows.filter((a) => a.date === d).length;
+              return `<button class="week-day ${d === date ? "today" : ""}" data-act="month-day" data-date="${d}">${esc(fmtDate(d, { weekday: "short" }))}<b>${Number(d.slice(-2))}</b><span class="mini-count">${count}</span></button>`;
+            },
+          ).join("")}</div>${Array.from({ length: 7 }, (_, i) => {
+            const d = addDays(start, i),
+              items = rows.filter((a) => a.date === d);
+            if (!items.length && d !== date) return "";
+            return `<div class="card-head" style="margin:15px 0 0"><h3>${esc(fmtDate(d, { weekday: "long", day: "numeric" }))}${d === today() ? " · Hoy" : ""}</h3><button class="icon-button" data-act="appointment" data-date="${d}" aria-label="Crear turno para ${esc(fmtDate(d))}">${icon("plus")}</button></div>${items.length ? items.map((a) => sessionRow(a)).join("") : '<p class="muted small" style="padding:8px 0 18px">Sin turnos</p>'}`;
+          }).join("")}</div></section>`;
+        }
+        if (mode === "month") {
+          const first = month + "-01",
+            gridStart = weekStart(first),
+            last = addMonths(first, 1),
+            weeks = Math.ceil((dateObj(last) - dateObj(gridStart)) / 86400000 / 7);
+          content = `<section class="card"><div class="calendar">${["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d) => `<div class="calendar-label">${d}</div>`).join("")}${Array.from(
+            { length: weeks * 7 },
+            (_, i) => {
+              const d = addDays(gridStart, i),
+                items = rows.filter((a) => a.date === d);
+              return `<div class="month-cell ${monthOf(d) !== month ? "outside" : ""} ${d === today() ? "today" : ""} ${d === date ? "selected" : ""}" data-drop-date="${d}"><button class="day-number" data-act="month-day" data-date="${d}" aria-label="Ver turnos del ${esc(fmtDate(d, { day: "numeric", month: "long" }))}">${Number(d.slice(-2))}</button>${items
+                .slice(0, 3)
+                .map(
+                  (a) =>
+                    `<button draggable="true" class="month-event ${a.appointment_status} ${a.appointment_status === "Realizado" && pending(a) > 0 ? "pending" : ""}" data-drag-id="${esc(a.id)}" data-act="session" data-id="${esc(a.id)}" title="${esc(a.start_time + " " + patient(a.patient_id)?.name)}">${a.start_time} ${esc(patient(a.patient_id)?.name)}</button>`,
+                )
+                .join(
+                  "",
+                )}${items.length ? `<button class="mobile-count" data-act="month-day" data-date="${d}">${items.length} ${items.length === 1 ? "turno" : "turnos"}</button>` : ""}${items.length > 3 ? `<button class="text-button small" data-act="month-day" data-date="${d}">+${items.length - 3}</button>` : ""}</div>`;
+            },
+          ).join(
+            "",
+          )}</div><div class="calendar-detail"><div class="card-head"><h2>${esc(fmtDate(date, { weekday: "long", day: "numeric", month: "long" }))}</h2>${btn("Turno", "appointment", "small", "", "plus").replace('data-act="appointment"', `data-act="appointment" data-date="${date}"`)}</div>${list(rows.filter((a) => a.date === date))}</div></section>`;
+        }
+        const period =
+          mode === "week"
+            ? fmtDate(start) + " — " + fmtDate(end)
+            : mode === "month"
+              ? fmtDate(date, { month: "long", year: "numeric" })
+              : fmtDate(date, { weekday: "long", day: "numeric", month: "long" });
+        return (
+          heading(
+            "Agenda",
+            "Cada sesión, en su lugar.",
+            btn("Nuevo turno", "appointment", "primary", "", "plus"),
+          ) +
+          `<div class="toolbar"><div class="segmented">${[
+            ["day", "Día"],
+            ["week", "Semana"],
+            ["month", "Mes"],
+            ["list", "Próximos"],
+          ]
+            .map(
+              ([v, t]) =>
+                `<button class="${mode === v ? "active" : ""}" data-agenda-mode="${v}" aria-pressed="${mode === v}">${t}</button>`,
+            )
+            .join(
+              "",
+            )}</div><select aria-label="Filtrar por paciente" id="agenda-patient"><option value="">Todos los pacientes</option>${patients()
+            .map(
+              (p) =>
+                `<option value="${esc(p.id)}" ${view.agendaPatient === p.id ? "selected" : ""}>${esc(p.name)}</option>`,
+            )
+            .join(
+              "",
+            )}</select><select aria-label="Filtrar por estado" id="agenda-status"><option value="">Todos los estados</option>${["Agendado", "Realizado", "Ausente", "Cancelado"].map((s) => `<option ${view.agendaStatus === s ? "selected" : ""}>${s}</option>`).join("")}<option value="debt" ${view.agendaStatus === "debt" ? "selected" : ""}>Con saldo pendiente</option><option value="overdue" ${view.agendaStatus === "overdue" ? "selected" : ""}>Asistencia sin registrar</option></select></div><div class="date-nav"><div class="actions"><button class="icon-button" data-act="date-prev" aria-label="Período anterior">${icon("left")}</button><button class="btn small outline" data-act="date-today">Hoy</button><button class="icon-button" data-act="date-next" aria-label="Período siguiente">${icon("chevron")}</button></div><strong>${esc(period)}</strong><input class="input" type="date" id="agenda-date" value="${date}" aria-label="Ir a una fecha"></div>${content}`
+        );
+      }
+      function patientsView() {
+        const rows = patients().filter(
+          (p) =>
+            normalize(p.name + " " + p.phone + " " + p.locality).includes(
+              normalize(view.patientQuery),
+            ) &&
+            (view.patientFilter === "debt"
+              ? patientDebt(p.id) > 0
+              : view.patientFilter === "all" || p.status === view.patientFilter),
+        );
+        return (
+          heading(
+            "Pacientes",
+            `${patients().filter((p) => p.status === "Activo").length} fichas activas`,
+            btn("Nuevo paciente", "patient", "primary", "", "plus"),
+          ) +
+          `<div class="toolbar"><input class="grow" type="search" id="patient-search" placeholder="Buscar nombre, teléfono o localidad" aria-label="Buscar paciente" value="${esc(view.patientQuery)}"><div class="segmented">${[
+            ["Activo", "Activos"],
+            ["Inactivo", "Inactivos"],
+            ["debt", "Con deuda"],
+            ["all", "Todos"],
+          ]
+            .map(
+              ([v, t]) =>
+                `<button class="${view.patientFilter === v ? "active" : ""}" data-patient-filter="${v}" aria-pressed="${view.patientFilter === v}">${t}</button>`,
+            )
+            .join("")}</div></div><div id="patient-results">${patientCards(rows)}</div>`
+        );
+      }
+      function patientCards(rows) {
+        return rows.length
+          ? `<div class="patient-grid">${rows.map((p) => `<button class="patient-card" data-act="patient-detail" data-id="${esc(p.id)}"><div class="patient-top"><span class="avatar">${esc(initials(p.name))}</span><div><h2>${esc(p.name)}</h2><small>${esc(p.modality)} · ${esc(p.frequency)}</small></div></div><div class="patient-bottom"><span>${money(p.default_fee)}<small class="muted" style="display:block">Honorario</small></span>${patientDebt(p.id) > 0 ? badge(money(patientDebt(p.id)) + " pendiente", "pending") : badge(p.status === "Inactivo" ? "Inactivo" : "Al día", p.status === "Activo" ? "Realizado" : "")}</div></button>`).join("")}</div>`
+          : empty(
+              patients().length ? "No encontramos coincidencias" : "Tu directorio empieza acá",
+              patients().length
+                ? "Probá con otro nombre o filtro."
+                : "Creá una ficha para agendar turnos y registrar cobros.",
+              patients().length ? "" : "Agregar paciente",
+              patients().length ? "" : "patient",
+              "users",
+            );
+      }
+      const initials = (name) =>
+        name
+          .trim()
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((s) => s[0])
+          .join("")
+          .toUpperCase();
+      function chart(month) {
+        const year = month.slice(0, 4),
+          rows = Array.from({ length: 12 }, (_, i) => {
+            const m = year + "-" + String(i + 1).padStart(2, "0");
+            return { month: m, ...totals(m) };
+          }),
+          max = Math.max(...rows.map((x) => Math.max(x.collected + x.extra, x.expenses)), 1);
+        return `<div class="chart" aria-label="Ingresos y gastos mensuales de ${year}">${rows.map((r) => `<button class="chart-month ${month === r.month ? "active" : ""}" data-chart-month="${r.month}" title="${esc(fmtDate(r.month + "-01", { month: "long" }))}: ingresos ${money(r.collected + r.extra)}, gastos ${money(r.expenses)}" aria-label="${esc(fmtDate(r.month + "-01", { month: "long" }))}: ingresos ${money(r.collected + r.extra)}, gastos ${money(r.expenses)}"><div class="chart-bars"><div class="bar" style="height:${Math.max(2, (100 * (r.collected + r.extra)) / max)}%"></div><div class="bar expense" style="height:${Math.max(2, (100 * r.expenses) / max)}%"></div></div><span>${esc(fmtDate(r.month + "-01", { month: "short" }))}</span></button>`).join("")}</div><div class="legend"><span><i></i>Ingresos registrados</span><span><i class="expense"></i>Gastos pagados</span></div><p class="muted small" style="margin-top:12px">Tocá un mes para consultar su detalle.</p>`;
+      }
+      function economyView() {
+        const m = totals(view.month),
+          items = db.data.balance_items.filter((x) => x.month === view.month),
+          assets = sum(items.filter((x) => x.kind === "Activo")),
+          liabilities = sum(items.filter((x) => x.kind === "Pasivo"));
+        let body = "";
+        if (view.economyTab === "actividad") {
+          const due = sorted(
+            appointments().filter((a) => monthOf(a.date) === view.month && pending(a) > 0),
+          );
+          body = `<div class="stats">${stat("Ingresos por sesiones", money(m.collected), "Por fecha de cobro", "coins", "economy-movements", 'data-type="payment"')}${stat("Saldo de sesiones", money(m.due), "Por fecha de sesión", "clock", "economy-debt")}${stat("Gastos pagados", money(m.expenses), money(m.planned) + " por pagar o planificados", "wallet", "economy-movements", 'data-type="expense"')}${stat("Disponible", money(m.available), "Incluye otros ingresos, ahorro y traspasos", "wallet", "economy-movements")}</div><div class="economy-grid"><section class="card period-card"><h2>Actividad de ${esc(fmtDate(view.month + "-01", { month: "long" }))}</h2><div class="summary-line"><span>Honorarios previstos</span><strong>${money(m.expected)}</strong></div><div class="summary-line"><span>Cobros registrados</span><strong>${money(m.collected)}</strong></div><div class="summary-line"><span>Otros ingresos</span><strong>${money(m.extra)}</strong></div><div class="summary-line"><span>Gastos pagados</span><strong>− ${money(m.expenses)}</strong></div><div class="summary-line total"><span>Resultado</span><strong>${money(m.result)}</strong></div><div class="summary-line"><span>Ahorro y traspasos enviados</span><strong>− ${money(m.saving)}</strong></div><div class="summary-line"><span>Traspasos recibidos</span><strong>+ ${money(m.transfers)}</strong></div><div class="summary-line total"><span>Disponible del mes</span><strong>${money(m.available)}</strong></div><div class="actions" style="margin-top:22px">${btn("Otro ingreso", "income", "outline", "", "plus")}${btn("Ahorro o traspaso", "saving", "outline", "", "plus")}</div></section><section class="card"><div class="card-head"><h2>El año en números</h2><span class="muted small">${view.month.slice(0, 4)}</span></div>${chart(view.month)}<div class="summary-line total"><span>Sesiones del mes</span><strong>${m.completed} realizadas / ${m.count} previstas</strong></div></section></div><section class="card" id="economy-debt"><div class="card-head"><h2>Pendientes de cobro</h2><span class="muted small">${due.length} turnos</span></div>${due.length ? due.map((a) => `<div class="ledger-row"><div class="ledger-left"><button class="session-name" data-act="session" data-id="${esc(a.id)}">${esc(patient(a.patient_id)?.name)}</button><small>${esc(fmtDate(a.date))} · ${a.start_time} · ${esc(a.appointment_status)}</small></div><span class="ledger-amount">${money(pending(a))}</span>${btn("Cobrar", "payment", "small outline", a.id)}</div>`).join("") : empty("Sin saldos pendientes", "Las sesiones de este mes están al día.", "", "", "check")}</section>`;
+        }
+        if (view.economyTab === "patrimonio")
+          body = `<div class="stats">${stat("Total activos", money(assets), "Saldos de las cuentas del período", "wallet", "noop")}${stat("Total pasivos", money(liabilities), "Compromisos del período", "wallet", "noop")}${stat("Patrimonio neto", money(assets - liabilities), "Activos menos pasivos", "coins", "noop")}</div><div class="economy-grid">${[
+            "Activo",
+            "Pasivo",
+          ]
+            .map(
+              (kind) =>
+                `<section class="card"><div class="card-head"><h2>${kind === "Activo" ? "Activos y cuentas" : "Pasivos"}</h2>${btn("Agregar", "balance", "small outline", kind, "plus")}</div>${
+                  items.filter((x) => x.kind === kind).length
+                    ? items
+                        .filter((x) => x.kind === kind)
+                        .map(
+                          (x) =>
+                            `<div class="ledger-row"><div class="ledger-left"><strong>${esc(x.name)}</strong><small>${esc(x.note || "Saldo del período")}</small></div><span class="ledger-amount">${money(x.amount)}</span><button class="icon-button" data-act="balance-detail" data-id="${esc(x.id)}" aria-label="Ver cuenta ${esc(x.name)}">${icon("more")}</button></div>`,
+                        )
+                        .join("")
+                    : empty(
+                        "Sin " + (kind === "Activo" ? "cuentas" : "pasivos"),
+                        "Agregá los saldos de este mes.",
+                        "",
+                        "",
+                        "wallet",
+                      )
+                }</section>`,
+            )
+            .join(
+              "",
+            )}</div><div class="alert info">${icon("wallet")}<span>El patrimonio refleja saldos. Los cobros nuevos actualizan la cuenta de su medio de pago; los ingresos y gastos se consultan en Actividad.</span></div>`;
+        if (view.economyTab === "movimientos") {
+          const records = movementRows();
+          body = `<div class="toolbar"><select id="economy-type" aria-label="Filtrar movimientos">${[
+            ["all", "Todos los movimientos"],
+            ["payment", "Cobros de sesiones"],
+            ["expense", "Gastos"],
+            ["income", "Otros ingresos"],
+            ["saving", "Ahorro y traspasos"],
+          ]
+            .map(
+              ([v, t]) =>
+                `<option value="${v}" ${view.economyType === v ? "selected" : ""}>${t}</option>`,
+            )
+            .join(
+              "",
+            )}</select><div class="actions">${btn("Gasto", "expense", "outline", "", "plus")}${btn("Otro ingreso", "income", "outline", "", "plus")}${btn("Ahorro", "saving", "outline", "", "plus")}</div></div><section class="card">${records.length ? records.map((r) => `<div class="ledger-row"><div class="ledger-left"><strong>${esc(r.title)}</strong><small>${esc(fmtDate(r.date))} · ${esc(r.detail)}</small></div><span class="ledger-amount ${r.positive ? "positive" : "negative"}">${r.positive ? "+" : "−"} ${money(r.amount)}</span><button class="icon-button" data-act="${r.type === "payment" ? "payment-detail" : r.type}" data-id="${esc(r.id)}" aria-label="Editar movimiento ${esc(r.title)}">${icon("more")}</button></div>`).join("") : empty("Sin movimientos en este período", "Registrá un cobro, un gasto u otro ingreso.", "", "", "wallet")}</section>`;
+        }
+        return (
+          heading(
+            "Economía",
+            "Tus ingresos, gastos y saldos, con el detalle a mano.",
+            btn("Registrar cobro", "payment", "primary", "", "plus"),
+          ) +
+          `<div class="toolbar"><input type="month" class="input" style="width:180px" id="economy-month" value="${view.month}" aria-label="Período económico"><div class="segmented">${[
+            ["actividad", "Actividad"],
+            ["patrimonio", "Patrimonio"],
+            ["movimientos", "Movimientos"],
+          ]
+            .map(
+              ([v, t]) =>
+                `<button class="${view.economyTab === v ? "active" : ""}" data-economy-tab="${v}" aria-pressed="${view.economyTab === v}">${t}</button>`,
+            )
+            .join(
+              "",
+            )}</div>${btn("Exportar CSV", "csv-economy", "outline", "", "download")}</div>${body}`
+        );
+      }
+      function movementRows() {
+        return [
+          ...activePayments().map((p) => ({
+            ...p,
+            type: "payment",
+            title: patient(p.patient_id)?.name || "Cobro",
+            detail: "Cobro · " + p.method,
+            positive: true,
+          })),
+          ...db.data.expenses
+            .filter((x) => !x.deleted)
+            .map((x) => ({
+              ...x,
+              type: "expense",
+              title: x.concept,
+              detail: "Gasto · " + x.status,
+              positive: false,
+            })),
+          ...db.data.other_income
+            .filter((x) => !x.deleted)
+            .map((x) => ({
+              ...x,
+              type: "income",
+              title: x.concept,
+              detail: "Otro ingreso · " + x.method,
+              positive: true,
+            })),
+          ...db.data.savings
+            .filter((x) => !x.deleted)
+            .map((x) => ({
+              ...x,
+              type: "saving",
+              title: x.concept,
+              detail: x.type + (x.destination_month ? " · destino " + x.destination_month : ""),
+              positive: false,
+            })),
+        ]
+          .filter(
+            (x) =>
+              monthOf(x.date) === view.month &&
+              (view.economyType === "all" || x.type === view.economyType),
+          )
+          .sort((a, b) => b.date.localeCompare(a.date));
+      }
+      function moreView() {
+        return (
+          heading("Más", "Preferencias, recordatorios y copias de tus datos.") +
+          `<div class="settings-grid"><section class="card"><div class="card-head"><h2>Tu consultorio</h2>${btn("Editar", "settings", "small outline", "", "edit")}</div><div class="setting-line"><span>Nombre</span><strong>${esc(getSetting("app_name"))}</strong></div><div class="setting-line"><span>Duración habitual</span><strong>${esc(getSetting("default_duration"))} min</strong></div><div class="setting-line"><span>Honorario inicial</span><strong>${money(getSetting("default_fee"))}</strong></div><div class="setting-line"><span>Medios de pago</span><span style="text-align:right">${esc(listSetting("payment_methods").join(", "))}</span></div><div class="setting-line"><span>Moneda y zona horaria</span><strong>ARS · Córdoba</strong></div><button class="text-button" data-act="category">Agregar categoría de gasto</button></section><section class="card"><div class="card-head"><h2>Datos y respaldo</h2>${icon("download")}</div><p class="muted small">Esta versión funciona sin conexión y guarda los datos en este navegador. No se sincroniza con el sitio original ni con otros dispositivos.</p><div class="download-list">${btn("Descargar copia completa", "export", "primary", "", "download")}${btn("Importar una copia de Camicas", "import", "outline", "", "upload")}${btn("Exportar pacientes CSV", "csv-patients", "outline", "", "download")}${btn("Exportar sesiones CSV", "csv-sessions", "outline", "", "download")}</div><p class="muted small" style="margin-top:17px">Última copia descargada: ${db.lastBackup ? esc(new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short" }).format(new Date(db.lastBackup))) : "todavía no registrada"}.</p>${storageGet(PREVIOUS) ? btn("Recuperar copia anterior a la importación", "restore", "outline") : ""}</section><section class="card"><div class="card-head"><h2>Recordatorios administrativos</h2>${btn("Agregar", "task", "small outline", "", "plus")}</div><label class="small muted"><input type="checkbox" id="show-done" ${view.showDone ? "checked" : ""}> Mostrar completados</label>${taskRows()}</section><section class="card"><div class="card-head"><h2>Acerca de esta versión</h2></div><p class="small muted">Archivo HTML independiente, sin librerías ni conexiones externas. Los datos no se envían a ningún servidor.</p><div class="alert">${icon("bell")}<span>El almacenamiento local no tiene contraseña ni cifrado. Usá un dispositivo protegido y descargá respaldos: borrar los datos del navegador puede eliminar tus registros.</span></div><p class="small muted">Para migrar desde el sitio original, descargá «Exportar copia completa» en Más e importá ese JSON acá. Cada archivo o dirección puede tener su propio guardado.</p><button class="text-button" data-act="help">Ver ayuda de uso y compatibilidad</button></section></div>`
+        );
+      }
+      function render() {
+        document.querySelector(".global-search").innerHTML =
+          icon("search") +
+          '<span class="search-label">Buscar pacientes o turnos</span><span class="search-shortcut">Ctrl K</span>';
+        document
+          .querySelector(".global-search")
+          .setAttribute("aria-label", "Buscar pacientes o turnos");
+        for (const id of ["desktop-nav", "mobile-nav"])
+          document.getElementById(id).innerHTML = navItems
+            .map(
+              ([page, text, ico]) =>
+                `<button data-nav="${page}" class="${view.page === page ? "active" : ""}" ${view.page === page ? 'aria-current="page"' : ""}>${icon(ico)}<span>${text}</span></button>`,
+            )
+            .join("");
+        main.innerHTML = {
+          hoy: todayView,
+          agenda: agendaView,
+          pacientes: patientsView,
+          economia: economyView,
+          mas: moreView,
+        }[view.page]();
+        document.title = `${getSetting("app_name") || "Camicas"} · ${navItems.find((x) => x[0] === view.page)?.[1]}`;
+        document.getElementById("theme-toggle").innerHTML = icon(
+          document.documentElement.dataset.theme === "dark" ? "sun" : "moon",
+        );
+        document
+          .getElementById("theme-toggle")
+          .setAttribute(
+            "aria-label",
+            document.documentElement.dataset.theme === "dark"
+              ? "Cambiar a modo claro"
+              : "Cambiar a modo oscuro",
+          );
+        document.getElementById("sidebar-backup").textContent = db.lastBackup
+          ? "Última copia: " +
+            new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "short" }).format(
+              new Date(db.lastBackup),
+            )
+          : "Guardá una copia de respaldo";
+        if (loadError)
+          main.insertAdjacentHTML("afterbegin", `<div class="alert">${esc(loadError)}</div>`);
+      }
+      function navigate(page) {
+        view.page = page;
+        location.hash = page;
+        render();
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+      function toast(text, error = false) {
+        const n = document.createElement("div");
+        n.className = "toast" + (error ? " error" : "");
+        n.textContent = text;
+        document.getElementById("notices").append(n);
+        setTimeout(() => n.remove(), 4800);
+      }
+      function showError(text) {
+        const box = document.getElementById("form-error");
+        if (box) {
+          box.textContent = text;
+          box.focus();
+        } else toast(text, true);
+      }
+      function openModal(title, body, kind = "") {
+        if (!modal.open) returnFocus = document.activeElement;
+        currentModal = kind;
+        modalRevision = db.revision;
+        document.getElementById("modal-title").textContent = title;
+        document.getElementById("modal-body").innerHTML = body;
+        if (!modal.open) modal.showModal();
+        document.body.style.overflow = "hidden";
+        modal.scrollTop = 0;
+        setTimeout(
+          () =>
+            document
+              .querySelector(
+                "#modal-body input:not([type=hidden]),#modal-body select,#modal-body button",
+              )
+              ?.focus(),
+          0,
+        );
+      }
+      function closeModal() {
+        modal.close();
+        currentModal = null;
+        stagedImport = null;
+        document.body.style.overflow = "";
+        if (returnFocus?.isConnected) returnFocus.focus();
+      }
+      function formShell(kind, fields, { id = "", submit = "Guardar", extra = "" } = {}) {
+        return `<form data-form="${kind}" data-id="${esc(id)}"><div class="form-grid">${fields}</div><div class="form-error" id="form-error" tabindex="-1" role="alert"></div>${extra}<div class="form-actions">${btn("Cancelar", "close", "outline")}<button class="btn primary" type="submit">${submit}</button></div></form>`;
+      }
+      function field(label, name, value = "", type = "text", extra = "") {
+        return `<label class="field">${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;
+      }
+      function select(label, name, options, value = "", extra = "") {
+        return `<label class="field">${label}<select name="${name}" ${extra}>${options
+          .map((o) => {
+            const v = Array.isArray(o) ? o[0] : o,
+              t = Array.isArray(o) ? o[1] : o;
+            return `<option value="${esc(v)}" ${String(value) === String(v) ? "selected" : ""}>${esc(t)}</option>`;
+          })
+          .join("")}</select></label>`;
+      }
+      function formPatient(id = "") {
+        const p = patient(id) || {},
+          fields =
+            field(
+              "Nombre y apellido",
+              "name",
+              p.name,
+              "text",
+              'required maxlength="160" autocomplete="name"',
+            ) +
+            field(
+              "Honorario por sesión",
+              "default_fee",
+              p.default_fee ?? getSetting("default_fee"),
+              "number",
+              'required min="0" max="1000000000" step="0.01" inputmode="decimal"',
+            ) +
+            field(
+              "Teléfono / WhatsApp",
+              "phone",
+              p.phone,
+              "tel",
+              'maxlength="40" placeholder="Código de país + área + número"',
+            ) +
+            field("Correo electrónico", "email", p.email, "email", 'maxlength="180"') +
+            field("Localidad", "locality", p.locality, "text", 'maxlength="160"') +
+            select(
+              "Modalidad",
+              "modality",
+              listSetting("modalities"),
+              p.modality || listSetting("modalities")[0],
+            ) +
+            select(
+              "Frecuencia",
+              "frequency",
+              listSetting("frequencies"),
+              p.frequency || listSetting("frequencies")[0],
+            ) +
+            field(
+              "Contacto de emergencia 1",
+              "emergency_1",
+              p.emergency_1,
+              "text",
+              'maxlength="200"',
+            ) +
+            field(
+              "Contacto de emergencia 2",
+              "emergency_2",
+              p.emergency_2,
+              "text",
+              'maxlength="200"',
+            ) +
+            (id
+              ? field("Aplicar honorario a turnos agendados desde", "valid_from", "", "date")
+              : "");
+        openModal(
+          id ? "Editar ficha" : "Nuevo paciente",
+          formShell("patient", fields, {
+            id,
+            extra: id
+              ? '<p class="muted small">Si dejás la fecha vacía, el nuevo honorario se usará sólo al crear turnos.</p>'
+              : "",
+          }),
+          "patient",
+        );
+      }
+      function formAppointment(id = "", date = "", patientId = "", duplicate = false) {
+        if (!patients().length) {
+          openModal(
+            "Primero, una ficha",
+            empty(
+              "Agregá un paciente",
+              "Necesitás una ficha para agendar su primera sesión.",
+              "Crear paciente",
+              "patient",
+              "users",
+            ),
+          );
+          return;
+        }
+        const a = appointment(id) || {},
+          p =
+            patient(patientId || a.patient_id) ||
+            patients().find((p) => p.status === "Activo") ||
+            patients()[0],
+          edit = id && !duplicate;
+        const fields =
+          select(
+            "Paciente",
+            "patient_id",
+            patients().map((p) => [p.id, p.name + (p.status === "Inactivo" ? " · Inactivo" : "")]),
+            p.id,
+            "required",
+          ) +
+          field(
+            "Honorario de la sesión",
+            "fee",
+            a.fee ?? p.default_fee ?? getSetting("default_fee"),
+            "number",
+            'required min="0" step="0.01" max="1000000000" inputmode="decimal"',
+          ) +
+          field(
+            "Fecha",
+            "date",
+            date ||
+              (duplicate ? addDays(a.date, 7) : a.date) ||
+              (view.page === "agenda" ? view.date : today()),
+            "date",
+            "required",
+          ) +
+          field("Hora", "start_time", a.start_time || "10:00", "time", "required") +
+          field(
+            "Duración en minutos",
+            "duration_minutes",
+            a.duration_minutes || getSetting("default_duration"),
+            "number",
+            'required min="5" max="480" step="5"',
+          ) +
+          select("Modalidad", "modality", listSetting("modalities"), a.modality || p.modality) +
+          (!edit
+            ? select(
+                "Repetir",
+                "recurrence",
+                [
+                  ["none", "Una sola sesión"],
+                  ["weekly", "Semanal"],
+                  ["biweekly", "Quincenal"],
+                  ["monthly", "Mensual"],
+                ],
+                "none",
+              ) + field("Cantidad de sesiones", "count", 8, "number", 'min="1" max="52" required')
+            : a.recurrence_id
+              ? select("Aplicar cambios a", "scope", [
+                  ["this", "Sólo esta sesión"],
+                  ["future", "Esta y las siguientes de la serie"],
+                ])
+              : "") +
+          `<label class="field full">Nota administrativa<textarea name="administrative_note" maxlength="500" placeholder="Por ejemplo, confirmar horario. Evitá incluir información clínica.">${esc(a.administrative_note || "")}</textarea></label>`;
+        openModal(
+          edit ? "Editar o reprogramar turno" : duplicate ? "Duplicar turno" : "Nuevo turno",
+          formShell("appointment", fields, {
+            id: edit ? id : "",
+            submit: edit ? "Guardar cambios" : "Guardar turno",
+            extra:
+              '<p class="muted small">Se comprueba que las sesiones no se superpongan. La cantidad define el final de la serie.</p>',
+          }),
+          "appointment",
+        );
+        toggleRecurrence();
+      }
+      function toggleRecurrence() {
+        const f = document.querySelector("form[data-form=appointment]");
+        if (!f) return;
+        const r = f.elements.recurrence,
+          count = f.elements.count;
+        if (count) {
+          count.disabled = r.value === "none";
+          count.closest("label").classList.toggle("hidden", count.disabled);
+        }
+      }
+      function patientDetail(id) {
+        const p = patient(id);
+        if (!p) return;
+        const sessions = sorted(appointments().filter((a) => a.patient_id === id)),
+          last = [...sessions]
+            .reverse()
+            .find((a) => a.date <= today() && a.appointment_status === "Realizado"),
+          next = sessions.find((a) => a.date >= today() && a.appointment_status === "Agendado"),
+          payments = activePayments()
+            .filter((x) => x.patient_id === id)
+            .sort((a, b) => b.date.localeCompare(a.date));
+        openModal(
+          p.name,
+          `<div class="detail-hero"><span class="avatar">${esc(initials(p.name))}</span><div><div class="detail-title">${esc(p.name)}</div><p class="muted small">${esc(p.modality)} · ${esc(p.frequency)} · ${esc(p.status)}</p></div></div><div class="detail-stats"><div class="detail-stat"><small>Honorario</small><b>${money(p.default_fee)}</b></div><div class="detail-stat"><small>Pendiente</small><b>${money(patientDebt(id))}</b></div><div class="detail-stat"><small>A favor</small><b>${money(patientCredit(id))}</b></div></div><div class="patient-details">${[
+            ["Teléfono", p.phone],
+            ["Correo", p.email],
+            ["Localidad", p.locality],
+            ["Próximo turno", next ? fmtDate(next.date) + " · " + next.start_time : "—"],
+            ["Última sesión realizada", last ? fmtDate(last.date) : "—"],
+            ["Emergencia 1", p.emergency_1],
+            ["Emergencia 2", p.emergency_2],
+          ]
+            .filter(([k, v]) => v)
+            .map(([k, v]) => `<div><small>${k}</small><p>${esc(v)}</p></div>`)
+            .join(
+              "",
+            )}</div><div class="actions">${btn("Editar ficha", "patient", "outline", id, "edit")}${btn("Nuevo turno", "patient-appointment", "primary", id, "plus")}${btn(p.status === "Activo" ? "Dar de baja" : "Reactivar", "patient-status", p.status === "Activo" ? "danger" : "outline", id)}</div><section class="detail-section"><h3>Historial de sesiones</h3>${
+            sessions.length
+              ? [...sessions]
+                  .reverse()
+                  .map((a) => sessionRow(a, { date: true }))
+                  .join("")
+              : empty("Todavía sin sesiones", "Agendá el primer turno desde esta ficha.")
+          }</section><section class="detail-section"><h3>Historial de cobros</h3>${payments.length ? payments.map((p) => `<div class="ledger-row"><div class="ledger-left"><strong>${money(p.amount)}</strong><small>${esc(fmtDate(p.date))} · ${esc(p.method)}</small></div>${btn("Ver", "payment-detail", "small outline", p.id)}</div>`).join("") : empty("Sin cobros registrados", "Los pagos que registres aparecerán acá.", "", "", "coins")}</section>`,
+          "patient-detail",
+        );
+      }
+      function sessionDetail(id) {
+        const a = appointment(id);
+        if (!a) return;
+        openModal(
+          "Detalle de sesión",
+          `<div class="detail-hero"><span class="avatar">${icon("calendar")}</span><div><button class="session-name detail-title" data-act="patient-detail" data-id="${esc(a.patient_id)}">${esc(patient(a.patient_id)?.name)}</button><p class="muted small">${esc(fmtDate(a.date, { weekday: "long", day: "numeric", month: "long" }))} · ${a.start_time}</p></div></div><div class="session-status">${badge(a.appointment_status)}${badge(a.financial_status || "Pendiente", pending(a) > 0 ? "pending" : "Realizado")}${a.recurrence_id ? badge("Turno recurrente") : ""}</div><div class="patient-details"><div><small>Modalidad</small><p>${esc(a.modality)} · ${a.duration_minutes} min</p></div><div><small>Honorario</small><p>${money(a.fee)}</p></div><div><small>Cobrado</small><p>${money(paid(a))}</p></div><div><small>Saldo pendiente</small><p>${money(pending(a))}</p></div></div>${credit(a) > 0 ? `<div class="alert">Este turno tiene ${money(credit(a))} a favor. El cobro se conserva; podés anularlo desde el historial de cobros si corresponde.</div>` : ""}${a.administrative_note ? `<p class="small muted" style="margin-bottom:18px">${esc(a.administrative_note)}</p>` : ""}<div class="actions">${a.appointment_status !== "Realizado" && a.appointment_status !== "Cancelado" ? btn("Registrar asistencia", "complete", "primary", id, "check") : ""}${pending(a) > 0 ? btn("Registrar cobro", "payment", "outline", id, "coins") : ""}${btn("Editar turno", "appointment", "outline", id, "edit")}${btn("Duplicar", "duplicate", "outline", id, "copy")}${a.appointment_status === "Agendado" ? btn("Preparar WhatsApp", "whatsapp", "outline", id, "phone") : ""}</div><section class="detail-section"><h3>Estado de la sesión</h3><div class="actions">${a.appointment_status === "Agendado" ? btn("Marcar ausente", "absent", "outline", id) : ""}${a.financial_status === "Bonificado" ? btn("Restablecer honorario", "unwaive", "outline", id) : ""}${a.appointment_status !== "Agendado" ? btn("Volver a agendado", "reopen", "outline", id) : ""}${a.appointment_status !== "Cancelado" ? btn("Cancelar turno", "cancel-session", "danger", id) : ""}${!db.data.payment_allocations.some((x) => x.appointment_id === id) ? btn("Eliminar turno", "delete-session", "danger", id) : ""}</div></section><section class="detail-section"><h3>Cobros asociados</h3>${
+            allocations()
+              .filter((x) => x.appointment_id === id)
+              .map((link) => {
+                const p = activePayments().find((p) => p.id === link.payment_id);
+                return `<div class="ledger-row"><div class="ledger-left"><strong>${money(link.amount)}</strong><small>${esc(fmtDate(p.date))} · ${esc(p.method)}</small></div>${btn("Ver cobro", "payment-detail", "small outline", p.id)}</div>`;
+              })
+              .join("") || '<p class="muted small">Sin cobros registrados.</p>'
+          }</section>`,
+          "session",
+        );
+      }
+      function formPayment(id = "") {
+        const payable = sorted(appointments().filter((a) => pending(a) > 0)),
+          selected = appointment(id);
+        if (!payable.length) {
+          openModal(
+            "Registrar cobro",
+            empty(
+              "Sin turnos con saldo",
+              "Creá un turno con honorario para registrar su pago.",
+              "Nuevo turno",
+              "appointment",
+              "coins",
+            ),
+          );
+          return;
+        }
+        const chosen = selected && pending(selected) > 0 ? selected : payable[0];
+        const fields =
+          select(
+            "Sesión",
+            "appointment_id",
+            payable.map((a) => [
+              a.id,
+              `${patient(a.patient_id)?.name} · ${fmtDate(a.date)} ${a.start_time} · ${money(pending(a))}`,
+            ]),
+            chosen.id,
+            "required",
+          ) +
+          field(
+            "Importe a cobrar",
+            "amount",
+            pending(chosen),
+            "number",
+            'required min="0.01" step="0.01" max="1000000000" inputmode="decimal"',
+          ) +
+          field("Fecha del cobro", "date", today(), "date", "required") +
+          select("Medio de pago", "method", listSetting("payment_methods"));
+        openModal(
+          "Registrar cobro",
+          formShell("payment", fields, {
+            submit: "Guardar cobro",
+            extra:
+              '<p class="muted small">Admite pagos parciales. El cobro no cambia la asistencia de la sesión.</p>',
+          }),
+          "payment",
+        );
+      }
+      function formComplete(id) {
+        const a = appointment(id);
+        if (!a) return;
+        openModal(
+          "Registrar asistencia",
+          formShell(
+            "complete",
+            select("Cobro de esta sesión", "mode", [
+              ["pending", "Realizada · pago pendiente"],
+              ["full", "Realizada · cobrar saldo completo"],
+              ["partial", "Realizada · pago parcial"],
+              ["waived", "Realizada · bonificada"],
+            ]) +
+              field("Importe parcial", "amount", "", "number", 'min="0.01" step="0.01"') +
+              field("Fecha del cobro", "date", today(), "date", "required") +
+              select("Medio de pago", "method", listSetting("payment_methods")),
+            {
+              id,
+              submit: "Registrar",
+              extra: `<div class="alert info">Saldo del turno: ${money(pending(a))}. Los cobros ya registrados se conservan.</div>`,
+            },
+          ),
+          "complete",
+        );
+        toggleComplete();
+      }
+      function toggleComplete() {
+        const f = document.querySelector("form[data-form=complete]");
+        if (!f) return;
+        const mode = f.elements.mode.value;
+        for (const name of ["amount", "date", "method"]) {
+          const el = f.elements[name],
+            visible = name === "amount" ? mode === "partial" : ["full", "partial"].includes(mode);
+          el.disabled = !visible;
+          el.required = visible;
+          el.closest("label").classList.toggle("hidden", !visible);
+        }
+      }
+      function formRecord(kind, id = "") {
+        const table = { expense: "expenses", income: "other_income", saving: "savings" }[kind],
+          r = db.data[table].find((x) => x.id === id) || {};
+        let fields =
+          field("Concepto", "concept", r.concept, "text", 'required maxlength="200"') +
+          field(
+            "Importe",
+            "amount",
+            r.amount,
+            "number",
+            'required min="0.01" max="1000000000" step="0.01" inputmode="decimal"',
+          ) +
+          field("Fecha", "date", r.date || today(), "date", "required");
+        if (kind === "expense")
+          fields +=
+            select(
+              "Categoría",
+              "category",
+              db.data.categories.filter((x) => x.active !== 0).map((x) => x.name),
+              r.category_name || r.category || "Consultorio",
+            ) +
+            select("Estado", "status", ["Pagado", "A pagar", "Planificado"], r.status || "Pagado") +
+            select("Medio de pago", "method", listSetting("payment_methods"), r.method);
+        if (kind === "income")
+          fields +=
+            field(
+              "Categoría",
+              "category",
+              r.category || "Otros ingresos",
+              "text",
+              'maxlength="100"',
+            ) + select("Medio de pago", "method", listSetting("payment_methods"), r.method);
+        if (kind === "saving")
+          fields +=
+            select("Tipo", "type", ["Ahorro/Reserva", "Traspaso"], r.type || "Ahorro/Reserva") +
+            field(
+              "Mes de destino del traspaso",
+              "destination_month",
+              r.destination_month || monthOf(addMonths(r.date || today(), 1)),
+              "month",
+            );
+        openModal(
+          { expense: "Gasto", income: "Otro ingreso", saving: "Ahorro o traspaso" }[kind],
+          formShell(kind, fields, {
+            id,
+            extra:
+              (id && ["expense", "income"].includes(kind) && !r.cash_managed
+                ? '<div class="alert info">Movimiento importado: esta edición actualiza la actividad. Revisá el saldo de las cuentas por separado; su cálculo original no pudo verificarse.</div>'
+                : "") +
+              (kind === "saving"
+                ? '<p class="muted small">Reduce el disponible del mes de origen. Un traspaso aumenta el disponible del mes de destino, sin contarse como ingreso nuevo.</p>'
+                : "") +
+              (id
+                ? `<div class="actions" style="margin-top:18px">${btn("Eliminar movimiento", "delete-record", "danger", kind + ":" + id)}</div>`
+                : ""),
+          }),
+          kind,
+        );
+        toggleSaving();
+      }
+      function toggleSaving() {
+        const f = document.querySelector("form[data-form=saving]");
+        if (f) {
+          const el = f.elements.destination_month;
+          el.disabled = f.elements.type.value !== "Traspaso";
+          el.required = !el.disabled;
+          el.closest("label").classList.toggle("hidden", el.disabled);
+        }
+      }
+      function formBalance(kindOrId) {
+        const item = db.data.balance_items.find((x) => x.id === kindOrId),
+          r = item || { kind: kindOrId, month: view.month };
+        openModal(
+          item ? "Editar saldo" : "Agregar " + r.kind.toLowerCase(),
+          formShell(
+            "balance",
+            select("Tipo", "kind", ["Activo", "Pasivo"], r.kind) +
+              field(
+                "Nombre de la cuenta o compromiso",
+                "name",
+                r.name,
+                "text",
+                'required maxlength="150"',
+              ) +
+              field(
+                "Saldo del período",
+                "amount",
+                r.amount ?? 0,
+                "number",
+                'required step="0.01" max="1000000000000"',
+              ) +
+              field("Período", "month", r.month, "month", "required") +
+              field("Nota", "note", r.note, "text", 'maxlength="300"'),
+            {
+              id: item?.id || "",
+              extra: item
+                ? '<p class="muted small">Se guarda un ajuste de saldo. Los cobros y movimientos asociados se conservan.</p>'
+                : "",
+            },
+          ),
+          "balance",
+        );
+      }
+      function balanceDetail(id) {
+        const item = db.data.balance_items.find((x) => x.id === id);
+        if (!item) return;
+        const movements = db.data.balance_movements.filter((x) => x.balance_item_id === id);
+        openModal(
+          item.name,
+          `<div class="eyebrow">${esc(item.kind)} · ${esc(item.month)}</div><div class="balance-title">${money(item.amount)}</div><p class="muted small">${esc(item.note)}</p><div class="actions" style="margin-top:18px">${btn("Editar saldo", "balance", "outline", id, "edit")}${movements.length ? "" : btn("Eliminar cuenta", "delete-balance", "danger", id)}</div><section class="detail-section"><h3>Movimientos y ajustes</h3>${
+            movements.length
+              ? [...movements]
+                  .reverse()
+                  .map(
+                    (x) =>
+                      `<div class="ledger-row"><div class="ledger-left"><strong>${esc(x.description || x.movement_type || "Movimiento")}</strong><small>${esc(fmtDate(x.date))}${x.reversed ? " · Anulado" : ""}</small></div><span class="ledger-amount">${money(x.amount)}</span></div>`,
+                  )
+                  .join("")
+              : '<p class="muted small">Sin movimientos asociados.</p>'
+          }</section>`,
+          "balance-detail",
+        );
+      }
+      function paymentDetail(id) {
+        const p = db.data.payments.find((x) => x.id === id);
+        if (!p) return;
+        openModal(
+          "Detalle de cobro",
+          `<div class="detail-title">${esc(patient(p.patient_id)?.name)}</div><div class="balance-title">${money(p.amount)}</div><p class="muted small">${esc(fmtDate(p.date, { day: "numeric", month: "long", year: "numeric" }))}${p.reversed ? " · Anulado" : ""}</p>${formShell("payment-method", select("Medio de pago", "method", listSetting("payment_methods"), p.method), { id, submit: "Cambiar medio de pago", extra: !p.reversed ? btn("Anular cobro", "reverse-payment", "danger", id) : "" })}<section class="detail-section"><h3>Asignación a sesiones</h3>${
+            db.data.payment_allocations
+              .filter((x) => x.payment_id === id)
+              .map((x) => {
+                const a = appointment(x.appointment_id);
+                return `<div class="ledger-row"><div class="ledger-left"><strong>${esc(fmtDate(a.date))} · ${a.start_time}</strong><small>${money(x.amount)} asignados</small></div>${btn("Ver sesión", "session", "small outline", a.id)}</div>`;
+              })
+              .join("") || '<p class="muted small">Cobro importado sin asignación a una sesión.</p>'
+          }</section>`,
+          "payment-detail",
+        );
+      }
+      function formTask(id = "") {
+        const t = db.data.tasks.find((x) => x.id === id) || {};
+        openModal(
+          id ? "Editar recordatorio" : "Nuevo recordatorio",
+          formShell(
+            "task",
+            field("Recordatorio", "title", t.title, "text", 'required maxlength="250"') +
+              field("Fecha límite (opcional)", "due", t.due, "date"),
+            { id, extra: id ? btn("Eliminar recordatorio", "delete-task", "danger", id) : "" },
+          ),
+          "task",
+        );
+      }
+      function formSettings() {
+        openModal(
+          "Preferencias",
+          formShell(
+            "settings",
+            field(
+              "Nombre del consultorio",
+              "app_name",
+              getSetting("app_name"),
+              "text",
+              'required maxlength="80"',
+            ) +
+              field(
+                "Duración habitual en minutos",
+                "default_duration",
+                getSetting("default_duration"),
+                "number",
+                'required min="5" max="480" step="5"',
+              ) +
+              field(
+                "Honorario inicial",
+                "default_fee",
+                getSetting("default_fee"),
+                "number",
+                'required min="0" max="1000000000" step="0.01"',
+              ) +
+              field(
+                "Modalidades (separadas por coma)",
+                "modalities",
+                listSetting("modalities").join(", "),
+                "text",
+                'required maxlength="500"',
+              ) +
+              field(
+                "Frecuencias (separadas por coma)",
+                "frequencies",
+                listSetting("frequencies").join(", "),
+                "text",
+                'required maxlength="500"',
+              ) +
+              field(
+                "Medios de pago (separados por coma)",
+                "payment_methods",
+                listSetting("payment_methods").join(", "),
+                "text",
+                'required maxlength="500"',
+              ),
+          ),
+          "settings",
+        );
+      }
+      function confirmModal(title, text, action, id = "", extra = "") {
+        openModal(
+          title,
+          `<p class="small">${text}</p>${extra}<div class="form-error" id="form-error" tabindex="-1" role="alert"></div><div class="form-actions">${btn("Volver", "close", "outline")}${btn("Confirmar", action, "primary", id)}</div>`,
+          "confirm",
+        );
+      }
+
+      // Forms and actions save atomically; failed writes leave the previous database intact.
+      function searchModal() {
+        openModal(
+          "Buscar en Camicas",
+          `<label class="field"><span class="hidden">Buscar pacientes o turnos</span><input id="global-query" type="search" placeholder="Nombre, teléfono o fecha (AAAA-MM-DD)" autocomplete="off" value="${esc(view.searchQuery)}"></label><div class="search-results" id="search-results"></div>`,
+          "search",
+        );
+        updateSearch();
+      }
+      function updateSearch() {
+        const q = normalize(view.searchQuery),
+          ps = patients()
+            .filter((p) => q && normalize(p.name + " " + p.phone + " " + p.locality).includes(q))
+            .slice(0, 8),
+          as = sorted(
+            appointments().filter(
+              (a) =>
+                q &&
+                normalize(
+                  (patient(a.patient_id)?.name || "") +
+                    " " +
+                    a.date +
+                    " " +
+                    fmtDate(a.date) +
+                    " " +
+                    a.start_time,
+                ).includes(q),
+            ),
+          ).slice(0, 12);
+        document.getElementById("search-results").innerHTML = q
+          ? ps
+              .map(
+                (p) =>
+                  `<button class="search-result" data-act="patient-detail" data-id="${esc(p.id)}"><span class="avatar">${esc(initials(p.name))}</span><span>${esc(p.name)}<small>Paciente · ${esc(p.status)}</small></span></button>`,
+              )
+              .join("") +
+            as
+              .map(
+                (a) =>
+                  `<button class="search-result" data-act="session" data-id="${esc(a.id)}"><span class="avatar">${icon("calendar")}</span><span>${esc(patient(a.patient_id)?.name)}<small>${esc(fmtDate(a.date))} · ${a.start_time} · ${esc(a.appointment_status)}</small></span></button>`,
+              )
+              .join("") +
+            (!ps.length && !as.length
+              ? empty("Sin coincidencias", "Probá otro nombre, número o fecha.", "", "", "search")
+              : "")
+          : '<p class="muted small">Buscá una ficha o una sesión sin cambiar de pantalla.</p>';
+      }
+      function whatsappModal(id) {
+        const a = appointment(id),
+          p = a && patient(a.patient_id);
+        if (!p) return;
+        const text = `Hola ${p.name.split(" ")[0]}, te recuerdo nuestro turno del ${fmtDate(a.date, { weekday: "long", day: "numeric", month: "long" })} a las ${a.start_time}. ¿Podés confirmar? Gracias.`;
+        openModal(
+          "Confirmación por WhatsApp",
+          `<label class="field">Mensaje<textarea id="whatsapp-text" rows="5">${esc(text)}</textarea></label><label class="field" style="margin-top:15px">Número con código de país<input id="whatsapp-number" type="tel" value="${esc(p.phone || "")}" placeholder="Ej.: 5493511234567"></label><p class="muted small" style="margin-top:12px">Se abre el chat con este borrador. Revisá el número y el mensaje antes de enviarlo.</p><div class="form-error" id="form-error" role="alert" tabindex="-1"></div><div class="form-actions">${btn("Copiar mensaje", "copy-whatsapp", "outline")}${btn("Abrir WhatsApp", "open-whatsapp", "primary")}</div>`,
+          "whatsapp",
+        );
+      }
+      function download(name, text, type = "application/json") {
+        const url = URL.createObjectURL(new Blob([text], { type }));
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.append(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      }
+      function exportData(snapshot = db, track = true) {
+        const out = { ...clone(snapshot), exportedAt: new Date().toISOString(), locale: "es-AR" };
+        download("camicas-respaldo-" + today() + ".json", JSON.stringify(out, null, 2));
+        if (track && !storageBlocked)
+          mutate((s) => {
+            s.lastBackup = new Date().toISOString();
+          }, "Copia descargada. Conservá el archivo en un lugar seguro.");
+      }
+      function csvCell(value) {
+        let s = String(value ?? "");
+        if (/^[=+@\-\t\r]/.test(s)) s = "'" + s;
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      function exportCSV(kind) {
+        let rows, headers;
+        if (kind === "patients") {
+          headers = [
+            "ID",
+            "Nombre",
+            "Estado",
+            "Teléfono",
+            "Correo",
+            "Localidad",
+            "Modalidad",
+            "Frecuencia",
+            "Honorario",
+            "Pendiente",
+            "A favor",
+          ];
+          rows = patients().map((p) => [
+            p.id,
+            p.name,
+            p.status,
+            p.phone,
+            p.email,
+            p.locality,
+            p.modality,
+            p.frequency,
+            p.default_fee,
+            patientDebt(p.id),
+            patientCredit(p.id),
+          ]);
+        } else if (kind === "sessions") {
+          headers = [
+            "ID",
+            "Paciente",
+            "Fecha",
+            "Hora",
+            "Duración",
+            "Modalidad",
+            "Estado",
+            "Honorario",
+            "Cobrado",
+            "Pendiente",
+            "Estado financiero",
+          ];
+          rows = sorted(appointments()).map((a) => [
+            a.id,
+            patient(a.patient_id)?.name,
+            a.date,
+            a.start_time,
+            a.duration_minutes,
+            a.modality,
+            a.appointment_status,
+            a.fee,
+            paid(a),
+            pending(a),
+            a.financial_status,
+          ]);
+        } else {
+          headers = ["ID", "Fecha", "Tipo", "Concepto", "Detalle", "Importe"];
+          rows = movementRows().map((r) => [r.id, r.date, r.type, r.title, r.detail, r.amount]);
+        }
+        download(
+          "camicas-" + kind + "-" + (kind === "economy" ? view.month : today()) + ".csv",
+          "\ufeff" + [headers, ...rows].map((r) => r.map(csvCell).join(";")).join("\r\n"),
+          "text/csv;charset=utf-8",
+        );
+        toast("Archivo CSV descargado");
+      }
+      function importModal() {
+        openModal(
+          "Importar una copia",
+          `<p class="small muted">Elegí una copia JSON completa de la versión original o de Camicas 2.0. Se revisará antes de reemplazar el guardado de este navegador.</p><label class="field" style="margin-top:20px">Copia completa de Camicas<input id="import-file" type="file" accept=".json,application/json"></label><div class="form-error" id="form-error" role="alert" tabindex="-1"></div><div id="import-preview"></div>`,
+          "import",
+        );
+      }
+      async function readImport(file) {
+        if (!file) return;
+        try {
+          if (file.size > 25 * 1024 * 1024) throw Error("La copia supera los 25 MB.");
+          const raw = JSON.parse(await file.text());
+          stagedImport = assertImport(raw);
+          const d = stagedImport.data;
+          document.getElementById("import-preview").innerHTML =
+            `<div class="import-report"><strong>Copia válida</strong><br>${d.patients.length} pacientes · ${d.appointments.length} turnos<br>${d.payments.length} cobros · ${d.expenses.length} gastos<br>${d.balance_items.length} cuentas · ${d.savings.length} ahorros / traspasos</div><div class="alert">Esta acción reemplaza los registros locales. Antes se descargará una copia del guardado actual y se conservará una copia recuperable en este navegador.</div><p class="small muted">Los saldos patrimoniales se conservan sin volver a sumar sus movimientos. No se modifica el sitio original.</p><div class="form-actions">${btn("Volver", "close", "outline")}${btn("Importar y reemplazar", "confirm-import", "primary")}</div>`;
+          document.getElementById("form-error").textContent = "";
+        } catch (e) {
+          stagedImport = null;
+          document.getElementById("import-preview").innerHTML = "";
+          showError(e.message || "No se pudo leer el archivo JSON.");
+        }
+      }
+      function commitImport(candidate) {
+        try {
+          if (!storageBlocked && modalRevision !== db.revision)
+            throw Error(
+              "El guardado cambió desde que abriste esta ventana. Volvé a seleccionar la copia.",
+            );
+          if (!candidate) throw Error("Primero elegí una copia válida.");
+          const next = assertImport(candidate),
+            oldRaw = localStorage.getItem(STORE) || JSON.stringify(db),
+            previousRaw = localStorage.getItem(PREVIOUS);
+          next.revision = db.revision + 1;
+          next.updatedAt = new Date().toISOString();
+          next.lastBackup = null;
+          const newRaw = JSON.stringify(next);
+          localStorage.setItem(PREVIOUS, oldRaw);
+          try {
+            localStorage.setItem(STORE, newRaw);
+          } catch (e) {
+            if (previousRaw) localStorage.setItem(PREVIOUS, previousRaw);
+            else localStorage.removeItem(PREVIOUS);
+            throw e;
+          }
+          exportData(db, false);
+          db = next;
+          storageBlocked = false;
+          loadError = null;
+          closeModal();
+          render();
+          toast("Copia importada. El guardado anterior quedó disponible en Más.");
+        } catch (e) {
+          showError(e.message || "No se pudo importar. El guardado actual se conserva.");
+        }
+      }
+      function helpModal() {
+        openModal(
+          "Uso y compatibilidad",
+          `<div class="stack small"><div><h3>Primeros pasos</h3><p class="muted">Creá un paciente, agendá su sesión y registrá la asistencia y el cobro por separado. Podés cobrar antes de la sesión o en varios pagos.</p></div><div><h3>Agenda</h3><p class="muted">Elegí Día, Semana, Mes o Próximos. En computadora podés arrastrar a otro día; en cualquier dispositivo, abrí el turno y cambiá fecha y hora. Las series nuevas tienen un final definido y se comprueba la superposición.</p></div><div><h3>Cancelar y bonificar</h3><p class="muted">Un turno cancelado o bonificado deja de generar deuda. Los cobros previos se conservan como saldo a favor de esa sesión; para corregirlos, anulá el cobro desde su detalle. No se reasigna automáticamente a otra sesión.</p></div><div><h3>Economía</h3><p class="muted">Cobrado se calcula por fecha de pago; pendiente, por fecha de sesión. Activos y pasivos son saldos mensuales. Los cobros nuevos actualizan la cuenta de su medio de pago; gastos pagados y otros ingresos nuevos también generan movimientos. Los ahorros reducen el disponible sin contarse como gasto.</p></div><div><h3>Migración</h3><p class="muted">Se conserva la estructura de la copia original: pacientes, turnos, cobros y asignaciones, cuentas y movimientos, otros ingresos, categorías y preferencias. Los campos adicionales se conservan. Cada importación reemplaza el guardado; no combina ni duplica registros.</p></div><div><h3>Límites</h3><p class="muted">No se trasladan la autenticación, la base remota, los registros del servidor ni su sincronización. Las series importadas conservan los turnos existentes y su identificador; no generan nuevas ocurrencias automáticamente. El esquema de gastos y ahorros del respaldo observado estaba vacío: otras copias se validan antes de importar. Un HTML local no ofrece instalación PWA completa ni notificaciones con la aplicación cerrada.</p></div><div><h3>Respaldo</h3><p class="muted">Descargá JSON regularmente. Los CSV sirven para revisar registros; la restauración completa usa JSON. Mover el archivo, cambiar de navegador o abrir otra dirección puede cambiar el lugar donde se guardan los datos.</p></div></div>`,
+          "help",
+        );
+      }
+      function scopeValue() {
+        return document.getElementById("confirm-scope")?.value || "this";
+      }
+      function seriesScope(a, scope) {
+        return appointments()
+          .filter(
+            (x) =>
+              x.id === a.id ||
+              (scope === "future" &&
+                a.recurrence_id &&
+                x.recurrence_id === a.recurrence_id &&
+                x.date + " " + x.start_time >= a.date + " " + a.start_time &&
+                x.appointment_status === "Agendado"),
+          )
+          .map((x) => x.id);
+      }
+      function scopeSelect(a) {
+        return a.recurrence_id
+          ? `<label class="field" style="margin-top:20px">Aplicar a<select id="confirm-scope"><option value="this">Sólo esta sesión</option><option value="future">Esta y las siguientes agendadas de la serie</option></select></label>`
+          : "";
+      }
+      const actions = {
+        close: closeModal,
+        search: searchModal,
+        help: helpModal,
+        theme() {
+          const dark = document.documentElement.dataset.theme !== "dark";
+          document.documentElement.dataset.theme = dark ? "dark" : "light";
+          try {
+            localStorage.setItem("camicas.v2.theme", dark ? "dark" : "light");
+          } catch {}
+          document.querySelector("meta[name=theme-color]").content = dark ? "#1e1927" : "#f7f5fa";
+          render();
+        },
+        quick() {
+          openModal(
+            "Acciones rápidas",
+            `<div class="quick-menu">${btn("Nuevo turno", "appointment", "outline", "", "calendar")}${btn("Registrar cobro", "payment", "outline", "", "coins")}${btn("Nuevo paciente", "patient", "outline", "", "users")}${btn("Registrar gasto", "expense", "outline", "", "wallet")}${btn("Agregar recordatorio", "task", "outline", "", "task")}</div>`,
+            "quick",
+          );
+        },
+        patient: (el) => formPatient(el.dataset.id),
+        "patient-detail": (el) => patientDetail(el.dataset.id),
+        "patient-appointment": (el) => formAppointment("", today(), el.dataset.id),
+        appointment: (el) => formAppointment(el.dataset.id || "", el.dataset.date || ""),
+        duplicate: (el) => formAppointment(el.dataset.id, "", "", true),
+        session: (el) => sessionDetail(el.dataset.id),
+        payment: (el) => formPayment(el.dataset.id),
+        complete: (el) => formComplete(el.dataset.id),
+        expense: (el) => formRecord("expense", el.dataset.id),
+        income: (el) => formRecord("income", el.dataset.id),
+        saving: (el) => formRecord("saving", el.dataset.id),
+        task: (el) => formTask(el.dataset.id),
+        settings: formSettings,
+        balance: (el) => formBalance(el.dataset.id || "Activo"),
+        "balance-detail": (el) => balanceDetail(el.dataset.id),
+        "payment-detail": (el) => paymentDetail(el.dataset.id),
+        whatsapp: (el) => whatsappModal(el.dataset.id),
+        "go-day"() {
+          view.date = today();
+          view.agendaMode = "day";
+          view.agendaStatus = "";
+          view.agendaPatient = "";
+          navigate("agenda");
+        },
+        "go-week"() {
+          view.date = today();
+          view.agendaMode = "week";
+          view.agendaStatus = "";
+          view.agendaPatient = "";
+          navigate("agenda");
+        },
+        "go-economy"() {
+          view.month = monthOf(today());
+          view.economyTab = "actividad";
+          navigate("economia");
+        },
+        "go-debt"() {
+          view.month = monthOf(today());
+          view.economyTab = "actividad";
+          navigate("economia");
+          document
+            .getElementById("economy-debt")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        },
+        "economy-debt"() {
+          document
+            .getElementById("economy-debt")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        },
+        "economy-movements"(el) {
+          view.economyTab = "movimientos";
+          view.economyType = el.dataset.type || "all";
+          render();
+        },
+        "select-day"(el) {
+          view.date = el.dataset.date;
+          view.agendaMode = "day";
+          view.agendaStatus = "";
+          navigate("agenda");
+        },
+        "month-day"(el) {
+          view.date = el.dataset.date;
+          render();
+        },
+        overdue() {
+          view.agendaMode = "list";
+          view.agendaStatus = "overdue";
+          view.agendaPatient = "";
+          navigate("agenda");
+        },
+        "date-prev"() {
+          view.date =
+            view.agendaMode === "month"
+              ? addMonths(view.date, -1)
+              : addDays(view.date, view.agendaMode === "week" ? -7 : -1);
+          render();
+        },
+        "date-next"() {
+          view.date =
+            view.agendaMode === "month"
+              ? addMonths(view.date, 1)
+              : addDays(view.date, view.agendaMode === "week" ? 7 : 1);
+          render();
+        },
+        "date-today"() {
+          view.date = today();
+          render();
+        },
+        "patient-status"(el) {
+          const p = patient(el.dataset.id);
+          if (p.status === "Inactivo") {
+            confirmModal(
+              "Reactivar paciente",
+              "La ficha volverá a aparecer entre los pacientes activos.",
+              "confirm-patient-status",
+              p.id,
+            );
+          } else
+            confirmModal(
+              "Dar de baja al paciente",
+              "Se conserva la ficha, las sesiones y el historial de cobros. Elegí qué hacer con sus turnos futuros.",
+              "confirm-patient-status",
+              p.id,
+              `<label class="field" style="margin-top:20px">Turnos futuros<select id="cancel-future"><option value="keep">Mantener los turnos</option><option value="cancel">Cancelar turnos agendados desde hoy</option></select></label>`,
+            );
+        },
+        "confirm-patient-status"(el) {
+          const id = el.dataset.id,
+            cancel = document.getElementById("cancel-future")?.value === "cancel";
+          if (
+            mutate((s) => {
+              const p = patient(id, s);
+              p.status = p.status === "Activo" ? "Inactivo" : "Activo";
+              if (p.status === "Inactivo" && cancel)
+                appointments(s)
+                  .filter(
+                    (a) =>
+                      a.patient_id === id &&
+                      a.date >= today() &&
+                      a.appointment_status === "Agendado",
+                  )
+                  .forEach((a) => (a.appointment_status = "Cancelado"));
+            }, "Estado del paciente actualizado")
+          )
+            closeModal();
+        },
+        unwaive(el) {
+          confirmModal(
+            "Restablecer honorario",
+            "Se quitará la bonificación y volverá a calcularse el saldo a partir del honorario y los cobros existentes.",
+            "confirm-unwaive",
+            el.dataset.id,
+          );
+        },
+        "confirm-unwaive"(el) {
+          if (
+            mutate((s) => {
+              const a = appointment(el.dataset.id, s);
+              a.financial_status = "Pendiente";
+              financialSync(a, s);
+            }, "Honorario restablecido")
+          )
+            closeModal();
+        },
+        "cancel-session"(el) {
+          const a = appointment(el.dataset.id);
+          confirmModal(
+            "Cancelar turno",
+            "Se libera el horario y se quita el cargo pendiente. Los cobros previos se conservan como saldo a favor.",
+            "confirm-cancel",
+            a.id,
+            scopeSelect(a),
+          );
+        },
+        "confirm-cancel"(el) {
+          const a = appointment(el.dataset.id),
+            ids = seriesScope(a, scopeValue());
+          if (
+            mutate(
+              (s) =>
+                appointments(s)
+                  .filter((x) => ids.includes(x.id))
+                  .forEach((x) => (x.appointment_status = "Cancelado")),
+              "Turno cancelado",
+            )
+          )
+            closeModal();
+        },
+        absent(el) {
+          confirmModal(
+            "Registrar ausencia",
+            "Se marca la sesión como ausente y se mantiene su honorario. Podés bonificarla desde Registrar asistencia si corresponde.",
+            "confirm-absent",
+            el.dataset.id,
+          );
+        },
+        "confirm-absent"(el) {
+          if (
+            mutate(
+              (s) => (appointment(el.dataset.id, s).appointment_status = "Ausente"),
+              "Ausencia registrada",
+            )
+          )
+            closeModal();
+        },
+        reopen(el) {
+          confirmModal(
+            "Volver a agendado",
+            "Se conserva el honorario y los cobros. Se comprobará la disponibilidad del horario.",
+            "confirm-reopen",
+            el.dataset.id,
+          );
+        },
+        "confirm-reopen"(el) {
+          if (
+            mutate((s) => {
+              const a = appointment(el.dataset.id, s),
+                updated = { ...a, appointment_status: "Agendado" };
+              const conflict = collision([updated], appointments(s), new Set([a.id]));
+              if (conflict)
+                throw Error(
+                  "Ese horario se superpone con otra sesión. Editá primero la fecha o la hora.",
+                );
+              a.appointment_status = "Agendado";
+              a.completed_at = null;
+              financialSync(a, s);
+            }, "Turno agendado nuevamente")
+          )
+            closeModal();
+        },
+        "delete-session"(el) {
+          confirmModal(
+            "Eliminar turno",
+            "Se elimina este turno sin cobros asociados. El resto de la serie se conserva.",
+            "confirm-delete-session",
+            el.dataset.id,
+          );
+        },
+        "confirm-delete-session"(el) {
+          if (
+            mutate((s) => {
+              if (s.data.payment_allocations.some((x) => x.appointment_id === el.dataset.id))
+                throw Error(
+                  "Este turno tiene historial de cobros. Cancelalo para conservar ese historial.",
+                );
+              s.data.appointments = s.data.appointments.filter((x) => x.id !== el.dataset.id);
+            }, "Turno eliminado")
+          )
+            closeModal();
+        },
+        "reverse-payment"(el) {
+          confirmModal(
+            "Anular cobro",
+            "El movimiento quedará marcado como anulado. Se recalcularán el saldo de la sesión y la cuenta donde se registró.",
+            "confirm-reverse",
+            el.dataset.id,
+          );
+        },
+        "confirm-reverse"(el) {
+          if (mutate((s) => reversePayment(s, el.dataset.id), "Cobro anulado")) closeModal();
+        },
+        "delete-record"(el) {
+          confirmModal(
+            "Eliminar movimiento",
+            "El movimiento quedará anulado y se revertirá su efecto en las cuentas de esta versión.",
+            "confirm-delete-record",
+            el.dataset.id,
+          );
+        },
+        "confirm-delete-record"(el) {
+          const [kind, id] = el.dataset.id.split(":");
+          if (
+            mutate((s) => {
+              const table = { expense: "expenses", income: "other_income", saving: "savings" }[
+                  kind
+                ],
+                r = s.data[table].find((x) => x.id === id);
+              if (!r) throw Error("No se encontró el movimiento.");
+              undoCash(s, kind + ":" + id);
+              r.deleted = true;
+            }, "Movimiento eliminado")
+          )
+            closeModal();
+        },
+        "delete-balance"(el) {
+          confirmModal(
+            "Eliminar cuenta",
+            "Se elimina el saldo de esta cuenta del período.",
+            "confirm-delete-balance",
+            el.dataset.id,
+          );
+        },
+        "confirm-delete-balance"(el) {
+          if (
+            mutate((s) => {
+              if (s.data.balance_movements.some((x) => x.balance_item_id === el.dataset.id))
+                throw Error("La cuenta tiene movimientos. Podés editar su saldo.");
+              s.data.balance_items = s.data.balance_items.filter((x) => x.id !== el.dataset.id);
+            }, "Cuenta eliminada")
+          )
+            closeModal();
+        },
+        "delete-task"(el) {
+          confirmModal(
+            "Eliminar recordatorio",
+            "Se quitará este recordatorio.",
+            "confirm-delete-task",
+            el.dataset.id,
+          );
+        },
+        "confirm-delete-task"(el) {
+          if (
+            mutate(
+              (s) => (s.data.tasks = s.data.tasks.filter((x) => x.id !== el.dataset.id)),
+              "Recordatorio eliminado",
+            )
+          )
+            closeModal();
+        },
+        category() {
+          openModal(
+            "Nueva categoría de gasto",
+            formShell(
+              "category",
+              field("Nombre", "name", "", "text", 'required maxlength="120"') +
+                select("Grupo", "group_name", [
+                  "Profesional",
+                  "Servicios e Impuestos",
+                  "Personal y Hogar",
+                  "Otros",
+                ]),
+            ),
+            "category",
+          );
+        },
+        export: () => exportData(),
+        "csv-patients": () => exportCSV("patients"),
+        "csv-sessions": () => exportCSV("sessions"),
+        "csv-economy": () => exportCSV("economy"),
+        import: importModal,
+        "confirm-import": () => commitImport(stagedImport),
+        restore() {
+          try {
+            stagedImport = assertImport(JSON.parse(localStorage.getItem(PREVIOUS)));
+            confirmModal(
+              "Recuperar copia anterior",
+              "Se reemplazará el guardado actual por el respaldo anterior a la última importación. Se descargará una copia del actual.",
+              "confirm-import",
+            );
+          } catch (e) {
+            toast("No se pudo leer la copia anterior.", true);
+          }
+        },
+        async "copy-whatsapp"() {
+          const text = document.getElementById("whatsapp-text").value;
+          try {
+            await navigator.clipboard.writeText(text);
+            toast("Mensaje copiado");
+          } catch {
+            document.getElementById("whatsapp-text").select();
+            toast("Seleccionamos el mensaje. Copialo desde el menú del dispositivo.");
+          }
+        },
+        "open-whatsapp"() {
+          const phone = document.getElementById("whatsapp-number").value.replace(/\D/g, ""),
+            text = document.getElementById("whatsapp-text").value.trim();
+          if (!/^\d{8,15}$/.test(phone)) {
+            showError("Ingresá el número con código de país, sin el signo +.");
+            return;
+          }
+          if (!text) {
+            showError("Escribí un mensaje.");
+            return;
+          }
+          window.open(
+            "https://wa.me/" + phone + "?text=" + encodeURIComponent(text),
+            "_blank",
+            "noopener,noreferrer",
+          );
+        },
+      };
+      document.addEventListener("click", (event) => {
+        const el = event.target.closest(
+          "button[data-act],button[data-nav],button[data-agenda-mode],button[data-patient-filter],button[data-economy-tab],button[data-chart-month]",
+        );
+        if (!el) return;
+        if (el.dataset.nav) {
+          if (modal.open) closeModal();
+          navigate(el.dataset.nav);
+        } else if (el.dataset.agendaMode) {
+          view.agendaMode = el.dataset.agendaMode;
+          render();
+        } else if (el.dataset.patientFilter) {
+          view.patientFilter = el.dataset.patientFilter;
+          render();
+        } else if (el.dataset.economyTab) {
+          view.economyTab = el.dataset.economyTab;
+          render();
+        } else if (el.dataset.chartMonth) {
+          view.month = el.dataset.chartMonth;
+          render();
+        } else actions[el.dataset.act]?.(el);
+      });
+      document.addEventListener("input", (event) => {
+        const el = event.target;
+        if (el.id === "patient-search") {
+          view.patientQuery = el.value;
+          const rows = patients().filter(
+            (p) =>
+              normalize(p.name + " " + p.phone + " " + p.locality).includes(
+                normalize(view.patientQuery),
+              ) &&
+              (view.patientFilter === "debt"
+                ? patientDebt(p.id) > 0
+                : view.patientFilter === "all" || p.status === view.patientFilter),
+          );
+          document.getElementById("patient-results").innerHTML = patientCards(rows);
+        }
+        if (el.id === "global-query") {
+          view.searchQuery = el.value;
+          updateSearch();
+        }
+      });
+      document.addEventListener("change", (event) => {
+        const el = event.target;
+        if (el.id === "agenda-patient") {
+          view.agendaPatient = el.value;
+          render();
+        }
+        if (el.id === "agenda-status") {
+          view.agendaStatus = el.value;
+          render();
+        }
+        if (el.id === "agenda-date" && validDate(el.value)) {
+          view.date = el.value;
+          render();
+        }
+        if (el.id === "economy-month" && validMonth(el.value)) {
+          view.month = el.value;
+          render();
+        }
+        if (el.id === "economy-type") {
+          view.economyType = el.value;
+          render();
+        }
+        if (el.id === "show-done") {
+          view.showDone = el.checked;
+          render();
+        }
+        if (el.id === "import-file") readImport(el.files[0]);
+        if (el.dataset.task)
+          mutate(
+            (s) => {
+              const t = s.data.tasks.find((t) => t.id === el.dataset.task);
+              if (t) t.done = el.checked;
+            },
+            el.checked ? "Recordatorio completado" : "Recordatorio pendiente",
+          );
+        const f = el.closest("form");
+        if (f?.dataset.form === "appointment") {
+          if (el.name === "patient_id") {
+            const p = patient(el.value);
+            f.elements.fee.value = p.default_fee;
+            f.elements.modality.value = p.modality;
+            if (p.status === "Inactivo") toast("Al guardar el turno, esta ficha se reactivará.");
+          }
+          toggleRecurrence();
+        }
+        if (f?.dataset.form === "payment" && el.name === "appointment_id")
+          f.elements.amount.value = pending(appointment(el.value));
+        if (f?.dataset.form === "complete") toggleComplete();
+        if (f?.dataset.form === "saving") toggleSaving();
+      });
+      document.addEventListener("submit", (event) => {
+        const f = event.target;
+        if (!f.dataset.form) return;
+        event.preventDefault();
+        if (!f.reportValidity()) return;
+        const values = Object.fromEntries(new FormData(f)),
+          id = f.dataset.id,
+          kind = f.dataset.form;
+        document.getElementById("form-error").textContent = "";
+        const result = mutate(
+          (s) => {
+            if (kind === "patient") {
+              const fee = Number(values.default_fee);
+              if (!values.name.trim()) throw Error("Escribí el nombre del paciente.");
+              if (!Number.isFinite(fee) || fee < 0) throw Error("Revisá el honorario.");
+              let p = patient(id, s);
+              if (!p) {
+                p = { id: uuid(), status: "Activo", created_at: new Date().toISOString() };
+                s.data.patients.push(p);
+              }
+              Object.assign(p, {
+                name: values.name.trim(),
+                phone: values.phone.trim(),
+                email: values.email.trim(),
+                locality: values.locality.trim(),
+                default_fee: fee,
+                modality: values.modality,
+                frequency: values.frequency,
+                emergency_1: values.emergency_1.trim(),
+                emergency_2: values.emergency_2.trim(),
+                updated_at: new Date().toISOString(),
+              });
+              if (values.valid_from) {
+                if (!validDate(values.valid_from)) throw Error("Revisá la fecha de vigencia.");
+                appointments(s)
+                  .filter(
+                    (a) =>
+                      a.patient_id === p.id &&
+                      a.date >= values.valid_from &&
+                      a.appointment_status === "Agendado",
+                  )
+                  .forEach((a) => {
+                    a.fee = fee;
+                    financialSync(a, s);
+                  });
+              }
+            }
+            if (kind === "appointment") {
+              const p = patient(values.patient_id, s);
+              if (!p) throw Error("Elegí un paciente.");
+              const duration = Number(values.duration_minutes);
+              if (
+                !validDate(values.date) ||
+                !validTime(values.start_time) ||
+                minutes(values.start_time) + duration > 1440
+              )
+                throw Error(
+                  "Revisá fecha, hora y duración. La sesión debe terminar dentro del día.",
+                );
+              const data = {
+                patient_id: p.id,
+                date: values.date,
+                start_time: values.start_time,
+                duration_minutes: duration,
+                fee: Number(values.fee),
+                modality: values.modality,
+                administrative_note: values.administrative_note.trim(),
+                updated_at: new Date().toISOString(),
+              };
+              let proposed = [],
+                exclude = new Set();
+              if (id) {
+                const a = appointment(id, s);
+                if (
+                  a.patient_id !== p.id &&
+                  s.data.payment_allocations.some((x) => x.appointment_id === id)
+                )
+                  throw Error(
+                    "Un turno con cobros conserva su paciente. Creá un turno nuevo para otra ficha.",
+                  );
+                const targets =
+                  values.scope === "future" && a.recurrence_id
+                    ? appointments(s).filter(
+                        (x) =>
+                          x.id === id ||
+                          (x.recurrence_id === a.recurrence_id &&
+                            x.date + " " + x.start_time >= a.date + " " + a.start_time &&
+                            x.appointment_status === "Agendado"),
+                      )
+                    : [a];
+                const shift = Math.round((dateObj(values.date) - dateObj(a.date)) / 86400000);
+                proposed = targets.map((x) => ({
+                  ...x,
+                  ...data,
+                  date: x.id === id ? data.date : addDays(x.date, shift),
+                }));
+                exclude = new Set(targets.map((x) => x.id));
+              } else {
+                const count = values.recurrence === "none" ? 1 : Number(values.count);
+                if (!Number.isInteger(count) || count < 1 || count > 52)
+                  throw Error("La serie debe tener entre 1 y 52 sesiones.");
+                const rid = count > 1 ? uuid() : null;
+                proposed = recurDates(values.date, values.recurrence, count).map((date) => ({
+                  ...data,
+                  id: uuid(),
+                  date,
+                  appointment_status: "Agendado",
+                  financial_status: "Pendiente",
+                  recurrence_id: rid,
+                  created_at: new Date().toISOString(),
+                }));
+              }
+              const conflict = collision(proposed, appointments(s), exclude);
+              if (conflict)
+                throw Error(
+                  "Se superpone una sesión del " +
+                    fmtDate(conflict.date) +
+                    " a las " +
+                    conflict.time +
+                    ". Elegí otro horario.",
+                );
+              s.data.appointments = s.data.appointments
+                .filter((x) => !exclude.has(x.id))
+                .concat(proposed);
+              proposed.forEach((a) => financialSync(a, s));
+              p.status = "Activo";
+            }
+            if (kind === "payment")
+              registerPayment(s, {
+                appointmentId: values.appointment_id,
+                amount: Number(values.amount),
+                date: values.date,
+                method: values.method,
+              });
+            if (kind === "complete") {
+              const a = appointment(id, s);
+              if (a.appointment_status === "Realizado")
+                throw Error(
+                  "La asistencia ya está registrada. Usá Registrar cobro para agregar un pago.",
+                );
+              if (values.mode === "waived") a.financial_status = "Bonificado";
+              else if (values.mode === "full") {
+                if (pending(a, s) > 0)
+                  registerPayment(s, {
+                    appointmentId: id,
+                    amount: pending(a, s),
+                    date: values.date,
+                    method: values.method,
+                  });
+              } else if (values.mode === "partial")
+                registerPayment(s, {
+                  appointmentId: id,
+                  amount: Number(values.amount),
+                  date: values.date,
+                  method: values.method,
+                });
+              a.appointment_status = "Realizado";
+              a.completed_at = new Date().toISOString();
+              financialSync(a, s);
+            }
+            if (["expense", "income", "saving"].includes(kind)) {
+              if (!values.concept.trim()) throw Error("Escribí el concepto.");
+              const value = Number(values.amount);
+              if (!Number.isFinite(value) || value <= 0)
+                throw Error("El importe debe ser mayor a cero.");
+              const table = { expense: "expenses", income: "other_income", saving: "savings" }[
+                kind
+              ];
+              let r = s.data[table].find((x) => x.id === id);
+              if (!r) {
+                r = { id: uuid(), created_at: new Date().toISOString(), cash_managed: true };
+                s.data[table].push(r);
+              } else undoCash(s, kind + ":" + id);
+              Object.assign(r, values, {
+                id: r.id,
+                amount: amount(cents(value)),
+                concept: values.concept.trim(),
+                deleted: false,
+                updated_at: new Date().toISOString(),
+              });
+              if (kind === "expense") {
+                r.category_name = values.category;
+                if (r.status === "Pagado" && r.cash_managed)
+                  cashEffect(s, {
+                    date: r.date,
+                    method: r.method,
+                    delta: -r.amount,
+                    description: r.concept,
+                    sourceKey: kind + ":" + r.id,
+                  });
+              }
+              if (kind === "income" && r.cash_managed)
+                cashEffect(s, {
+                  date: r.date,
+                  method: r.method,
+                  delta: r.amount,
+                  description: r.concept,
+                  sourceKey: kind + ":" + r.id,
+                });
+              if (kind === "saving") {
+                if (
+                  r.type === "Traspaso" &&
+                  (!validMonth(values.destination_month) ||
+                    values.destination_month === monthOf(r.date))
+                )
+                  throw Error("El traspaso requiere un mes de destino distinto del mes de origen.");
+                if (r.type !== "Traspaso") r.destination_month = null;
+              }
+            }
+            if (kind === "balance") {
+              let item = s.data.balance_items.find((x) => x.id === id);
+              if (!item) {
+                item = { id: uuid(), created_at: new Date().toISOString() };
+                s.data.balance_items.push(item);
+              } else {
+                if (
+                  s.data.balance_movements.some((x) => x.balance_item_id === id) &&
+                  (item.kind !== values.kind || item.month !== values.month)
+                )
+                  throw Error("Una cuenta con movimientos conserva su tipo y período.");
+                const delta = amount(cents(values.amount) - cents(item.amount));
+                if (delta)
+                  s.data.balance_movements.push({
+                    id: uuid(),
+                    balance_item_id: id,
+                    date: values.month + "-01",
+                    amount: Math.abs(delta),
+                    signed_delta: delta,
+                    movement_type: "Ajuste",
+                    description: "Ajuste manual de saldo",
+                    origin: "camicas-v2",
+                    created_at: new Date().toISOString(),
+                  });
+              }
+              if (!values.name.trim()) throw Error("Ingresá un nombre.");
+              if (
+                s.data.balance_items.some(
+                  (x) =>
+                    x.id !== item.id &&
+                    x.kind === values.kind &&
+                    x.month === values.month &&
+                    normalize(x.name) === normalize(values.name),
+                )
+              )
+                throw Error("Ya existe una cuenta con ese nombre en el período.");
+              Object.assign(item, values, {
+                amount: Number(values.amount),
+                name: values.name.trim(),
+                updated_at: new Date().toISOString(),
+              });
+            }
+            if (kind === "payment-method") {
+              const p = s.data.payments.find((x) => x.id === id);
+              if (p.reversed) throw Error("No se modifica un cobro anulado.");
+              if (p.method !== values.method) {
+                const newMethod = values.method,
+                  a = s.data.payment_allocations.find((x) => x.payment_id === id);
+                const own = s.data.balance_movements.some(
+                  (x) => x.source_key === "payment:" + id && x.origin === "camicas-v2",
+                );
+                if (own) undoCash(s, "payment:" + id);
+                else
+                  for (const m of s.data.balance_movements.filter(
+                    (x) => x.payment_id === id && !x.reversed,
+                  )) {
+                    const item = s.data.balance_items.find((x) => x.id === m.balance_item_id);
+                    if (item) item.amount = amount(cents(item.amount) - cents(m.amount));
+                    m.reversed = true;
+                  }
+                cashEffect(s, {
+                  date: p.date,
+                  method: newMethod,
+                  delta: p.amount,
+                  description: "Cambio de medio de pago",
+                  paymentId: p.id,
+                  appointmentId: a?.appointment_id || null,
+                  sourceKey: "payment:" + p.id,
+                });
+                p.method = newMethod;
+              }
+            }
+            if (kind === "task") {
+              if (!values.title.trim()) throw Error("Escribí el recordatorio.");
+              let t = s.data.tasks.find((x) => x.id === id);
+              if (!t) {
+                t = { id: uuid(), done: false };
+                s.data.tasks.push(t);
+              }
+              t.title = values.title.trim();
+              t.due = values.due || null;
+            }
+            if (kind === "settings") {
+              for (const key of ["modalities", "frequencies", "payment_methods"]) {
+                const valuesList = [
+                  ...new Set(
+                    values[key]
+                      .split(",")
+                      .map((x) => x.trim())
+                      .filter(Boolean),
+                  ),
+                ];
+                if (!valuesList.length) throw Error("Ingresá al menos un valor por lista.");
+                setSetting(s, key, valuesList);
+              }
+              setSetting(s, "app_name", values.app_name.trim());
+              setSetting(s, "default_duration", Number(values.default_duration));
+              setSetting(s, "default_fee", Number(values.default_fee));
+            }
+            if (kind === "category") {
+              const name = values.name.trim();
+              if (!name) throw Error("Escribí el nombre de la categoría.");
+              if (s.data.categories.some((c) => normalize(c.name) === normalize(name)))
+                throw Error("La categoría ya existe.");
+              s.data.categories.push({
+                id: uuid(),
+                name,
+                active: 1,
+                group_name: values.group_name,
+              });
+            }
+          },
+          {
+            patient: "Ficha guardada",
+            appointment: "Turno guardado",
+            payment: "Cobro registrado",
+            complete: "Asistencia registrada",
+            expense: "Gasto guardado",
+            income: "Ingreso guardado",
+            saving: "Ahorro o traspaso guardado",
+            settings: "Preferencias guardadas",
+          }[kind] || "Cambios guardados",
+        );
+        if (result) closeModal();
+      });
+      let draggedId = null;
+      document.addEventListener("dragstart", (e) => {
+        const el = e.target.closest("[data-drag-id]");
+        if (!el) return;
+        draggedId = el.dataset.dragId;
+        e.dataTransfer.setData("text/plain", draggedId);
+        e.dataTransfer.effectAllowed = "move";
+      });
+      document.addEventListener("dragover", (e) => {
+        const el = e.target.closest("[data-drop-date]");
+        if (el && draggedId) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          el.classList.add("drop-over");
+        }
+      });
+      document.addEventListener("dragleave", (e) =>
+        e.target.closest("[data-drop-date]")?.classList.remove("drop-over"),
+      );
+      document.addEventListener("dragend", () => {
+        draggedId = null;
+        document.querySelectorAll(".drop-over").forEach((x) => x.classList.remove("drop-over"));
+      });
+      document.addEventListener("drop", (e) => {
+        const el = e.target.closest("[data-drop-date]");
+        if (!el || !draggedId) return;
+        e.preventDefault();
+        const a = appointment(draggedId),
+          date = el.dataset.dropDate;
+        draggedId = null;
+        document.querySelectorAll(".drop-over").forEach((x) => x.classList.remove("drop-over"));
+        if (!a || a.date === date) return;
+        confirmModal(
+          "Reprogramar sesión",
+          `Se moverá la sesión del ${esc(fmtDate(a.date))} al ${esc(fmtDate(date))}, a las ${a.start_time}. Los cobros se conservan.`,
+          "confirm-drop",
+          a.id,
+          `<input type="hidden" id="drop-date" value="${date}">`,
+        );
+      });
+      actions["confirm-drop"] = (el) => {
+        const date = document.getElementById("drop-date").value;
+        if (
+          mutate((s) => {
+            const a = appointment(el.dataset.id, s),
+              updated = { ...a, date };
+            const conflict = collision([updated], appointments(s), new Set([a.id]));
+            if (conflict)
+              throw Error(
+                "Ese horario se superpone con otra sesión. Editá el turno para elegir otra hora.",
+              );
+            a.date = date;
+            a.updated_at = new Date().toISOString();
+          }, "Turno reprogramado")
+        )
+          closeModal();
+      };
+      modal.addEventListener("cancel", (e) => {
+        e.preventDefault();
+        closeModal();
+      });
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          const r = modal.getBoundingClientRect();
+          if (
+            e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom
+          )
+            closeModal();
+        }
+      });
+      document.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          searchModal();
+        }
+      });
+      window.addEventListener("hashchange", () => {
+        const page = location.hash.slice(1);
+        if (navItems.some((x) => x[0] === page) && page !== view.page) {
+          view.page = page;
+          render();
+        }
+      });
+      window.addEventListener("storage", (e) => {
+        if (e.key === STORE && e.newValue) {
+          try {
+            db = assertImport(JSON.parse(e.newValue));
+            render();
+            if (modal.open)
+              toast(
+                "Cambió el guardado desde otra pestaña. Revisá el formulario antes de guardar.",
+              );
+            else toast("Datos actualizados desde otra pestaña");
+          } catch {
+            toast("No se pudo leer el cambio de otra pestaña.", true);
+          }
+        }
+      });
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("camicas.v2.theme") ||
+          (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      } catch {
+        document.documentElement.dataset.theme = "light";
+      }
+      render();
+
+      // Short, sourced quotations. Spanish translations are explicitly labelled.
+      const welcomeQuotes = [
+        {
+          text: "Con la autocompasión, nos damos la misma amabilidad y apoyo que le daríamos a un buen amigo.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/",
+          sourceTitle: "Self-Compassion · sitio de Kristin Neff",
+        },
+        {
+          text: "El límite de lo que aceptamos es el límite de nuestra libertad.",
+          author: "Tara Brach",
+          source: "https://www.tarabrach.com/judgment-acceptance-freedom-retreat/",
+          sourceTitle: "Judgment, Acceptance and Freedom · Tara Brach",
+        },
+        {
+          text: "Al habitar el momento presente, sé que este es un momento maravilloso.",
+          author: "Thich Nhat Hanh",
+          source: "https://web.plumvillage.app/item/calming-the-breath-gatha",
+          sourceTitle: "Calming the Breath Gatha · Plum Village",
+        },
+        {
+          text: "No hay un camino hacia la felicidad; la felicidad es el camino.",
+          author: "Thich Nhat Hanh",
+          source: "https://plumvillage.org/articles/teachings-on-true-transmission",
+          sourceTitle: "Teachings on True Transmission · Plum Village",
+        },
+      ];
+      const WELCOME_STORE = "camicas.v2.welcome";
+      let welcomePrefs = { enabled: true, seen: false, lastShown: 0, lastIndex: -1 },
+        welcomeVisible = false,
+        welcomeIndex = 0;
+      try {
+        const saved = JSON.parse(storageGet(WELCOME_STORE) || "null");
+        if (saved && typeof saved === "object")
+          welcomePrefs = { ...welcomePrefs, ...saved, enabled: saved.enabled !== false };
+      } catch {}
+      function saveWelcomePrefs() {
+        try {
+          localStorage.setItem(WELCOME_STORE, JSON.stringify(welcomePrefs));
+        } catch {}
+      }
+      function chooseWelcome() {
+        const choices = welcomeQuotes.map((_, i) => i).filter((i) => i !== welcomePrefs.lastIndex);
+        welcomeIndex = choices[Math.floor(Math.random() * choices.length)];
+        welcomePrefs.lastIndex = welcomeIndex;
+        welcomePrefs.lastShown = Date.now();
+        welcomePrefs.seen = true;
+        saveWelcomePrefs();
+      }
+      if (
+        welcomePrefs.enabled &&
+        (!welcomePrefs.seen ||
+          (Date.now() - Number(welcomePrefs.lastShown) > 18 * 60 * 60 * 1000 &&
+            Math.random() < 0.5))
+      ) {
+        welcomeVisible = true;
+        chooseWelcome();
+      }
+      function renderWelcome() {
+        document.getElementById("welcome-card")?.remove();
+        if (welcomeVisible && welcomePrefs.enabled) {
+          const q = welcomeQuotes[welcomeIndex];
+          main.insertAdjacentHTML(
+            "afterbegin",
+            `<aside class="welcome-card" id="welcome-card" aria-label="Mensaje de bienvenida"><span class="welcome-flower" aria-hidden="true">✿</span><div class="welcome-content"><div class="welcome-label">Una pequeña bienvenida</div><blockquote>«${esc(q.text)}»</blockquote><div class="welcome-credit">${esc(q.author)} <span>·</span> <a href="${esc(q.source)}" target="_blank" rel="noopener noreferrer" title="${esc(q.sourceTitle)}">Fuente</a> <span>·</span> Traducción propia</div><button class="welcome-disable" data-act="welcome-disable">No mostrar más</button></div><button class="icon-button welcome-close" data-act="welcome-dismiss" aria-label="Cerrar mensaje de bienvenida">×</button></aside>`,
+          );
+        }
+        if (view.page === "mas") {
+          const card = main.querySelector(".settings-grid .card"),
+            last = card?.querySelector('button[data-act="category"]');
+          if (card && last)
+            last.insertAdjacentHTML(
+              "beforebegin",
+              `<div class="setting-line"><span>Mensajes de bienvenida<small>Ocasionales, sin bloquear la agenda</small></span><button class="btn small outline" data-act="welcome-toggle" aria-pressed="${welcomePrefs.enabled}">${welcomePrefs.enabled ? "Activados" : "Desactivados"}</button></div>`,
+            );
+        }
+      }
+      actions["welcome-dismiss"] = () => {
+        welcomeVisible = false;
+        document.getElementById("welcome-card")?.remove();
+      };
+      actions["welcome-disable"] = () => {
+        welcomePrefs.enabled = false;
+        welcomeVisible = false;
+        saveWelcomePrefs();
+        render();
+        toast("Mensajes de bienvenida desactivados. Podés reactivarlos en Más.");
+      };
+      actions["welcome-toggle"] = () => {
+        welcomePrefs.enabled = !welcomePrefs.enabled;
+        if (welcomePrefs.enabled) {
+          welcomeVisible = true;
+          chooseWelcome();
+        } else welcomeVisible = false;
+        saveWelcomePrefs();
+        render();
+      };
+      const renderWithoutWelcome = render;
+      render = function () {
+        renderWithoutWelcome();
+        renderWelcome();
+      };
+      render();
+    </script>
+  </body>
+</html>
