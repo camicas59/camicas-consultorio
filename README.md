@@ -19,7 +19,7 @@ Los dos HTML son idénticos. No requieren compilación, paquetes ni servicios ex
 
 La paleta combina violeta suave y lavanda. El modo oscuro mantiene esa familia de colores. Las flores acompañan los controles habituales; no hay botón de pausa ni temporizadores.
 
-Al abrirse, la aplicación puede mostrar una cita breve sin bloquear la agenda. Aparece la primera vez y después sólo ocasionalmente, como máximo una vez cada 18 horas. Se cierra con la X, se desactiva con **No mostrar más** y se reactiva desde **Más**.
+Al abrirse o volver a la aplicación, puede aparecer una bienvenida encima de la pantalla. Hay que cerrarla con la X o **Entrar a Camicas**. Se muestra como máximo dos veces por día y con al menos seis horas entre mensajes; no queda como una tarjeta del inicio. Se desactiva con **No mostrar más** y se reactiva desde **Más**. El límite se cuenta en el navegador del celular.
 
 Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras. Son traducciones propias del inglés, y cada mensaje enlaza su fuente:
 

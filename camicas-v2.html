@@ -1811,6 +1811,41 @@
         }
       }
       /* Controles cómodos para el uso diario desde el celular. */
+      #welcome-dialog {
+        width: min(430px, calc(100% - 32px));
+        border-color: var(--line);
+      }
+      .welcome-popup {
+        position: relative;
+        padding: 32px 24px 20px;
+        text-align: center;
+        background: var(--surface);
+      }
+      .welcome-popup .welcome-flower {
+        display: block;
+        font-size: 2.5rem;
+        margin: 0 0 14px;
+      }
+      .welcome-popup h2 {
+        font-size: 1.15rem;
+        color: var(--primary);
+        margin-bottom: 20px;
+      }
+      .welcome-popup blockquote {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin: 0 0 16px;
+      }
+      .welcome-popup .welcome-credit {
+        margin-bottom: 24px;
+      }
+      .welcome-popup .btn {
+        width: 100%;
+      }
+      .welcome-popup .welcome-disable {
+        display: block;
+        margin: 8px auto 0;
+      }
       @media (max-width: 899px) {
         html {
           scroll-padding-bottom: calc(100px + env(safe-area-inset-bottom));
@@ -4785,7 +4820,14 @@
         },
       ];
       const WELCOME_STORE = "camicas.v2.welcome";
-      let welcomePrefs = { enabled: true, seen: false, lastShown: 0, lastIndex: -1 },
+      let welcomePrefs = {
+          enabled: true,
+          seen: false,
+          lastShown: 0,
+          lastIndex: -1,
+          day: "",
+          count: 0,
+        },
         welcomeVisible = false,
         welcomeIndex = 0;
       try {
@@ -4798,45 +4840,61 @@
           localStorage.setItem(WELCOME_STORE, JSON.stringify(welcomePrefs));
         } catch {}
       }
+      function welcomeDay(now) {
+        const date = new Date(now);
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      }
+      function welcomeCanShow(prefs, now) {
+        const count = prefs.day === welcomeDay(now) ? Number(prefs.count) || 0 : 0;
+        return (
+          prefs.enabled !== false &&
+          count < 2 &&
+          (!prefs.lastShown || now - Number(prefs.lastShown) >= 6 * 60 * 60 * 1000)
+        );
+      }
       function chooseWelcome() {
         const choices = welcomeQuotes.map((_, i) => i).filter((i) => i !== welcomePrefs.lastIndex);
         welcomeIndex = choices[Math.floor(Math.random() * choices.length)];
+        const now = Date.now(),
+          day = welcomeDay(now);
+        welcomePrefs.count = welcomePrefs.day === day ? (Number(welcomePrefs.count) || 0) + 1 : 1;
+        welcomePrefs.day = day;
         welcomePrefs.lastIndex = welcomeIndex;
-        welcomePrefs.lastShown = Date.now();
+        welcomePrefs.lastShown = now;
         welcomePrefs.seen = true;
         saveWelcomePrefs();
       }
-      if (
-        welcomePrefs.enabled &&
-        (!welcomePrefs.seen ||
-          (Date.now() - Number(welcomePrefs.lastShown) > 18 * 60 * 60 * 1000 &&
-            Math.random() < 0.5))
-      ) {
+      if (welcomeCanShow(welcomePrefs, Date.now())) {
         welcomeVisible = true;
         chooseWelcome();
       }
+      const welcomeDialog = document.createElement("dialog");
+      welcomeDialog.id = "welcome-dialog";
+      welcomeDialog.setAttribute("aria-labelledby", "welcome-title");
+      document.body.append(welcomeDialog);
+      welcomeDialog.addEventListener("cancel", () => {
+        welcomeVisible = false;
+      });
       function renderWelcome() {
-        document.getElementById("welcome-card")?.remove();
-        if (welcomeVisible && welcomePrefs.enabled) {
+        if (welcomeVisible && welcomePrefs.enabled && !welcomeDialog.open) {
           const q = welcomeQuotes[welcomeIndex];
-          main.insertAdjacentHTML(
-            "afterbegin",
-            `<aside class="welcome-card" id="welcome-card" aria-label="Mensaje de bienvenida"><span class="welcome-flower" aria-hidden="true">✿</span><div class="welcome-content"><div class="welcome-label">Una pequeña bienvenida</div><blockquote>«${esc(q.text)}»</blockquote><div class="welcome-credit">${esc(q.author)} <span>·</span> <a href="${esc(q.source)}" target="_blank" rel="noopener noreferrer" title="${esc(q.sourceTitle)}">Fuente</a> <span>·</span> Traducción propia</div><button class="welcome-disable" data-act="welcome-disable">No mostrar más</button></div><button class="icon-button welcome-close" data-act="welcome-dismiss" aria-label="Cerrar mensaje de bienvenida">×</button></aside>`,
-          );
+          welcomeDialog.innerHTML = `<div class="welcome-popup"><button class="icon-button welcome-close" data-act="welcome-dismiss" aria-label="Cerrar mensaje de bienvenida">×</button><span class="welcome-flower" aria-hidden="true">✿</span><h2 id="welcome-title">Un momento para vos</h2><blockquote>«${esc(q.text)}»</blockquote><div class="welcome-credit">${esc(q.author)} <span>·</span> <a href="${esc(q.source)}" target="_blank" rel="noopener noreferrer" title="${esc(q.sourceTitle)}">Fuente</a><br>Traducción propia</div><button class="btn primary" data-act="welcome-dismiss" autofocus>Entrar a Camicas</button><button class="welcome-disable" data-act="welcome-disable">No mostrar más</button></div>`;
+          welcomeDialog.showModal();
         }
+        if (!welcomeVisible && welcomeDialog.open) welcomeDialog.close();
         if (view.page === "mas") {
           const card = main.querySelector(".settings-grid .card"),
             last = card?.querySelector('button[data-act="category"]');
           if (card && last)
             last.insertAdjacentHTML(
               "beforebegin",
-              `<div class="setting-line"><span>Mensajes de bienvenida<small>Ocasionales, sin bloquear la agenda</small></span><button class="btn small outline" data-act="welcome-toggle" aria-pressed="${welcomePrefs.enabled}">${welcomePrefs.enabled ? "Activados" : "Desactivados"}</button></div>`,
+              `<div class="setting-line"><span>Mensajes de bienvenida<small>Hasta dos al día, separados por 6 horas</small></span><button class="btn small outline" data-act="welcome-toggle" aria-pressed="${welcomePrefs.enabled}">${welcomePrefs.enabled ? "Activados" : "Desactivados"}</button></div>`,
             );
         }
       }
       actions["welcome-dismiss"] = () => {
         welcomeVisible = false;
-        document.getElementById("welcome-card")?.remove();
+        welcomeDialog.close();
       };
       actions["welcome-disable"] = () => {
         welcomePrefs.enabled = false;
@@ -4847,13 +4905,27 @@
       };
       actions["welcome-toggle"] = () => {
         welcomePrefs.enabled = !welcomePrefs.enabled;
-        if (welcomePrefs.enabled) {
+        if (welcomeCanShow(welcomePrefs, Date.now())) {
           welcomeVisible = true;
           chooseWelcome();
         } else welcomeVisible = false;
         saveWelcomePrefs();
         render();
       };
+      function maybeWelcome() {
+        if (
+          !document.hidden &&
+          !welcomeDialog.open &&
+          !document.getElementById("modal").open &&
+          welcomeCanShow(welcomePrefs, Date.now())
+        ) {
+          welcomeVisible = true;
+          chooseWelcome();
+          renderWelcome();
+        }
+      }
+      document.addEventListener("visibilitychange", maybeWelcome);
+      window.addEventListener("pageshow", maybeWelcome);
       const renderWithoutWelcome = render;
       render = function () {
         renderWithoutWelcome();
