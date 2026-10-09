@@ -1815,6 +1815,56 @@
         width: min(430px, calc(100% - 32px));
         border-color: var(--line);
       }
+      .special-national,
+      .special-tourism {
+        background: #f8e7c8 !important;
+        color: #6f4518 !important;
+        border-color: #dcad69 !important;
+      }
+      .special-cordoba {
+        background: #daebf2 !important;
+        color: #245368 !important;
+        border-color: #87b5c9 !important;
+      }
+      .special-personal {
+        background: #f6dae9 !important;
+        color: #763a5b !important;
+        border-color: #d794b5 !important;
+      }
+      .special-national .day-number,
+      .special-tourism .day-number,
+      .special-cordoba .day-number,
+      .special-personal .day-number {
+        color: inherit !important;
+      }
+      .special-notice {
+        border: 1px solid var(--line);
+        background: var(--peach);
+        padding: 14px 16px;
+        border-radius: 12px;
+        margin: 0 0 18px;
+        font-size: 0.875rem;
+      }
+      .special-notice a {
+        font-size: 0.75rem;
+        text-underline-offset: 3px;
+      }
+      .special-line {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        border: 1px solid;
+        border-radius: 10px;
+        padding: 12px;
+        margin-top: 12px;
+        font-size: 0.875rem;
+      }
+      .special-line strong {
+        min-width: 50px;
+      }
+      .special-line span {
+        min-width: 0;
+      }
       .welcome-popup {
         position: relative;
         padding: 32px 24px 20px;
@@ -2004,6 +2054,8 @@
         "categories",
         "settings",
         "tasks",
+        "calendar_days",
+        "calendar_days",
       ];
       const uuid = () =>
         globalThis.crypto?.randomUUID?.() ||
@@ -2228,6 +2280,12 @@
         );
       }
       function financialSync(a, store) {
+        if (a.fee == null) {
+          a.fee_pending = true;
+          a.financial_status = "Por completar";
+          return;
+        }
+        a.fee_pending = false;
         if (a.financial_status === "Bonificado") return;
         a.financial_status =
           pending(a, store) > 0 ? (paid(a, store) > 0 ? "Parcial" : "Pendiente") : "Cobrado";
@@ -2283,6 +2341,8 @@
       function registerPayment(store, { appointmentId, amount: value, date, method }) {
         const a = appointment(appointmentId, store);
         if (!a) throw Error("Elegí un turno válido.");
+        if (a.fee == null) throw Error("Completá el honorario del turno antes de cobrar.");
+        if (a.fee == null) throw Error("Completá el honorario del turno antes de cobrar.");
         if (a.appointment_status === "Cancelado" || a.financial_status === "Bonificado")
           throw Error("Este turno no admite un nuevo cobro.");
         if (!validDate(date)) throw Error("Revisá la fecha del cobro.");
@@ -2410,7 +2470,7 @@
             Number(a.duration_minutes) < 5 ||
             minutes(a.start_time) + Number(a.duration_minutes) > 1440 ||
             !["Agendado", "Realizado", "Ausente", "Cancelado"].includes(a.appointment_status) ||
-            a.fee == null
+            (a.fee == null && a.fee_pending !== true)
           )
             throw Error("Hay un turno con datos inválidos o paciente inexistente.");
         for (const p of result.data.payments)
@@ -2498,6 +2558,22 @@
             (x.done != null && typeof x.done !== "boolean")
           )
             throw Error("Hay un recordatorio con datos inválidos.");
+        for (const x of result.data.calendar_days)
+          if (
+            !validDate(x.date) ||
+            typeof x.name !== "string" ||
+            !x.name.trim() ||
+            (x.annual != null && typeof x.annual !== "boolean")
+          )
+            throw Error("Hay una fecha especial inválida.");
+        for (const x of result.data.calendar_days)
+          if (
+            !validDate(x.date) ||
+            typeof x.name !== "string" ||
+            !x.name.trim() ||
+            (x.annual != null && typeof x.annual !== "boolean")
+          )
+            throw Error("Hay una fecha especial inválida.");
         for (const key of ["updatedAt", "lastBackup"])
           if (
             input[key] != null &&
@@ -2636,7 +2712,7 @@
       }
       function sessionRow(a, { date = false } = {}) {
         const p = patient(a.patient_id);
-        return `<article class="session-row"><div class="session-time">${esc(a.start_time)}<small>${date ? esc(fmtDate(a.date)) : esc(a.duration_minutes) + " min"}</small></div><div class="session-main"><button class="session-name" data-act="session" data-id="${esc(a.id)}">${esc(p?.name || "Paciente sin ficha")}</button><div class="session-info">${esc(a.modality)} <span>·</span> ${money(a.fee)}</div><div class="session-status">${badge(a.appointment_status)}${a.financial_status === "Bonificado" ? badge("Bonificado") : pending(a) > 0 ? badge(money(pending(a)) + " pendiente", "pending") : charge(a) > 0 ? badge("Cobrado", "Realizado") : ""}${credit(a) > 0 ? badge(money(credit(a)) + " a favor", "pending") : ""}</div></div><div class="row-actions"><button class="icon-button" data-act="session" data-id="${esc(a.id)}" aria-label="Opciones del turno de ${esc(p?.name)}">${icon("more")}</button></div></article>`;
+        return `<article class="session-row"><div class="session-time">${esc(a.start_time)}<small>${date ? esc(fmtDate(a.date)) : esc(a.duration_minutes) + " min"}</small></div><div class="session-main"><button class="session-name" data-act="session" data-id="${esc(a.id)}">${esc(p?.name || "Paciente sin ficha")}</button><div class="session-info">${esc(a.modality || "Modalidad por completar")} <span>·</span> ${feeLabel(a.fee)}</div><div class="session-status">${badge(a.appointment_status)}${a.fee == null ? badge("Honorario por completar", "pending") : ""}${hasScheduleConflict(a) ? badge("Revisar superposición", "pending") : ""}${a.financial_status === "Bonificado" ? badge("Bonificado") : pending(a) > 0 ? badge(money(pending(a)) + " pendiente", "pending") : charge(a) > 0 ? badge("Cobrado", "Realizado") : ""}${credit(a) > 0 ? badge(money(credit(a)) + " a favor", "pending") : ""}</div></div><div class="row-actions"><button class="icon-button" data-act="session" data-id="${esc(a.id)}" aria-label="Opciones del turno de ${esc(p?.name)}">${icon("more")}</button></div></article>`;
       }
       function taskRows(limit = 50) {
         let rows = db.data.tasks
@@ -2874,7 +2950,7 @@
       }
       function patientCards(rows) {
         return rows.length
-          ? `<div class="patient-grid">${rows.map((p) => `<button class="patient-card" data-act="patient-detail" data-id="${esc(p.id)}"><div class="patient-top"><span class="avatar">${esc(initials(p.name))}</span><div><h2>${esc(p.name)}</h2><small>${esc(p.modality)} · ${esc(p.frequency)}</small></div></div><div class="patient-bottom"><span>${money(p.default_fee)}<small class="muted" style="display:block">Honorario</small></span>${patientDebt(p.id) > 0 ? badge(money(patientDebt(p.id)) + " pendiente", "pending") : badge(p.status === "Inactivo" ? "Inactivo" : "Al día", p.status === "Activo" ? "Realizado" : "")}</div></button>`).join("")}</div>`
+          ? `<div class="patient-grid">${rows.map((p) => `<button class="patient-card" data-act="patient-detail" data-id="${esc(p.id)}"><div class="patient-top"><span class="avatar">${esc(initials(p.name))}</span><div><h2>${esc(p.name)}</h2><small>${esc(p.modality || "Modalidad por completar")} · ${esc(p.frequency || "Frecuencia por completar")}</small></div></div><div class="patient-bottom"><span>${feeLabel(p.default_fee)}<small class="muted" style="display:block">Honorario</small></span>${patientDebt(p.id) > 0 ? badge(money(patientDebt(p.id)) + " pendiente", "pending") : p.default_fee == null ? badge("Datos por completar", "pending") : badge(p.status === "Inactivo" ? "Inactivo" : "Al día", p.status === "Activo" ? "Realizado" : "")}</div></button>`).join("")}</div>`
           : empty(
               patients().length ? "No encontramos coincidencias" : "Tu directorio empieza acá",
               patients().length
@@ -2912,7 +2988,7 @@
           const due = sorted(
             appointments().filter((a) => monthOf(a.date) === view.month && pending(a) > 0),
           );
-          body = `<div class="stats">${stat("Ingresos por sesiones", money(m.collected), "Por fecha de cobro", "coins", "economy-movements", 'data-type="payment"')}${stat("Saldo de sesiones", money(m.due), "Por fecha de sesión", "clock", "economy-debt")}${stat("Gastos pagados", money(m.expenses), money(m.planned) + " por pagar o planificados", "wallet", "economy-movements", 'data-type="expense"')}${stat("Disponible", money(m.available), "Incluye otros ingresos, ahorro y traspasos", "wallet", "economy-movements")}</div><div class="economy-grid"><section class="card period-card"><h2>Actividad de ${esc(fmtDate(view.month + "-01", { month: "long" }))}</h2><div class="summary-line"><span>Honorarios previstos</span><strong>${money(m.expected)}</strong></div><div class="summary-line"><span>Cobros registrados</span><strong>${money(m.collected)}</strong></div><div class="summary-line"><span>Otros ingresos</span><strong>${money(m.extra)}</strong></div><div class="summary-line"><span>Gastos pagados</span><strong>− ${money(m.expenses)}</strong></div><div class="summary-line total"><span>Resultado</span><strong>${money(m.result)}</strong></div><div class="summary-line"><span>Ahorro y traspasos enviados</span><strong>− ${money(m.saving)}</strong></div><div class="summary-line"><span>Traspasos recibidos</span><strong>+ ${money(m.transfers)}</strong></div><div class="summary-line total"><span>Disponible del mes</span><strong>${money(m.available)}</strong></div><div class="actions" style="margin-top:22px">${btn("Otro ingreso", "income", "outline", "", "plus")}${btn("Ahorro o traspaso", "saving", "outline", "", "plus")}</div></section><section class="card"><div class="card-head"><h2>El año en números</h2><span class="muted small">${view.month.slice(0, 4)}</span></div>${chart(view.month)}<div class="summary-line total"><span>Sesiones del mes</span><strong>${m.completed} realizadas / ${m.count} previstas</strong></div></section></div><section class="card" id="economy-debt"><div class="card-head"><h2>Pendientes de cobro</h2><span class="muted small">${due.length} turnos</span></div>${due.length ? due.map((a) => `<div class="ledger-row"><div class="ledger-left"><button class="session-name" data-act="session" data-id="${esc(a.id)}">${esc(patient(a.patient_id)?.name)}</button><small>${esc(fmtDate(a.date))} · ${a.start_time} · ${esc(a.appointment_status)}</small></div><span class="ledger-amount">${money(pending(a))}</span>${btn("Cobrar", "payment", "small outline", a.id)}</div>`).join("") : empty("Sin saldos pendientes", "Las sesiones de este mes están al día.", "", "", "check")}</section>`;
+          body = `<div class="stats">${stat("Ingresos por sesiones", money(m.collected), "Por fecha de cobro", "coins", "economy-movements", 'data-type="payment"')}${stat("Saldo de sesiones", money(m.due), "Por fecha de sesión", "clock", "economy-debt")}${stat("Gastos pagados", money(m.expenses), money(m.planned) + " por pagar o planificados", "wallet", "economy-movements", 'data-type="expense"')}${stat("Disponible", money(m.available), "Incluye otros ingresos, ahorro y traspasos", "wallet", "economy-movements")}</div><div class="economy-grid"><section class="card period-card"><h2>Actividad de ${esc(fmtDate(view.month + "-01", { month: "long" }))}</h2><div class="summary-line"><span>Honorarios previstos</span><strong>${money(m.expected)}</strong></div><div class="summary-line"><span>Cobros registrados</span><strong>${money(m.collected)}</strong></div><div class="summary-line"><span>Otros ingresos</span><strong>${money(m.extra)}</strong></div><div class="summary-line"><span>Gastos pagados</span><strong>− ${money(m.expenses)}</strong></div><div class="summary-line total"><span>Resultado</span><strong>${money(m.result)}</strong></div><div class="summary-line"><span>Ahorro y traspasos enviados</span><strong>− ${money(m.saving)}</strong></div><div class="summary-line"><span>Traspasos recibidos</span><strong>+ ${money(m.transfers)}</strong></div><div class="summary-line total"><span>Disponible del mes</span><strong>${money(m.available)}</strong></div><div class="actions" style="margin-top:22px">${btn("Otro ingreso", "income", "outline", "", "plus")}${btn("Ahorro o traspaso", "saving", "outline", "", "plus")}</div></section><section class="card"><div class="card-head"><h2>El año en números</h2><span class="muted small">${view.month.slice(0, 4)}</span></div>${chart(view.month)}<div class="summary-line total"><span>Sesiones del mes</span><strong>${m.completed} realizadas / ${m.count} previstas</strong></div></section></div><section class="card" id="economy-debt"><div class="card-head"><h2>Pendientes de cobro</h2><span class="muted small">${due.length} turnos</span></div>${due.length ? due.map((a) => `<div class="ledger-row"><div class="ledger-left"><button class="session-name" data-act="session" data-id="${esc(a.id)}">${esc(patient(a.patient_id)?.name)}</button><small>${esc(fmtDate(a.date))} · ${a.start_time} · ${esc(a.appointment_status)}</small></div><span class="ledger-amount">${money(pending(a))}</span>${btn("Cobrar", "payment", "small outline", a.id)}</div>`).join("") : appointments().some((a) => monthOf(a.date) === view.month && a.fee == null && a.appointment_status !== "Cancelado") ? empty("Honorarios por completar", "Completá los importes para calcular los saldos de este mes.", "", "", "clock") : empty("Sin saldos pendientes", "Las sesiones de este mes están al día.", "", "", "check")}</section>`;
         }
         if (view.economyTab === "patrimonio")
           body = `<div class="stats">${stat("Total activos", money(assets), "Saldos de las cuentas del período", "wallet", "noop")}${stat("Total pasivos", money(liabilities), "Compromisos del período", "wallet", "noop")}${stat("Patrimonio neto", money(assets - liabilities), "Activos menos pasivos", "coins", "noop")}</div><div class="economy-grid">${[
@@ -3026,7 +3102,7 @@
       function moreView() {
         return (
           heading("Más", "Preferencias, recordatorios y copias de tus datos.") +
-          `<div class="settings-grid"><section class="card"><div class="card-head"><h2>Tu consultorio</h2>${btn("Editar", "settings", "small outline", "", "edit")}</div><div class="setting-line"><span>Nombre</span><strong>${esc(getSetting("app_name"))}</strong></div><div class="setting-line"><span>Duración habitual</span><strong>${esc(getSetting("default_duration"))} min</strong></div><div class="setting-line"><span>Honorario inicial</span><strong>${money(getSetting("default_fee"))}</strong></div><div class="setting-line"><span>Medios de pago</span><span style="text-align:right">${esc(listSetting("payment_methods").join(", "))}</span></div><div class="setting-line"><span>Moneda y zona horaria</span><strong>ARS · Córdoba</strong></div><button class="text-button" data-act="category">Agregar categoría de gasto</button></section><section class="card"><div class="card-head"><h2>Datos y respaldo</h2>${icon("download")}</div><p class="muted small">Esta versión funciona sin conexión y guarda los datos en este navegador. No se sincroniza con el sitio original ni con otros dispositivos.</p><div class="download-list">${btn("Descargar copia completa", "export", "primary", "", "download")}${btn("Importar una copia de Camicas", "import", "outline", "", "upload")}${btn("Exportar pacientes CSV", "csv-patients", "outline", "", "download")}${btn("Exportar sesiones CSV", "csv-sessions", "outline", "", "download")}</div><p class="muted small" style="margin-top:17px">Última copia descargada: ${db.lastBackup ? esc(new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short" }).format(new Date(db.lastBackup))) : "todavía no registrada"}.</p>${storageGet(PREVIOUS) ? btn("Recuperar copia anterior a la importación", "restore", "outline") : ""}</section><section class="card"><div class="card-head"><h2>Recordatorios administrativos</h2>${btn("Agregar", "task", "small outline", "", "plus")}</div><label class="small muted"><input type="checkbox" id="show-done" ${view.showDone ? "checked" : ""}> Mostrar completados</label>${taskRows()}</section><section class="card"><div class="card-head"><h2>Acerca de esta versión</h2></div><p class="small muted">Archivo HTML independiente, sin librerías ni conexiones externas. Los datos no se envían a ningún servidor.</p><div class="alert">${icon("bell")}<span>El almacenamiento local no tiene contraseña ni cifrado. Usá un dispositivo protegido y descargá respaldos: borrar los datos del navegador puede eliminar tus registros.</span></div><p class="small muted">Para migrar desde el sitio original, descargá «Exportar copia completa» en Más e importá ese JSON acá. Cada archivo o dirección puede tener su propio guardado.</p><button class="text-button" data-act="help">Ver ayuda de uso y compatibilidad</button></section></div>`
+          `<div class="settings-grid"><section class="card"><div class="card-head"><h2>Tu consultorio</h2>${btn("Editar", "settings", "small outline", "", "edit")}</div><div class="setting-line"><span>Nombre</span><strong>${esc(getSetting("app_name"))}</strong></div><div class="setting-line"><span>Duración habitual</span><strong>${esc(getSetting("default_duration"))} min</strong></div><div class="setting-line"><span>Honorario inicial</span><strong>${money(getSetting("default_fee"))}</strong></div><div class="setting-line"><span>Medios de pago</span><span style="text-align:right">${esc(listSetting("payment_methods").join(", "))}</span></div><div class="setting-line"><span>Moneda y zona horaria</span><strong>ARS · Córdoba</strong></div><button class="text-button" data-act="category">Agregar categoría de gasto</button></section><section class="card"><div class="card-head"><h2>Datos y respaldo</h2>${icon("download")}</div><p class="muted small">Los datos se guardan en este navegador. La conexión privada con Google puede incorporar respuestas del formulario; la agenda y los cobros no se sincronizan entre dispositivos.</p><div class="download-list">${btn("Descargar copia completa", "export", "primary", "", "download")}${btn("Importar una copia de Camicas", "import", "outline", "", "upload")}${btn("Cargar fichas y agenda", "intake", "outline", "", "upload")}${btn("Exportar pacientes CSV", "csv-patients", "outline", "", "download")}${btn("Exportar sesiones CSV", "csv-sessions", "outline", "", "download")}</div><p class="muted small" style="margin-top:17px">Última copia descargada: ${db.lastBackup ? esc(new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short" }).format(new Date(db.lastBackup))) : "todavía no registrada"}.</p>${storageGet(PREVIOUS) ? btn("Recuperar copia anterior a la importación", "restore", "outline") : ""}</section><section class="card"><div class="card-head"><h2>Recordatorios administrativos</h2>${btn("Agregar", "task", "small outline", "", "plus")}</div><label class="small muted"><input type="checkbox" id="show-done" ${view.showDone ? "checked" : ""}> Mostrar completados</label>${taskRows()}</section><section class="card"><div class="card-head"><h2>Acerca de esta versión</h2></div><p class="small muted">Archivo HTML independiente. La conexión opcional con Google utiliza su servicio de autorización para leer respuestas; los registros del consultorio se guardan en este navegador y no se suben a GitHub.</p><div class="alert">${icon("bell")}<span>El almacenamiento local no tiene contraseña ni cifrado. Usá un dispositivo protegido y descargá respaldos: borrar los datos del navegador puede eliminar tus registros.</span></div><p class="small muted">Para migrar desde el sitio original, descargá «Exportar copia completa» en Más e importá ese JSON acá. Cada archivo o dirección puede tener su propio guardado.</p><button class="text-button" data-act="help">Ver ayuda de uso y compatibilidad</button></section></div>`
         );
       }
       function render() {
@@ -3145,9 +3221,9 @@
             field(
               "Honorario por sesión",
               "default_fee",
-              p.default_fee ?? getSetting("default_fee"),
+              id ? (p.default_fee ?? "") : getSetting("default_fee"),
               "number",
-              'required min="0" max="1000000000" step="0.01" inputmode="decimal"',
+              'min="0" max="1000000000" step="0.01" inputmode="decimal" placeholder="Por completar"',
             ) +
             field(
               "Teléfono / WhatsApp",
@@ -3157,18 +3233,25 @@
               'maxlength="40" placeholder="Código de país + área + número"',
             ) +
             field("Correo electrónico", "email", p.email, "email", 'maxlength="180"') +
+            field(
+              "Edad declarada en el formulario",
+              "age_declared",
+              p.age_declared,
+              "text",
+              'maxlength="40"',
+            ) +
             field("Localidad", "locality", p.locality, "text", 'maxlength="160"') +
             select(
               "Modalidad",
               "modality",
-              listSetting("modalities"),
-              p.modality || listSetting("modalities")[0],
+              [["", "Por completar"], ...listSetting("modalities")],
+              p.modality || "",
             ) +
             select(
               "Frecuencia",
               "frequency",
-              listSetting("frequencies"),
-              p.frequency || listSetting("frequencies")[0],
+              [["", "Por completar"], ...listSetting("frequencies")],
+              p.frequency || "",
             ) +
             field(
               "Contacto de emergencia 1",
@@ -3229,9 +3312,9 @@
           field(
             "Honorario de la sesión",
             "fee",
-            a.fee ?? p.default_fee ?? getSetting("default_fee"),
+            id ? (a.fee ?? "") : (p.default_fee ?? ""),
             "number",
-            'required min="0" step="0.01" max="1000000000" inputmode="decimal"',
+            'min="0" step="0.01" max="1000000000" inputmode="decimal" placeholder="Por completar"',
           ) +
           field(
             "Fecha",
@@ -3250,7 +3333,12 @@
             "number",
             'required min="5" max="480" step="5"',
           ) +
-          select("Modalidad", "modality", listSetting("modalities"), a.modality || p.modality) +
+          select(
+            "Modalidad",
+            "modality",
+            [["", "Por completar"], ...listSetting("modalities")],
+            id ? a.modality || "" : p.modality || "",
+          ) +
           (!edit
             ? select(
                 "Repetir",
@@ -3305,7 +3393,7 @@
             .sort((a, b) => b.date.localeCompare(a.date));
         openModal(
           p.name,
-          `<div class="detail-hero"><span class="avatar">${esc(initials(p.name))}</span><div><div class="detail-title">${esc(p.name)}</div><p class="muted small">${esc(p.modality)} · ${esc(p.frequency)} · ${esc(p.status)}</p></div></div><div class="detail-stats"><div class="detail-stat"><small>Honorario</small><b>${money(p.default_fee)}</b></div><div class="detail-stat"><small>Pendiente</small><b>${money(patientDebt(id))}</b></div><div class="detail-stat"><small>A favor</small><b>${money(patientCredit(id))}</b></div></div><div class="patient-details">${[
+          `<div class="detail-hero"><span class="avatar">${esc(initials(p.name))}</span><div><div class="detail-title">${esc(p.name)}</div><p class="muted small">${esc(p.modality || "Modalidad por completar")} · ${esc(p.frequency || "Frecuencia por completar")} · ${esc(p.status)}</p></div></div><div class="detail-stats"><div class="detail-stat"><small>Honorario</small><b>${feeLabel(p.default_fee)}</b></div><div class="detail-stat"><small>Pendiente</small><b>${money(patientDebt(id))}</b></div><div class="detail-stat"><small>A favor</small><b>${money(patientCredit(id))}</b></div></div><div class="patient-details">${[
             ["Teléfono", p.phone],
             ["Correo", p.email],
             ["Localidad", p.locality],
@@ -3334,7 +3422,7 @@
         if (!a) return;
         openModal(
           "Detalle de sesión",
-          `<div class="detail-hero"><span class="avatar">${icon("calendar")}</span><div><button class="session-name detail-title" data-act="patient-detail" data-id="${esc(a.patient_id)}">${esc(patient(a.patient_id)?.name)}</button><p class="muted small">${esc(fmtDate(a.date, { weekday: "long", day: "numeric", month: "long" }))} · ${a.start_time}</p></div></div><div class="session-status">${badge(a.appointment_status)}${badge(a.financial_status || "Pendiente", pending(a) > 0 ? "pending" : "Realizado")}${a.recurrence_id ? badge("Turno recurrente") : ""}</div><div class="patient-details"><div><small>Modalidad</small><p>${esc(a.modality)} · ${a.duration_minutes} min</p></div><div><small>Honorario</small><p>${money(a.fee)}</p></div><div><small>Cobrado</small><p>${money(paid(a))}</p></div><div><small>Saldo pendiente</small><p>${money(pending(a))}</p></div></div>${credit(a) > 0 ? `<div class="alert">Este turno tiene ${money(credit(a))} a favor. El cobro se conserva; podés anularlo desde el historial de cobros si corresponde.</div>` : ""}${a.administrative_note ? `<p class="small muted" style="margin-bottom:18px">${esc(a.administrative_note)}</p>` : ""}<div class="actions">${a.appointment_status !== "Realizado" && a.appointment_status !== "Cancelado" ? btn("Registrar asistencia", "complete", "primary", id, "check") : ""}${pending(a) > 0 ? btn("Registrar cobro", "payment", "outline", id, "coins") : ""}${btn("Editar turno", "appointment", "outline", id, "edit")}${btn("Duplicar", "duplicate", "outline", id, "copy")}${a.appointment_status === "Agendado" ? btn("Preparar WhatsApp", "whatsapp", "outline", id, "phone") : ""}</div><section class="detail-section"><h3>Estado de la sesión</h3><div class="actions">${a.appointment_status === "Agendado" ? btn("Marcar ausente", "absent", "outline", id) : ""}${a.financial_status === "Bonificado" ? btn("Restablecer honorario", "unwaive", "outline", id) : ""}${a.appointment_status !== "Agendado" ? btn("Volver a agendado", "reopen", "outline", id) : ""}${a.appointment_status !== "Cancelado" ? btn("Cancelar turno", "cancel-session", "danger", id) : ""}${!db.data.payment_allocations.some((x) => x.appointment_id === id) ? btn("Eliminar turno", "delete-session", "danger", id) : ""}</div></section><section class="detail-section"><h3>Cobros asociados</h3>${
+          `<div class="detail-hero"><span class="avatar">${icon("calendar")}</span><div><button class="session-name detail-title" data-act="patient-detail" data-id="${esc(a.patient_id)}">${esc(patient(a.patient_id)?.name)}</button><p class="muted small">${esc(fmtDate(a.date, { weekday: "long", day: "numeric", month: "long" }))} · ${a.start_time}</p></div></div><div class="session-status">${badge(a.appointment_status)}${badge(a.financial_status || "Pendiente", pending(a) > 0 ? "pending" : "Realizado")}${a.recurrence_id ? badge("Turno recurrente") : ""}</div><div class="patient-details"><div><small>Modalidad</small><p>${esc(a.modality || "Por completar")} · ${a.duration_minutes} min</p></div><div><small>Honorario</small><p>${feeLabel(a.fee)}</p></div><div><small>Cobrado</small><p>${money(paid(a))}</p></div><div><small>Saldo pendiente</small><p>${money(pending(a))}</p></div></div>${credit(a) > 0 ? `<div class="alert">Este turno tiene ${money(credit(a))} a favor. El cobro se conserva; podés anularlo desde el historial de cobros si corresponde.</div>` : ""}${a.administrative_note ? `<p class="small muted" style="margin-bottom:18px">${esc(a.administrative_note)}</p>` : ""}<div class="actions">${a.appointment_status !== "Realizado" && a.appointment_status !== "Cancelado" ? btn("Registrar asistencia", "complete", "primary", id, "check") : ""}${pending(a) > 0 ? btn("Registrar cobro", "payment", "outline", id, "coins") : ""}${btn("Editar turno", "appointment", "outline", id, "edit")}${btn("Duplicar", "duplicate", "outline", id, "copy")}${a.appointment_status === "Agendado" ? btn("Preparar WhatsApp", "whatsapp", "outline", id, "phone") : ""}</div><section class="detail-section"><h3>Estado de la sesión</h3><div class="actions">${a.appointment_status === "Agendado" ? btn("Marcar ausente", "absent", "outline", id) : ""}${a.financial_status === "Bonificado" ? btn("Restablecer honorario", "unwaive", "outline", id) : ""}${a.appointment_status !== "Agendado" ? btn("Volver a agendado", "reopen", "outline", id) : ""}${a.appointment_status !== "Cancelado" ? btn("Cancelar turno", "cancel-session", "danger", id) : ""}${!db.data.payment_allocations.some((x) => x.appointment_id === id) ? btn("Eliminar turno", "delete-session", "danger", id) : ""}</div></section><section class="detail-section"><h3>Cobros asociados</h3>${
             allocations()
               .filter((x) => x.appointment_id === id)
               .map((link) => {
@@ -4337,7 +4425,7 @@
         if (f?.dataset.form === "appointment") {
           if (el.name === "patient_id") {
             const p = patient(el.value);
-            f.elements.fee.value = p.default_fee;
+            f.elements.fee.value = p.default_fee ?? "";
             f.elements.modality.value = p.modality;
             if (p.status === "Inactivo") toast("Al guardar el turno, esta ficha se reactivará.");
           }
@@ -4350,7 +4438,7 @@
       });
       document.addEventListener("submit", (event) => {
         const f = event.target;
-        if (!f.dataset.form) return;
+        if (!f.dataset.form || f.dataset.form === "form-link") return;
         event.preventDefault();
         if (!f.reportValidity()) return;
         const values = Object.fromEntries(new FormData(f)),
@@ -4360,9 +4448,10 @@
         const result = mutate(
           (s) => {
             if (kind === "patient") {
-              const fee = Number(values.default_fee);
+              const fee = values.default_fee.trim() === "" ? null : Number(values.default_fee);
               if (!values.name.trim()) throw Error("Escribí el nombre del paciente.");
-              if (!Number.isFinite(fee) || fee < 0) throw Error("Revisá el honorario.");
+              if (fee != null && (!Number.isFinite(fee) || fee < 0))
+                throw Error("Revisá el honorario.");
               let p = patient(id, s);
               if (!p) {
                 p = { id: uuid(), status: "Activo", created_at: new Date().toISOString() };
@@ -4373,6 +4462,7 @@
                 phone: values.phone.trim(),
                 email: values.email.trim(),
                 locality: values.locality.trim(),
+                age_declared: values.age_declared?.trim() || "",
                 default_fee: fee,
                 modality: values.modality,
                 frequency: values.frequency,
@@ -4391,6 +4481,7 @@
                   )
                   .forEach((a) => {
                     a.fee = fee;
+                    a.fee_pending = fee == null;
                     financialSync(a, s);
                   });
               }
@@ -4412,7 +4503,8 @@
                 date: values.date,
                 start_time: values.start_time,
                 duration_minutes: duration,
-                fee: Number(values.fee),
+                fee: values.fee.trim() === "" ? null : Number(values.fee),
+                fee_pending: values.fee.trim() === "",
                 modality: values.modality,
                 administrative_note: values.administrative_note.trim(),
                 updated_at: new Date().toISOString(),
@@ -4792,7 +4884,548 @@
       }
       render();
 
-      // Short, sourced quotations. Spanish translations are explicitly labelled.
+      // Patient files are read locally. This module never sends their contents to a server.
+      function feeLabel(value) {
+        return value == null ? "Por completar" : money(value);
+      }
+      function hasScheduleConflict(a, store = db) {
+        return (
+          a.appointment_status !== "Cancelado" &&
+          appointments(store).some(
+            (b) =>
+              b.id !== a.id &&
+              b.appointment_status !== "Cancelado" &&
+              b.date === a.date &&
+              minutes(a.start_time) < minutes(b.start_time) + Number(b.duration_minutes) &&
+              minutes(b.start_time) < minutes(a.start_time) + Number(a.duration_minutes),
+          )
+        );
+      }
+      function mergeIntake(store, input) {
+        if (input.kind !== "camicas-intake")
+          throw Error("Elegí un archivo de carga de fichas y agenda.");
+        const incoming = assertImport(input),
+          map = new Map(),
+          report = { patients: 0, filled: 0, appointments: 0, skipped: 0, specialDays: 0 };
+        for (const row of incoming.data.patients) {
+          let target = patients(store).find(
+            (p) =>
+              p.id === row.id ||
+              (row.source_key &&
+                (p.source_key === row.source_key ||
+                  (p.source_keys || []).includes(row.source_key))),
+          );
+          if (!target) {
+            const matches = patients(store).filter(
+              (p) => normalize(p.name).trim() === normalize(row.name).trim(),
+            );
+            if (matches.length === 1) target = matches[0];
+          }
+          if (!target) {
+            target = clone(row);
+            patients(store).push(target);
+            report.patients++;
+          } else
+            for (const [key, value] of Object.entries(row)) {
+              if (
+                !["id", "status", "created_at", "updated_at"].includes(key) &&
+                (target[key] == null || target[key] === "") &&
+                value != null &&
+                value !== ""
+              ) {
+                target[key] = clone(value);
+                report.filled++;
+              }
+            }
+          if (row.source_key) {
+            target.source_keys = Array.isArray(target.source_keys) ? target.source_keys : [];
+            if (!target.source_keys.includes(row.source_key)) {
+              target.source_keys.push(row.source_key);
+              report.filled++;
+            }
+          }
+          map.set(row.id, target.id);
+        }
+        for (const row of incoming.data.appointments) {
+          const a = { ...clone(row), patient_id: map.get(row.patient_id) };
+          const exists = appointments(store).some(
+            (x) =>
+              x.id === a.id ||
+              (a.source_key && x.source_key === a.source_key) ||
+              (x.patient_id === a.patient_id &&
+                x.date === a.date &&
+                x.start_time === a.start_time &&
+                Number(x.duration_minutes) === Number(a.duration_minutes)),
+          );
+          if (exists) {
+            report.skipped++;
+            continue;
+          }
+          appointments(store).push(a);
+          report.appointments++;
+        }
+        for (const row of incoming.data.calendar_days) {
+          if (
+            !store.data.calendar_days.some(
+              (x) => x.id === row.id || (x.date === row.date && x.name === row.name),
+            )
+          ) {
+            store.data.calendar_days.push(clone(row));
+            report.specialDays++;
+          }
+        }
+        assertImport(store);
+        return report;
+      }
+      let stagedIntake = null;
+      function intakeModal() {
+        stagedIntake = null;
+        openModal(
+          "Cargar fichas y agenda",
+          `<p class="small muted">Agrega los registros de un archivo de carga sin borrar los que ya tenés. Los datos se leen en este dispositivo y no se publican.</p><label class="field" style="margin-top:18px">Archivo privado de fichas y agenda<input id="intake-file" type="file" accept=".json,application/json"></label><div class="form-error" id="form-error" role="alert"></div><div id="intake-preview"></div>`,
+          "intake",
+        );
+      }
+      async function readIntake(file) {
+        if (!file) return;
+        try {
+          if (file.size > 25 * 1024 * 1024) throw Error("El archivo supera los 25 MB.");
+          const input = JSON.parse(await file.text()),
+            preview = clone(db),
+            report = mergeIntake(preview, input);
+          if (input.connection) validateFormConnection(input.connection);
+          stagedIntake = input;
+          document.getElementById("intake-preview").innerHTML =
+            `<div class="import-report"><strong>Carga lista</strong><br>${report.patients} fichas nuevas<br>${report.appointments} turnos nuevos · ${report.skipped} ya cargados<br>${report.specialDays} fechas personales<br>${input.connection ? "También prepara la conexión del formulario; Google pedirá tu autorización.<br>" : ""}Los campos desconocidos quedan vacíos. No se registran pagos ni asistencia automáticamente.</div><div class="form-actions">${btn("Volver", "close", "outline")}${btn("Agregar a Camicas", "confirm-intake", "primary")}</div>`;
+        } catch (e) {
+          stagedIntake = null;
+          showError(e.message);
+        }
+      }
+      actions.intake = intakeModal;
+      actions["confirm-intake"] = () => {
+        if (!stagedIntake) return;
+        const input = stagedIntake;
+        let connection;
+        try {
+          if (input.connection) connection = validateFormConnection(input.connection);
+        } catch (e) {
+          showError(e.message);
+          return;
+        }
+        const saved = mutate((s) => {
+          mergeIntake(s, input);
+        }, "Fichas y turnos agregados sin borrar los registros anteriores.");
+        if (saved) {
+          if (connection) {
+            formLink = { ...connection, enabled: true };
+            saveFormLink();
+            loadGoogleIdentity().catch(() => {});
+          }
+          stagedIntake = null;
+          closeModal();
+          navigate("agenda");
+        }
+      };
+      document.addEventListener("change", (e) => {
+        if (e.target.id === "intake-file") readIntake(e.target.files[0]);
+      });
+      const renderBeforeIntake = render;
+      render = function () {
+        renderBeforeIntake();
+        const unknown = appointments().filter(
+          (a) => a.fee == null && a.appointment_status !== "Cancelado",
+        );
+        if (view.page === "economia" && unknown.some((a) => monthOf(a.date) === view.month))
+          main
+            .querySelector(".page-heading")
+            .insertAdjacentHTML(
+              "afterend",
+              `<div class="alert info"><span>${unknown.filter((a) => monthOf(a.date) === view.month).length} turnos tienen el honorario por completar. Los totales de dinero aún están incompletos.</span></div>`,
+            );
+        if (view.page === "pacientes") {
+          const provisional = patients().filter((p) => p.provisional_name);
+          if (provisional.length)
+            main
+              .querySelector(".page-heading")
+              .insertAdjacentHTML(
+                "afterend",
+                `<p class="small muted" style="margin-bottom:18px">${provisional.length} fichas conservan el nombre abreviado de la agenda. Podés completarlas cuando confirmes a quién corresponden.</p>`,
+              );
+        }
+      };
+
+      const holidayLaw = "https://www.argentina.gob.ar/normativa/nacional/ley-27399-281835/texto";
+      const holidayVisit = "https://www.argentina.gob.ar/normativa/nacional/norma-430580/texto";
+      const HOLIDAYS_2026 = [
+        {
+          date: "2026-10-12",
+          name: "Día del Respeto a la Diversidad Cultural",
+          kind: "national",
+          source: holidayLaw,
+        },
+        {
+          date: "2026-11-09",
+          name: "Visita del Papa León XIV · feriado nacional",
+          kind: "national",
+          source: holidayVisit,
+        },
+        {
+          date: "2026-11-10",
+          name: "Visita del Papa León XIV · feriado en Córdoba",
+          kind: "cordoba",
+          source: holidayVisit,
+        },
+        {
+          date: "2026-11-23",
+          name: "Día de la Soberanía Nacional · trasladado del 20/11",
+          kind: "national",
+          source: holidayLaw,
+        },
+        {
+          date: "2026-12-07",
+          name: "Día no laborable con fines turísticos",
+          kind: "tourism",
+          source: "https://www.argentina.gob.ar/normativa/nacional/norma-421799/texto",
+        },
+        {
+          date: "2026-12-08",
+          name: "Inmaculada Concepción de María",
+          kind: "national",
+          source: holidayLaw,
+        },
+        { date: "2026-12-25", name: "Navidad", kind: "national", source: holidayLaw },
+      ];
+      function specialDays(date, store = db) {
+        return [
+          ...HOLIDAYS_2026.filter((x) => x.date === date),
+          ...(store.data.calendar_days || [])
+            .filter((x) => x.date === date || (x.annual && x.date.slice(5) === date.slice(5)))
+            .map((x) => ({ ...x, kind: "personal" })),
+        ];
+      }
+      function specialNotice(date) {
+        const days = specialDays(date);
+        return days.length
+          ? `<div class="special-notice">${days.map((x) => `<div><strong>${esc(x.name)}</strong>${x.source ? ` <a href="${esc(x.source)}" target="_blank" rel="noopener noreferrer">Norma</a>` : " <small>Fecha personal</small>"}</div>`).join("")}</div>`
+          : "";
+      }
+      const renderBeforeHolidays = render;
+      render = function () {
+        renderBeforeHolidays();
+        for (const el of main.querySelectorAll("[data-drop-date],button.week-day[data-date]")) {
+          const date = el.dataset.dropDate || el.dataset.date,
+            days = specialDays(date);
+          if (days.length) {
+            el.classList.add("special-" + days[0].kind);
+            el.title = days.map((x) => x.name).join(" · ");
+            el.setAttribute(
+              "aria-label",
+              (el.getAttribute("aria-label") || fmtDate(date, { day: "numeric", month: "long" })) +
+                " · " +
+                el.title,
+            );
+            const number = el.querySelector(".day-number");
+            if (number)
+              number.setAttribute("aria-label", "Ver " + fmtDate(date) + " · " + el.title);
+          }
+        }
+        if (view.page === "agenda") {
+          const date = view.date;
+          main.querySelector(".date-nav")?.insertAdjacentHTML("afterend", specialNotice(date));
+          const start =
+            view.agendaMode === "month"
+              ? monthOf(date) + "-01"
+              : view.agendaMode === "week"
+                ? weekStart(date)
+                : date;
+          const end =
+            view.agendaMode === "month"
+              ? addDays(addMonths(start, 1), -1)
+              : view.agendaMode === "week"
+                ? addDays(start, 6)
+                : date;
+          const dates = [];
+          for (let d = start; d <= end; d = addDays(d, 1)) if (specialDays(d).length) dates.push(d);
+          if (dates.length)
+            main.insertAdjacentHTML(
+              "beforeend",
+              `<section class="card special-list" style="margin-top:18px"><h2>Fechas para tener en cuenta</h2>${dates
+                .map(
+                  (d) =>
+                    `<div class="special-line special-${specialDays(d)[0].kind}"><strong>${esc(fmtDate(d))}</strong><span>${specialDays(
+                      d,
+                    )
+                      .map((x) => esc(x.name))
+                      .join(" · ")}</span></div>`,
+                )
+                .join("")}</section>`,
+            );
+        }
+        if (view.page === "hoy")
+          main
+            .querySelector(".page-heading")
+            ?.insertAdjacentHTML("afterend", specialNotice(today()));
+      };
+
+      // OAuth tokens stay in memory. Form responses are merged into this browser only.
+      const FORM_LINK_STORE = "camicas.v2.form-link";
+      let formLink = { clientId: "", formId: "", enabled: false },
+        formAccessToken = null,
+        formTokenUntil = 0,
+        formSyncBusy = false;
+      try {
+        const saved = JSON.parse(storageGet(FORM_LINK_STORE) || "null");
+        if (saved && typeof saved === "object") formLink = { ...formLink, ...saved };
+      } catch {}
+      function saveFormLink() {
+        localStorage.setItem(FORM_LINK_STORE, JSON.stringify(formLink));
+      }
+      function formLinkModal() {
+        openModal(
+          "Conectar Google Forms",
+          `<p class="small muted">La conexión lee respuestas con permiso de la cuenta propietaria. No publica la hoja ni el formulario. Hace falta configurar el acceso de Google una sola vez.</p>${formShell("form-link", field("ID de cliente de Google", "clientId", formLink.clientId, "text", 'required placeholder="…apps.googleusercontent.com"') + field("Enlace o ID del formulario", "formId", formLink.formId, "text", "required"), { submit: "Guardar conexión", extra: '<p class="muted small">El permiso de acceso lo autoriza Camila en la ventana de Google. Las respuestas se revisan al conectar y cada cinco minutos mientras la app permanece abierta y autorizada.</p>' })}`,
+          "form-link",
+        );
+      }
+      function normalizeFormId(value) {
+        const match = value.trim().match(/\/forms\/d\/([^/]+)/);
+        const id = match ? match[1] : value.trim();
+        if (!/^[A-Za-z0-9_-]{20,200}$/.test(id))
+          throw Error("Revisá el enlace o ID del formulario.");
+        return id;
+      }
+      function validateFormConnection(value) {
+        if (!value || typeof value.clientId !== "string" || typeof value.formId !== "string")
+          throw Error("La configuración del formulario está incompleta.");
+        const clientId = value.clientId.trim();
+        if (!/^[A-Za-z0-9._-]+\.apps\.googleusercontent\.com$/.test(clientId))
+          throw Error("Revisá el ID de cliente de Google.");
+        return { clientId, formId: normalizeFormId(value.formId) };
+      }
+      document.addEventListener("submit", (e) => {
+        const f = e.target;
+        if (f.dataset.form !== "form-link") return;
+        e.preventDefault();
+        try {
+          const values = Object.fromEntries(new FormData(f)),
+            clientId = values.clientId.trim();
+          if (!/^[A-Za-z0-9._-]+\.apps\.googleusercontent\.com$/.test(clientId))
+            throw Error("Revisá el ID de cliente de Google.");
+          formLink = { clientId, formId: normalizeFormId(values.formId), enabled: true };
+          saveFormLink();
+          loadGoogleIdentity().catch(() => {});
+          closeModal();
+          render();
+          toast("Configuración guardada. Tocá Autorizar y sincronizar.");
+        } catch (error) {
+          showError(error.message);
+        }
+      });
+      let identityReady = null;
+      function loadGoogleIdentity() {
+        if (identityReady) return identityReady;
+        identityReady = new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://accounts.google.com/gsi/client";
+          script.onload = resolve;
+          script.onerror = () => {
+            identityReady = null;
+            reject(Error("No se pudo conectar con Google. Revisá la conexión a internet."));
+          };
+          document.head.append(script);
+        });
+        return identityReady;
+      }
+      function authorizeForm() {
+        if (!formLink.clientId || !formLink.formId) {
+          formLinkModal();
+          return;
+        }
+        if (!window.google?.accounts?.oauth2) {
+          loadGoogleIdentity()
+            .then(() => toast("Google está listo. Volvé a tocar Autorizar y sincronizar."))
+            .catch((e) => toast(e.message, true));
+          return;
+        }
+        try {
+          google.accounts.oauth2
+            .initTokenClient({
+              client_id: formLink.clientId,
+              scope:
+                "https://www.googleapis.com/auth/forms.body.readonly https://www.googleapis.com/auth/forms.responses.readonly",
+              callback: async (response) => {
+                if (response.error) {
+                  toast("Google no autorizó la conexión.", true);
+                  return;
+                }
+                if (
+                  !google.accounts.oauth2.hasGrantedAllScopes(
+                    response,
+                    "https://www.googleapis.com/auth/forms.body.readonly",
+                    "https://www.googleapis.com/auth/forms.responses.readonly",
+                  )
+                ) {
+                  toast("Falta autorizar la lectura del formulario y sus respuestas.", true);
+                  return;
+                }
+                formAccessToken = response.access_token;
+                formTokenUntil = Date.now() + Number(response.expires_in) * 1000;
+                await syncForm();
+              },
+              error_callback: () => toast("La autorización de Google quedó sin completar.", true),
+            })
+            .requestAccessToken({ prompt: "" });
+        } catch (error) {
+          toast(error.message, true);
+        }
+      }
+      async function googleFormRequest(path) {
+        const response = await fetch("https://forms.googleapis.com/v1/" + path, {
+          headers: { Authorization: "Bearer " + formAccessToken },
+        });
+        if (response.status === 401) {
+          formAccessToken = null;
+          throw Error("Google pide renovar el permiso. Tocá Autorizar y sincronizar.");
+        }
+        if (!response.ok)
+          throw Error(
+            response.status === 403
+              ? "La cuenta no tiene acceso a las respuestas o falta habilitar la API de Google Forms."
+              : "No se pudieron leer las respuestas de Google.",
+          );
+        return response.json();
+      }
+      function answersToPatients(form, responses) {
+        const fields = {};
+        for (const item of form.items || []) {
+          const id = item.questionItem?.question?.questionId;
+          if (!id) continue;
+          const title = normalize(item.title);
+          let key = null;
+          if (title.includes("nombre completo")) key = "name";
+          else if (title === "correo" || title.includes("correo electronico")) key = "email";
+          else if (title.includes("emergencia 1")) key = "emergency_1";
+          else if (title.includes("emergencia 2")) key = "emergency_2";
+          else if (title.includes("telefono")) key = "phone";
+          else if (title === "edad") key = "age_declared";
+          if (key) fields[id] = key;
+        }
+        if (!Object.values(fields).includes("name"))
+          throw Error("El formulario no contiene una pregunta identificable de Nombre Completo.");
+        return responses.map((response) => {
+          const row = {
+            id: "form-" + response.responseId,
+            status: "Activo",
+            name: "",
+            email: "",
+            phone: "",
+            age_declared: "",
+            emergency_1: "",
+            emergency_2: "",
+            modality: "",
+            frequency: "",
+            locality: "",
+            default_fee: null,
+            source_key: "google-form:" + form.formId + ":" + response.responseId,
+            source_submitted_at: response.createTime || "",
+          };
+          for (const [id, key] of Object.entries(fields))
+            row[key] = (response.answers?.[id]?.textAnswers?.answers || [])
+              .map((x) => x.value || "")
+              .join("\n")
+              .trim();
+          if (!row.name)
+            throw Error("Una respuesta está sin nombre. No se aplicó la sincronización.");
+          return row;
+        });
+      }
+      async function syncForm() {
+        if (formSyncBusy || !formLink.enabled) return;
+        if (!formAccessToken || Date.now() >= formTokenUntil) {
+          toast("Tocá Autorizar y sincronizar para leer respuestas nuevas.", true);
+          return;
+        }
+        formSyncBusy = true;
+        try {
+          const form = await googleFormRequest("forms/" + encodeURIComponent(formLink.formId));
+          const responses = [];
+          let pageToken = "";
+          do {
+            const result = await googleFormRequest(
+              "forms/" +
+                encodeURIComponent(formLink.formId) +
+                "/responses?pageSize=500" +
+                (pageToken ? "&pageToken=" + encodeURIComponent(pageToken) : ""),
+            );
+            responses.push(...(result.responses || []));
+            pageToken = result.nextPageToken || "";
+            if (responses.length > 100000)
+              throw Error("El formulario contiene demasiadas respuestas.");
+          } while (pageToken);
+          const candidate = emptyData();
+          candidate.kind = "camicas-intake";
+          candidate.data.patients = answersToPatients(form, responses);
+          candidate.data.categories = [];
+          const preview = clone(db),
+            report = mergeIntake(preview, candidate);
+          if (report.patients || report.filled) {
+            if (
+              !mutate((s) => {
+                mergeIntake(s, candidate);
+              }, "Respuestas nuevas incorporadas.")
+            )
+              return;
+          }
+          formLink.lastSync = new Date().toISOString();
+          saveFormLink();
+          render();
+          toast("Formulario actualizado: " + report.patients + " fichas nuevas.");
+        } catch (error) {
+          toast(error.message, true);
+        } finally {
+          formSyncBusy = false;
+        }
+      }
+      actions["form-link"] = formLinkModal;
+      actions["form-authorize"] = authorizeForm;
+      actions["form-sync"] = syncForm;
+      actions["form-disconnect"] = () => {
+        if (formAccessToken && window.google?.accounts?.oauth2)
+          google.accounts.oauth2.revoke(formAccessToken, () => {});
+        formAccessToken = null;
+        formTokenUntil = 0;
+        formLink.enabled = false;
+        saveFormLink();
+        render();
+        toast("Conexión desactivada. Tus fichas se conservan.");
+      };
+      setInterval(
+        () => {
+          if (!document.hidden && formAccessToken && Date.now() < formTokenUntil && !modal.open)
+            syncForm();
+        },
+        5 * 60 * 1000,
+      );
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && formAccessToken && Date.now() < formTokenUntil && !modal.open)
+          syncForm();
+      });
+      const renderBeforeForms = render;
+      render = function () {
+        renderBeforeForms();
+        if (view.page === "mas")
+          main
+            .querySelector(".settings-grid")
+            .insertAdjacentHTML(
+              "beforeend",
+              `<section class="card"><h2>Formulario de pacientes</h2><p class="small muted" style="margin:14px 0">${formLink.enabled ? "Conexión configurada. Google pide autorizar la lectura de respuestas en este celular." : "La sincronización automática necesita configurar y autorizar la cuenta de Google."}</p>${formLink.lastSync ? `<p class="small muted">Última lectura: ${esc(new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short" }).format(new Date(formLink.lastSync)))}</p>` : ""}<div class="download-list">${btn("Configurar conexión", "form-link", "outline")}${formLink.enabled ? btn("Autorizar y sincronizar", "form-authorize", "primary") + btn("Desconectar", "form-disconnect", "outline") : ""}</div></section>`,
+            );
+      };
+
+      if (formLink.enabled && formLink.clientId) loadGoogleIdentity().catch(() => {});
+
+      // Short, sourced quotations. Sources are documented in the guide; the popup shows only the author.
       const welcomeQuotes = [
         {
           text: "Con la autocompasión, nos damos la misma amabilidad y apoyo que le daríamos a un buen amigo.",
@@ -4878,7 +5511,7 @@
       function renderWelcome() {
         if (welcomeVisible && welcomePrefs.enabled && !welcomeDialog.open) {
           const q = welcomeQuotes[welcomeIndex];
-          welcomeDialog.innerHTML = `<div class="welcome-popup"><button class="icon-button welcome-close" data-act="welcome-dismiss" aria-label="Cerrar mensaje de bienvenida">×</button><span class="welcome-flower" aria-hidden="true">✿</span><h2 id="welcome-title">Un momento para vos</h2><blockquote>«${esc(q.text)}»</blockquote><div class="welcome-credit">${esc(q.author)} <span>·</span> <a href="${esc(q.source)}" target="_blank" rel="noopener noreferrer" title="${esc(q.sourceTitle)}">Fuente</a><br>Traducción propia</div><button class="btn primary" data-act="welcome-dismiss" autofocus>Entrar a Camicas</button><button class="welcome-disable" data-act="welcome-disable">No mostrar más</button></div>`;
+          welcomeDialog.innerHTML = `<div class="welcome-popup"><button class="icon-button welcome-close" data-act="welcome-dismiss" aria-label="Cerrar mensaje de bienvenida">×</button><span class="welcome-flower" aria-hidden="true">✿</span><h2 id="welcome-title">Un momento para vos</h2><blockquote>«${esc(q.text)}»</blockquote><div class="welcome-credit">${esc(q.author)}</div><button class="btn primary" data-act="welcome-dismiss" autofocus>Entrar a Camicas</button></div>`;
           welcomeDialog.showModal();
         }
         if (!welcomeVisible && welcomeDialog.open) welcomeDialog.close();

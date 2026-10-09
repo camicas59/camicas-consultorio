@@ -13,15 +13,15 @@ El diseño prioriza el uso táctil: navegación inferior, formularios de una col
 - `.nojekyll`: sirve el HTML como sitio estático sin procesamiento adicional.
 - `.gitignore`: excluye respaldos, CSV y archivos locales de trabajo.
 
-Los dos HTML son idénticos. No requieren compilación, paquetes ni servicios externos. El código no contiene pacientes reales ni registros de prueba.
+Los dos HTML son idénticos. El uso local no requiere compilación ni paquetes. La conexión opcional con Google Forms requiere internet y autorización de Google. El código no contiene pacientes reales ni registros de prueba.
 
 ## Apariencia y bienvenida
 
 La paleta combina violeta suave y lavanda. El modo oscuro mantiene esa familia de colores. Las flores acompañan los controles habituales; no hay botón de pausa ni temporizadores.
 
-Al abrirse o volver a la aplicación, puede aparecer una bienvenida encima de la pantalla. Hay que cerrarla con la X o **Entrar a Camicas**. Se muestra como máximo dos veces por día y con al menos seis horas entre mensajes; no queda como una tarjeta del inicio. Se desactiva con **No mostrar más** y se reactiva desde **Más**. El límite se cuenta en el navegador del celular.
+Al abrirse o volver a la aplicación, puede aparecer una bienvenida encima de la pantalla. Hay que cerrarla con la X o **Entrar a Camicas**. Se muestra como máximo dos veces por día y con al menos seis horas entre mensajes; no queda como una tarjeta del inicio. El cartel muestra la cita y su autor, con la X y **Entrar a Camicas** como únicas acciones. El límite se cuenta en el navegador del celular. La preferencia general se administra desde **Más**.
 
-Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras. Son traducciones propias del inglés, y cada mensaje enlaza su fuente:
+Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras. Las citas originalmente en inglés se presentan en español. Sus fuentes se conservan aquí; el cartel muestra solamente el autor:
 
 - [Kristin Neff · Self-Compassion](https://self-compassion.org/).
 - [Tara Brach · Judgment, Acceptance and Freedom](https://www.tarabrach.com/judgment-acceptance-freedom-retreat/).
@@ -38,6 +38,10 @@ Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras
 - Economía con gráfico anual, gastos, otros ingresos, activos, pasivos, ahorros y traspasos.
 - Buscador general, borradores para WhatsApp, navegación móvil y modo oscuro.
 - Importación y respaldo JSON; informes CSV.
+- Carga adicional de fichas y turnos mediante archivos privados, sin borrar registros existentes.
+- Campos desconocidos vacíos y honorarios pendientes de completar.
+- Días nacionales, provinciales y personales destacados en el calendario.
+- Lectura privada de respuestas de Google Forms, con autorización de la cuenta propietaria.
 
 ## Primeros pasos
 
@@ -46,6 +50,24 @@ Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras
 3. Agendá su sesión, o una serie con cantidad definida.
 4. Registrá asistencia y cobro por separado. Se admiten pagos parciales.
 5. Descargá respaldos JSON regularmente desde **Más**.
+
+## Cargar fichas y agenda sin borrar lo anterior
+
+En **Más → Cargar fichas y agenda**, elegí un archivo privado de carga y revisá el resumen antes de **Agregar a Camicas**. La carga añade fichas y turnos, conserva cambios manuales y evita repetir los mismos registros. Los honorarios desconocidos no se tratan como sesiones gratuitas y no se pueden cobrar hasta completar su importe. No se deduce asistencia ni se inventan pagos.
+
+Si el archivo incluye la configuración pública de conexión, prepara el acceso al formulario, pero el permiso para leer respuestas debe autorizarse en Google. Los archivos privados nunca se incluyen en el repositorio público.
+
+## Fechas destacadas de octubre a diciembre de 2026
+
+- 12 de octubre: Día del Respeto a la Diversidad Cultural.
+- 9 de noviembre: feriado nacional por la visita del Papa León XIV.
+- 10 de noviembre: feriado provincial de Córdoba por esa visita.
+- 23 de noviembre: Día de la Soberanía Nacional, trasladado desde el 20.
+- 7 de diciembre: día no laborable con fines turísticos, identificado como tal.
+- 8 de diciembre: Inmaculada Concepción.
+- 25 de diciembre: Navidad.
+
+Se verificaron en la [Ley 27.399](https://www.argentina.gob.ar/normativa/nacional/ley-27399-281835/texto), el [Decreto 1103/2026](https://www.argentina.gob.ar/normativa/nacional/norma-430580/texto) y la [Resolución 164/2025](https://www.argentina.gob.ar/normativa/nacional/norma-421799/texto). Cada fecha permite consultar la norma. Las fechas personales son registros locales y se distinguen de los feriados legales.
 
 ## Migración
 
@@ -59,7 +81,9 @@ El formato se verificó con una copia original. Su tabla de gastos y ahorros est
 
 Los registros se guardan **en el navegador y dispositivo utilizados**, sin contraseña ni cifrado. No se envían a GitHub ni al servidor del sitio. GitHub almacena el código; no contiene la base de pacientes del consultorio.
 
-No hay sincronización con el sistema original ni entre dispositivos. Cambiar de navegador o dirección puede abrir un almacenamiento diferente: exportá e importá un respaldo para trasladar datos. Borrar los datos del navegador puede eliminar los registros.
+La conexión opcional de Google Forms incorpora fichas nuevas y completa campos vacíos; conserva los cambios manuales. Necesita una configuración inicial y la autorización de Google en cada sesión. Consulta respuestas cada cinco minutos mientras la app está abierta, visible y autorizada; al vencer el permiso, hay que renovarlo con el botón. No funciona con la app cerrada.
+
+No hay sincronización de agenda, pagos o cambios manuales entre dispositivos ni con el sistema original. Cambiar de navegador o dirección puede abrir un almacenamiento diferente: exportá e importá un respaldo para trasladar datos. Borrar los datos del navegador puede eliminar los registros.
 
 No se trasladan la autenticación, los registros del servidor, la instalación PWA completa ni las notificaciones con la aplicación cerrada. Las series importadas conservan sus turnos existentes; no generan nuevas sesiones indefinidamente.
 
