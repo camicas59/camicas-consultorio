@@ -1968,6 +1968,827 @@
           gap: 8px;
         }
       }
+
+      /* Financial views scroll with the page; charts never contain invented amounts. */
+      .finance-hero {
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--soft);
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .finance-hero h2 {
+        font-size: 1.4rem;
+      }
+      .finance-hero p {
+        font-size: 0.875rem;
+        color: var(--muted);
+        margin-top: 7px;
+        max-width: 560px;
+      }
+      .finance-hero .eyebrow {
+        margin-bottom: 5px;
+      }
+      .finance-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .finance-stats > div {
+        border-radius: 16px;
+        padding: 18px 16px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-top: 4px solid #8b65b3;
+        min-width: 0;
+      }
+      .finance-stats strong {
+        display: block;
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+        overflow-wrap: anywhere;
+        margin: 7px 0;
+      }
+      .finance-stats small,
+      .finance-stats span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+      .finance-stats .expense-stat {
+        border-top-color: #c26491;
+      }
+      .finance-stats .pending-stat {
+        border-top-color: #d18a45;
+      }
+      .finance-stats .asset-stat {
+        border-top-color: #429489;
+      }
+      .finance-stats .liability-stat {
+        border-top-color: #c26491;
+      }
+      .finance-chart-grid {
+        display: grid;
+        gap: 18px;
+        margin-top: 20px;
+      }
+      .finance-section {
+        margin-top: 20px;
+      }
+      .finance-filters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .finance-filters input,
+      .finance-filters select {
+        width: 100%;
+        min-width: 0;
+        min-height: 46px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: var(--bg);
+        color: var(--ink);
+        font-size: 16px;
+      }
+      .finance-filters input {
+        grid-column: 1/-1;
+      }
+      .finance-extra {
+        margin: 14px 0;
+      }
+      .expense-ledger-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 18px 0;
+        border-top: 1px solid var(--line);
+      }
+      .movement-mark {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        flex-shrink: 0;
+      }
+      .expense-row-end {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        max-width: 42%;
+        gap: 4px;
+        font-size: 0.9rem;
+        overflow-wrap: anywhere;
+      }
+      .category-tag {
+        display: inline-block;
+        padding: 3px 7px;
+        margin: 7px 5px 0 0;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 650;
+      }
+      .expense-ledger-row .pill {
+        font-size: 0.7rem;
+      }
+      .category-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .expense-breakdown {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .expense-donut {
+        height: 180px;
+        width: 180px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .expense-donut > div {
+        width: 132px;
+        height: 132px;
+        background: var(--surface);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 10px;
+      }
+      .expense-donut strong {
+        font-size: 1.1rem;
+        overflow-wrap: anywhere;
+        width: 100%;
+      }
+      .expense-donut small {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-bottom: 5px;
+      }
+      .category-breakdown {
+        flex: 1;
+        min-width: min(220px, 100%);
+        max-width: 100%;
+        display: grid;
+        gap: 9px;
+      }
+      .category-share {
+        display: flex;
+        position: relative;
+        align-items: center;
+        text-align: left;
+        gap: 10px;
+        background: var(--surface2);
+        color: var(--ink);
+        padding: 12px 10px 16px;
+        border-radius: 10px;
+        overflow: hidden;
+        min-height: 60px;
+        width: 100%;
+      }
+      .category-share > span:nth-child(2) {
+        flex: 1;
+        min-width: 0;
+      }
+      .category-share strong {
+        display: block;
+        font-size: 0.875rem;
+        overflow-wrap: anywhere;
+      }
+      .category-share small {
+        display: block;
+        font-size: 0.72rem;
+        color: var(--muted);
+      }
+      .category-share b {
+        font-size: 0.83rem;
+        max-width: 40%;
+        overflow-wrap: anywhere;
+      }
+      .category-share > i {
+        position: absolute;
+        height: 4px;
+        bottom: 0;
+        left: 0;
+      }
+      .weekly-expenses {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 7px;
+        margin-top: 24px;
+        align-items: end;
+      }
+      .weekly-expenses > div {
+        text-align: center;
+        min-width: 0;
+      }
+      .weekly-expenses small {
+        font-size: 0.7rem;
+        color: var(--muted);
+        display: block;
+        overflow-wrap: anywhere;
+        min-height: 35px;
+      }
+      .weekly-expenses strong {
+        font-size: 0.75rem;
+      }
+      .expense-column {
+        height: 155px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 8px;
+      }
+      .expense-column i {
+        width: 65%;
+        border-radius: 8px 8px 0 0;
+        display: block;
+      }
+      .finance-year {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 16px 7px;
+      }
+      .finance-year button {
+        min-width: 0;
+        background: transparent;
+        color: var(--muted);
+        padding: 8px 4px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+      }
+      .finance-year button.selected {
+        background: var(--soft);
+        color: var(--primary);
+      }
+      .finance-year button > div {
+        height: 115px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 4px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 7px;
+      }
+      .finance-year i {
+        width: 36%;
+        border-radius: 5px 5px 0 0;
+      }
+      .year-income {
+        background: #429489;
+      }
+      .year-expense {
+        background: #c26491;
+      }
+      .finance-legend {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin: 15px 0;
+      }
+      .finance-legend i {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 3px;
+        margin-right: 6px;
+      }
+      .wealth-account {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        background: transparent;
+        color: var(--ink);
+        border-top: 1px solid var(--line);
+        text-align: left;
+        padding: 18px 0;
+      }
+      .wealth-account > span:nth-child(2) {
+        flex: 1;
+        min-width: 0;
+      }
+      .wealth-account strong,
+      .wealth-account small {
+        display: block;
+        overflow-wrap: anywhere;
+      }
+      .wealth-account small {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .wealth-account b {
+        max-width: 40%;
+        overflow-wrap: anywhere;
+        font-size: 0.95rem;
+      }
+      .wealth-card.assets .movement-mark {
+        background: #42948920;
+        color: #429489;
+      }
+      .wealth-card.liabilities .movement-mark {
+        background: #c2649120;
+        color: #c26491;
+      }
+      .wealth-trend {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 15px 8px;
+      }
+      .wealth-trend button {
+        background: var(--surface2);
+        border-radius: 12px;
+        padding: 12px 5px;
+        color: var(--ink);
+        min-width: 0;
+        text-align: center;
+      }
+      .wealth-trend button > div {
+        height: 90px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 8px;
+      }
+      .wealth-trend i {
+        width: 45%;
+        border-radius: 6px 6px 0 0;
+      }
+      .wealth-trend strong {
+        font-size: 0.75rem;
+      }
+      .wealth-trend small {
+        font-size: 0.67rem;
+        display: block;
+        color: var(--muted);
+        overflow-wrap: anywhere;
+        margin-top: 3px;
+      }
+      /* Accurate time scale. Horizontal scrolling stays inside the calendar. */
+      .schedule-card {
+        padding: 18px 12px;
+        overflow: hidden;
+      }
+      .schedule-card .card-head {
+        padding: 0 6px;
+      }
+      .schedule-card h2 {
+        font-size: 1.05rem;
+      }
+      .scroll-hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin: 12px 6px;
+      }
+      .time-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+      .time-grid {
+        display: grid;
+        grid-template-columns: 44px repeat(var(--days), minmax(138px, 1fr));
+        width: max(100%, calc(44px + var(--days) * 138px));
+        align-items: start;
+        background: var(--surface);
+      }
+      .time-corner {
+        height: 62px;
+        padding: 19px 4px;
+        color: var(--muted);
+        font-size: 0.7rem;
+        background: var(--surface2);
+        position: sticky;
+        left: 0;
+        z-index: 5;
+      }
+      .time-heading {
+        height: 62px;
+        border-left: 1px solid var(--line);
+        background: var(--surface2);
+        color: var(--ink);
+        padding: 8px 4px;
+        text-align: center;
+        min-width: 0;
+      }
+      .time-heading.selected {
+        box-shadow: inset 0 -3px var(--primary);
+        background: var(--soft);
+      }
+      .time-heading strong {
+        font-size: 0.86rem;
+        display: block;
+      }
+      .time-heading small {
+        font-size: 0.68rem;
+        display: block;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .time-axis {
+        position: sticky;
+        left: 0;
+        background: var(--surface);
+        z-index: 5;
+        font-size: 0.67rem;
+        color: var(--muted);
+        border-right: 1px solid var(--line);
+      }
+      .time-axis span {
+        position: absolute;
+        left: 2px;
+        line-height: 1;
+        transform: translateY(-50%);
+        padding: 3px 0;
+      }
+      .time-axis span:first-child {
+        transform: none;
+      }
+      .time-axis span:last-child {
+        transform: translateY(-100%);
+      }
+      .time-day {
+        position: relative;
+        border-right: 1px solid var(--line);
+        background: repeating-linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent calc(var(--hour-height) / 2 - 1px),
+          var(--line) calc(var(--hour-height) / 2 - 1px),
+          var(--line) calc(var(--hour-height) / 2),
+          transparent calc(var(--hour-height) / 2),
+          transparent calc(var(--hour-height) - 1px),
+          var(--line) calc(var(--hour-height) - 1px),
+          var(--line) var(--hour-height)
+        );
+      }
+      .time-slot {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        background: transparent;
+        min-height: 0;
+        padding: 0;
+        z-index: 0;
+      }
+      .time-slot:hover {
+        background: var(--soft);
+      }
+      .time-event {
+        position: absolute;
+        border-radius: 8px;
+        border: 1px solid var(--event-color);
+        border-left: 4px solid var(--event-color);
+        color: var(--ink);
+        padding: 5px 5px 3px;
+        overflow: hidden;
+        text-align: left;
+        min-height: 0;
+        z-index: 2;
+        line-height: 1.3;
+        touch-action: manipulation;
+      }
+      .time-event strong {
+        font-size: 0.78rem;
+        display: block;
+        overflow-wrap: anywhere;
+        font-weight: 650;
+      }
+      .time-event span {
+        font-size: 0.65rem;
+        display: block;
+        margin-top: 3px;
+        white-space: nowrap;
+      }
+      .time-event small {
+        font-size: 0.64rem;
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+      }
+      .time-event.cancelled {
+        opacity: 0.5;
+        border-style: dashed;
+        text-decoration: line-through;
+      }
+      .time-event.overlap {
+        box-shadow: inset 0 0 0 1px #d18a45;
+      }
+      .agenda-colors {
+        padding: 0 6px;
+      }
+      .week-occupancy {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 4px;
+      }
+      .occupancy-day {
+        background: var(--surface2);
+        border: 1px solid transparent;
+        color: var(--ink);
+        border-radius: 10px;
+        padding: 9px 3px;
+        text-align: center;
+        min-width: 0;
+      }
+      .occupancy-day.selected {
+        border-color: var(--primary);
+        background: var(--soft);
+      }
+      .occupancy-day > strong {
+        font-size: 0.68rem;
+        display: block;
+      }
+      .occupancy-day > span {
+        font-size: 0.85rem;
+        display: block;
+      }
+      .occupancy-day > small {
+        font-size: 0.62rem;
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+      }
+      .occupancy-mini {
+        height: 74px;
+        position: relative;
+        margin: 6px 5px;
+        background: var(--surface);
+        border-radius: 3px;
+        background-image: linear-gradient(
+          to bottom,
+          transparent 38%,
+          var(--line) 38%,
+          var(--line) 39%,
+          transparent 39%
+        );
+      }
+      .occupancy-mini i {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        border-radius: 2px;
+      }
+      .selected-day-card {
+        margin-top: 20px;
+      }
+      .selected-day-card .card-head {
+        align-items: flex-start;
+      }
+      .month-occupancy-card {
+        padding: 18px 12px;
+      }
+      .month-occupancy-card > p {
+        margin: 10px 0 17px;
+      }
+      .occupancy-calendar {
+        margin: 0 !important;
+      }
+      .occupancy-calendar .month-cell {
+        padding: 0 3px 6px;
+        min-height: 0;
+        background: var(--surface);
+      }
+      .occupancy-calendar .day-number {
+        position: relative;
+        font-size: 0.8rem;
+        width: 100%;
+        min-width: 0;
+        height: 40px;
+        min-height: 40px;
+        padding: 4px 0;
+        background: transparent;
+      }
+      .occupancy-calendar .day-number small {
+        position: absolute;
+        right: 0;
+        top: 2px;
+        font-size: 0.56rem;
+        background: var(--soft);
+        color: var(--primary);
+        border-radius: 4px;
+        padding: 0 2px;
+      }
+      .month-timeline {
+        display: block;
+        width: 100%;
+        height: 82px;
+        position: relative;
+        padding: 0;
+        background: var(--surface2);
+        border-radius: 3px;
+        overflow: hidden;
+        min-height: 0;
+      }
+      .month-timeline > i {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        border-radius: 2px;
+      }
+      .month-timeline > b {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        border-top: 1px dashed var(--muted);
+        opacity: 0.5;
+        pointer-events: none;
+      }
+      .time-heading.special-national,
+      .time-day.special-national,
+      .occupancy-day.special-national {
+        background-color: #fae8c825;
+        color: var(--ink);
+      }
+      .time-heading.special-cordoba,
+      .time-day.special-cordoba,
+      .occupancy-day.special-cordoba {
+        background-color: #438dbc15;
+      }
+      .time-heading.special-personal,
+      .time-day.special-personal,
+      .occupancy-day.special-personal {
+        background-color: #c2649115;
+      }
+      .time-heading.special-tourism,
+      .time-day.special-tourism,
+      .occupancy-day.special-tourism {
+        background-color: #d18a4515;
+      }
+      @media (max-width: 539px) {
+        .finance-stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .finance-stats > div:last-child {
+          grid-column: 1/-1;
+        }
+        .finance-stats strong {
+          font-size: 1.4rem;
+        }
+        .finance-hero {
+          padding: 18px;
+        }
+        .finance-hero .actions {
+          width: 100%;
+        }
+        .finance-hero .actions .btn {
+          flex: 1;
+        }
+        .finance-ledger {
+          padding: 18px 14px;
+        }
+        .finance-filters {
+          gap: 8px;
+        }
+        .finance-filters select {
+          font-size: 0.84rem;
+          padding: 10px 7px;
+        }
+        .expense-ledger-row {
+          gap: 8px;
+        }
+        .expense-ledger-row .movement-mark {
+          width: 32px;
+          height: 34px;
+        }
+        .expense-row-end {
+          font-size: 0.84rem;
+        }
+        .expense-ledger-row .ledger-left strong {
+          font-size: 0.86rem;
+        }
+        .finance-year {
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 10px 3px;
+        }
+        .finance-year button > div {
+          height: 85px;
+        }
+        .finance-year button {
+          font-size: 0.65rem;
+        }
+        .wealth-account {
+          gap: 8px;
+        }
+        .wealth-account .icon:last-child {
+          width: 16px;
+        }
+        .wealth-account .movement-mark {
+          width: 30px;
+        }
+        .wealth-account b {
+          font-size: 0.85rem;
+        }
+        .time-grid:has(.time-day:only-of-type) {
+          grid-template-columns: 44px minmax(0, 1fr);
+        }
+        .time-grid[style*="--days:1"] {
+          width: 100%;
+          grid-template-columns: 44px minmax(0, 1fr);
+        }
+        .month-timeline {
+          height: 82px;
+        }
+        .selected-day-card h2 {
+          font-size: 1rem;
+        }
+        .schedule-card .session-row {
+          padding-left: 0;
+          padding-right: 0;
+        }
+      }
+      @media (min-width: 900px) {
+        .finance-chart-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .finance-filters {
+          grid-template-columns: 2fr repeat(3, 1fr);
+        }
+        .finance-filters input {
+          grid-column: auto;
+        }
+        .finance-year {
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+        }
+        .wealth-trend {
+          grid-template-columns: repeat(12, minmax(0, 1fr));
+        }
+        .time-grid {
+          grid-template-columns: 50px repeat(var(--days), minmax(110px, 1fr));
+          width: max(100%, calc(50px + var(--days) * 110px));
+        }
+        .time-event strong {
+          font-size: 0.85rem;
+        }
+        .time-event span {
+          font-size: 0.72rem;
+        }
+        .month-timeline {
+          height: 115px;
+        }
+        .occupancy-calendar .day-number {
+          font-size: 0.95rem;
+        }
+        .schedule-card,
+        .month-occupancy-card {
+          padding: 22px;
+        }
+        .occupancy-calendar .month-cell {
+          padding: 0 7px 8px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .time-scroll {
+          scroll-behavior: auto;
+        }
+      }
+      .time-event strong {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+      .time-event span {
+        font-variant-numeric: tabular-nums;
+      }
+      .time-event small {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .time-event.overlap span {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        margin-top: 2px;
+      }
     </style>
   </head>
   <body>
@@ -2054,7 +2875,6 @@
         "categories",
         "settings",
         "tasks",
-        "calendar_days",
         "calendar_days",
       ];
       const uuid = () =>
@@ -4438,7 +5258,7 @@
       });
       document.addEventListener("submit", (event) => {
         const f = event.target;
-        if (!f.dataset.form || f.dataset.form === "form-link") return;
+        if (!f.dataset.form || ["form-link", "finance-category"].includes(f.dataset.form)) return;
         event.preventDefault();
         if (!f.reportValidity()) return;
         const values = Object.fromEntries(new FormData(f)),
@@ -4622,6 +5442,8 @@
               });
               if (kind === "expense") {
                 r.category_name = values.category;
+                r.category_id =
+                  s.data.categories.find((c) => c.name === values.category)?.id || null;
                 if (r.status === "Pagado" && r.cash_managed)
                   cashEffect(s, {
                     date: r.date,
@@ -4883,6 +5705,788 @@
         document.documentElement.dataset.theme = "light";
       }
       render();
+
+      // Time blocks and expense analysis use only the records saved by the user.
+      const FINANCE_COLORS = [
+        "#8b65b3",
+        "#438dbc",
+        "#429489",
+        "#d18a45",
+        "#c26491",
+        "#a29238",
+        "#687dcc",
+        "#bf6e61",
+      ];
+      function colorFor(key) {
+        let hash = 0;
+        for (const char of String(key || "")) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+        return FINANCE_COLORS[hash % FINANCE_COLORS.length];
+      }
+      function categoryFor(record, store = db) {
+        return (
+          store.data.categories.find((c) => c.id === record.category_id) ||
+          store.data.categories.find(
+            (c) => normalize(c.name) === normalize(record.category_name || record.category),
+          )
+        );
+      }
+      function expenseCategory(record, store = db) {
+        const c = categoryFor(record, store),
+          name = c?.name || record.category_name || record.category || "Sin categoría";
+        return {
+          id: c?.id || "legacy:" + name,
+          name,
+          color: /^#[0-9a-f]{6}$/i.test(c?.color || "") ? c.color : colorFor(name),
+          archived: c?.active === 0,
+        };
+      }
+      function saveExpenseCategory(store, values, id = "") {
+        const name = String(values.name || "").trim(),
+          color = values.color;
+        if (!name) throw Error("Escribí el nombre de la categoría.");
+        if (!/^#[0-9a-f]{6}$/i.test(color)) throw Error("Elegí un color válido.");
+        if (
+          store.data.categories.some(
+            (c) => c.id !== id && normalize(c.name).trim() === normalize(name),
+          )
+        )
+          throw Error("Ya existe una categoría con ese nombre.");
+        let c = store.data.categories.find((c) => c.id === id);
+        if (id && !c) throw Error("No se encontró la categoría.");
+        if (!c) {
+          c = { id: uuid(), active: 1, created_at: new Date().toISOString() };
+          store.data.categories.push(c);
+        }
+        const oldName = c.name;
+        for (const r of store.data.expenses)
+          if (
+            r.category_id === c.id ||
+            (!r.category_id &&
+              oldName &&
+              normalize(r.category_name || r.category) === normalize(oldName))
+          ) {
+            r.category_id = c.id;
+            r.category_name = name;
+            r.category = name;
+          }
+        Object.assign(c, {
+          name,
+          color,
+          group_name: values.group_name || "Otros",
+          updated_at: new Date().toISOString(),
+        });
+        return c;
+      }
+      function expenseAnalysis(rows, store = db) {
+        const map = new Map();
+        for (const r of rows) {
+          const c = expenseCategory(r, store);
+          if (!map.has(c.id)) map.set(c.id, { ...c, amount: 0, count: 0, paid: 0, pending: 0 });
+          const b = map.get(c.id);
+          b.amount += cents(r.amount);
+          b.count++;
+          b[r.status === "Pagado" ? "paid" : "pending"] += cents(r.amount);
+        }
+        return [...map.values()]
+          .map((b) => ({
+            ...b,
+            amount: amount(b.amount),
+            paid: amount(b.paid),
+            pending: amount(b.pending),
+          }))
+          .sort((a, b) => b.amount - a.amount);
+      }
+      function filteredExpenses(store = db) {
+        return store.data.expenses.filter(
+          (r) =>
+            !r.deleted &&
+            monthOf(r.date) === view.month &&
+            (!view.financeCategory || expenseCategory(r, store).id === view.financeCategory) &&
+            (!view.financeStatus || r.status === view.financeStatus) &&
+            normalize(
+              r.concept + " " + expenseCategory(r, store).name + " " + (r.note || ""),
+            ).includes(normalize(view.financeQuery || "")),
+        );
+      }
+      function financeMovementRows() {
+        return movementRows().filter(
+          (r) =>
+            (r.type === "expense"
+              ? (!view.financeCategory || expenseCategory(r).id === view.financeCategory) &&
+                (!view.financeStatus || r.status === view.financeStatus)
+              : !view.financeCategory && !view.financeStatus) &&
+            normalize(
+              r.title +
+                " " +
+                r.detail +
+                " " +
+                (r.type === "expense" ? expenseCategory(r).name : "") +
+                " " +
+                (r.note || ""),
+            ).includes(normalize(view.financeQuery || "")),
+        );
+      }
+      function categoryOptions() {
+        const map = new Map(
+          db.data.categories.map((c) => [
+            c.id,
+            { id: c.id, name: c.name + (c.active === 0 ? " · archivada" : "") },
+          ]),
+        );
+        for (const r of db.data.expenses.filter((r) => !r.deleted)) {
+          const c = expenseCategory(r);
+          if (!map.has(c.id)) map.set(c.id, c);
+        }
+        return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, "es"));
+      }
+      function categoryManager() {
+        expenseCategoryDraft = null;
+        openModal(
+          "Categorías de gastos",
+          `<p class="small muted">Cada categoría conserva su color y su historial. Podés archivarla para dejar de usarla en gastos nuevos.</p><div class="actions" style="margin:18px 0">${btn("Crear categoría", "category", "primary", "", "plus")}</div>${db.data.categories.map((c) => `<div class="ledger-row"><span class="category-dot" style="background:${expenseCategory({ category_id: c.id }).color}"></span><div class="ledger-left"><strong>${esc(c.name)}</strong><small>${esc(c.group_name || "Otros")}${c.active === 0 ? " · Archivada" : ""}</small></div>${btn("Editar", "category-edit", "small outline", c.id)}${btn(c.active === 0 ? "Activar" : "Archivar", "category-archive", "small outline", c.id)}</div>`).join("")}`,
+          "categories",
+        );
+      }
+      let expenseCategoryDraft = null;
+      function categoryForm(id = "") {
+        const c = db.data.categories.find((c) => c.id === id) || {};
+        openModal(
+          id ? "Editar categoría" : "Nueva categoría de gasto",
+          formShell(
+            "finance-category",
+            field("Nombre", "name", c.name, "text", 'required maxlength="120"') +
+              field(
+                "Color",
+                "color",
+                c.color || colorFor(c.name || db.data.categories.length),
+                "color",
+                "required",
+              ) +
+              select(
+                "Grupo",
+                "group_name",
+                ["Profesional", "Servicios e Impuestos", "Personal y Hogar", "Otros"],
+                c.group_name || "Otros",
+              ),
+            { id },
+          ),
+          "finance-category",
+        );
+      }
+      const previousFormRecord = formRecord;
+      formRecord = function (kind, id = "") {
+        if (kind !== "expense") {
+          previousFormRecord(kind, id);
+          return;
+        }
+        const r = db.data.expenses.find((x) => x.id === id) || {},
+          current = expenseCategory(r).name,
+          choices = db.data.categories
+            .filter((c) => c.active !== 0 || c.name === current)
+            .map((c) => c.name);
+        if ((r.category_name || r.category) && !choices.includes(current)) choices.push(current);
+        const picked = choices.includes(current) ? current : choices[0] || "";
+        const fields =
+          field(
+            "Concepto",
+            "concept",
+            r.concept,
+            "text",
+            'required maxlength="200" placeholder="Por ejemplo, alquiler del consultorio"',
+          ) +
+          field(
+            "Importe",
+            "amount",
+            r.amount,
+            "number",
+            'required min="0.01" max="1000000000" step="0.01" inputmode="decimal"',
+          ) +
+          field(
+            "Fecha",
+            "date",
+            r.date ||
+              (view.page === "economia" && view.month !== monthOf(today())
+                ? view.month + "-01"
+                : today()),
+            "date",
+            "required",
+          ) +
+          select(
+            "Categoría",
+            "category",
+            [["", "Elegí una categoría"], ...choices],
+            picked,
+            "required",
+          ) +
+          select("Estado", "status", ["Pagado", "A pagar", "Planificado"], r.status || "Pagado") +
+          select("Medio de pago", "method", listSetting("payment_methods"), r.method) +
+          field("Nota (opcional)", "note", r.note, "text", 'maxlength="400"');
+        openModal(
+          id ? "Editar gasto" : "Nuevo gasto",
+          formShell("expense", fields, {
+            id,
+            extra: `<div class="actions" style="margin-top:12px">${btn("Crear categoría sin perder este gasto", "category-from-expense", "outline", "", "plus")}</div>${id && !r.cash_managed ? '<div class="alert info">Gasto importado: revisá el saldo patrimonial por separado al modificarlo.</div>' : ""}${id ? btn("Eliminar movimiento", "delete-record", "danger", "expense:" + id) : ""}`,
+          }),
+          kind,
+        );
+      };
+      function donutChart(buckets, total) {
+        if (total <= 0)
+          return empty(
+            "Todavía no hay gastos para graficar",
+            "Los gastos que registres aparecerán acá, con el color de su categoría.",
+            "",
+            "",
+            "wallet",
+          );
+        let progress = 0;
+        const segments = buckets.map((b) => {
+          const start = progress;
+          progress += (100 * b.amount) / total;
+          return `${b.color} ${start.toFixed(4)}% ${progress.toFixed(4)}%`;
+        });
+        return `<div class="expense-breakdown"><div class="expense-donut" role="img" aria-label="Gastos registrados: ${esc(money(total))}. Distribución detallada por categoría al lado." style="background:conic-gradient(${segments.join(",")})"><div><small>Gastos registrados</small><strong>${money(total)}</strong></div></div><div class="category-breakdown">${buckets.map((b) => `<button class="category-share" data-act="expense-filter" data-id="${esc(b.id)}" aria-label="Filtrar ${esc(b.name)}: ${esc(money(b.amount))}"><span class="category-dot" style="background:${b.color}"></span><span><strong>${esc(b.name)}</strong><small>${b.count} ${b.count === 1 ? "gasto" : "gastos"} · ${((100 * b.amount) / total).toFixed(1).replace(".", ",")}%</small></span><b>${money(b.amount)}</b><i style="width:${(100 * b.amount) / total}%;background:${b.color}"></i></button>`).join("")}</div></div>`;
+      }
+      function weeklyExpenseChart(rows) {
+        const last = Number(addDays(addMonths(view.month + "-01", 1), -1).slice(-2)),
+          groups = Array.from({ length: Math.ceil(last / 7) }, (_, i) => ({
+            start: i * 7 + 1,
+            end: Math.min(last, i * 7 + 7),
+            amount: sum(rows.filter((r) => Math.floor((Number(r.date.slice(-2)) - 1) / 7) === i)),
+          })),
+          max = Math.max(...groups.map((g) => g.amount), 1);
+        return rows.length
+          ? `<div class="weekly-expenses" role="img" aria-label="Gastos registrados por tramo del mes">${groups.map((g) => `<div><small>${money(g.amount)}</small><div class="expense-column"><i style="height:${(100 * g.amount) / max}%;background:${FINANCE_COLORS[Math.floor((g.start - 1) / 7)]}"></i></div><strong>${g.start}–${g.end}</strong></div>`).join("")}</div><p class="small muted" style="margin-top:14px">Incluye gastos pagados, a pagar y planificados que coinciden con los filtros.</p>`
+          : empty(
+              "Un vistazo a tus semanas",
+              "Al cargar gastos, podrás ver en qué parte del mes se concentran.",
+              "",
+              "",
+              "wallet",
+            );
+      }
+      function annualExpensesChart() {
+        const year = view.month.slice(0, 4),
+          rows = Array.from({ length: 12 }, (_, i) => {
+            const month = year + "-" + String(i + 1).padStart(2, "0");
+            return { month, ...totals(month) };
+          }),
+          max = Math.max(...rows.map((r) => Math.max(r.collected + r.extra, r.expenses)), 1);
+        return `<div class="finance-year">${rows.map((r) => `<button data-act="finance-month" data-id="${r.month}" class="${view.month === r.month ? "selected" : ""}" aria-label="${esc(fmtDate(r.month + "-01", { month: "long" }))}: ingresos ${esc(money(r.collected + r.extra))}, gastos pagados ${esc(money(r.expenses))}"><div><i class="year-income" style="height:${(100 * (r.collected + r.extra)) / max}%"></i><i class="year-expense" style="height:${(100 * r.expenses) / max}%"></i></div><span>${esc(fmtDate(r.month + "-01", { month: "short" }))}</span></button>`).join("")}</div><div class="finance-legend"><span><i style="background:#429489"></i>Ingresos registrados</span><span><i style="background:#c26491"></i>Gastos pagados</span></div><p class="muted small">Tocá un mes para abrir sus movimientos. Los gastos a pagar y planificados no se descuentan como pagos.</p>`;
+      }
+      function financeMovementsView() {
+        const expenses = filteredExpenses(),
+          buckets = expenseAnalysis(expenses),
+          records = financeMovementRows(),
+          paidTotal = sum(expenses.filter((r) => r.status === "Pagado")),
+          pendingTotal = sum(expenses.filter((r) => r.status !== "Pagado")),
+          total = sum(expenses);
+        return `<div class="finance-hero"><div><div class="eyebrow">Gastos del período</div><h2>Todo tiene su lugar</h2><p>Registrá tus gastos, ordenalos por categoría y descubrí cómo se distribuyen.</p></div><div class="actions">${btn("Nuevo gasto", "expense", "primary", "", "plus")}${btn("Crear categoría", "category", "outline", "", "plus")}${btn("Categorías y colores", "categories", "outline")}</div></div><div class="finance-stats"><div class="expense-stat"><small>Pagados</small><strong>${money(paidTotal)}</strong><span>${expenses.filter((r) => r.status === "Pagado").length} gastos</span></div><div class="pending-stat"><small>A pagar / planificados</small><strong>${money(pendingTotal)}</strong><span>${expenses.filter((r) => r.status !== "Pagado").length} gastos</span></div><div class="total-stat"><small>Total registrado</small><strong>${money(total)}</strong><span>${buckets.length} categorías · según filtros</span></div></div><section class="card finance-ledger"><div class="card-head"><h2>Movimientos del mes</h2><small class="muted">${records.length} registros</small></div><div class="finance-filters"><input type="search" id="finance-search" aria-label="Buscar movimiento" placeholder="Buscar concepto o categoría" value="${esc(view.financeQuery || "")}"><select id="economy-type" aria-label="Filtrar movimientos">${[
+          ["all", "Todos los movimientos"],
+          ["expense", "Gastos"],
+          ["payment", "Cobros de sesiones"],
+          ["income", "Otros ingresos"],
+          ["saving", "Ahorro y traspasos"],
+        ]
+          .map(
+            ([v, t]) =>
+              `<option value="${v}" ${view.economyType === v ? "selected" : ""}>${t}</option>`,
+          )
+          .join(
+            "",
+          )}</select><select id="finance-category" aria-label="Filtrar gastos por categoría"><option value="">Todas las categorías</option>${categoryOptions()
+          .map(
+            (c) =>
+              `<option value="${esc(c.id)}" ${view.financeCategory === c.id ? "selected" : ""}>${esc(c.name)}</option>`,
+          )
+          .join(
+            "",
+          )}</select><select id="finance-status" aria-label="Filtrar gastos por estado"><option value="">Todos los estados de gasto</option>${["Pagado", "A pagar", "Planificado"].map((s) => `<option ${view.financeStatus === s ? "selected" : ""}>${s}</option>`).join("")}</select></div><div class="actions finance-extra">${btn("Limpiar filtros", "finance-clear", "small outline")}${btn("Otro ingreso", "income", "small outline", "", "plus")}${btn("Ahorro o traspaso", "saving", "small outline", "", "plus")}</div><div id="finance-records">${
+          records.length
+            ? records
+                .map((r) => {
+                  const c =
+                    r.type === "expense"
+                      ? expenseCategory(r)
+                      : {
+                          name:
+                            r.type === "payment"
+                              ? "Sesiones"
+                              : r.type === "income"
+                                ? "Ingreso"
+                                : "Ahorro / traspaso",
+                          color: r.positive ? "#429489" : "#438dbc",
+                        };
+                  return `<div class="expense-ledger-row"><span class="movement-mark" style="background:${c.color}20;color:${c.color}">${icon(r.type === "expense" ? "wallet" : r.type === "saving" ? "coins" : "plus")}</span><div class="ledger-left"><strong>${esc(r.title)}</strong><small>${esc(fmtDate(r.date))} · ${esc(r.type === "expense" ? r.method || "Medio por completar" : r.detail)}</small><span class="category-tag" style="background:${c.color}20;color:${c.color}">${esc(c.name)}</span>${r.type === "expense" ? badge(r.status, r.status === "Pagado" ? "Realizado" : "pending") : ""}${r.note ? `<small>${esc(r.note)}</small>` : ""}</div><div class="expense-row-end"><strong class="${r.positive ? "positive" : "negative"}">${r.positive ? "+" : "−"} ${money(r.amount)}</strong><button class="icon-button" data-act="${r.type === "payment" ? "payment-detail" : r.type}" data-id="${esc(r.id)}" aria-label="Editar movimiento ${esc(r.title)}">${icon("edit")}</button></div></div>`;
+                })
+                .join("")
+            : empty(
+                "Sin movimientos con estos filtros",
+                "Podés registrar un gasto o cambiar los filtros.",
+                "Nuevo gasto",
+                "expense",
+                "wallet",
+              )
+        }</div></section><div class="finance-chart-grid"><section class="card"><div class="card-head"><h2>¿En qué se van tus gastos?</h2></div>${donutChart(buckets, total)}<p class="small muted" style="margin-top:16px">Tocá una categoría para ver sus movimientos. Incluye los gastos registrados según los filtros.</p></section><section class="card"><h2>Gastos a lo largo del mes</h2>${weeklyExpenseChart(expenses)}</section></div><section class="card finance-section"><div class="card-head"><h2>Ingresos y gastos durante ${esc(view.month.slice(0, 4))}</h2></div>${annualExpensesChart()}</section>`;
+      }
+      function previousBalances(store = db) {
+        const month = monthOf(addMonths(view.month + "-01", -1));
+        return store.data.balance_items.filter(
+          (x) =>
+            x.month === month &&
+            !store.data.balance_items.some(
+              (y) =>
+                y.month === view.month &&
+                y.kind === x.kind &&
+                normalize(y.name) === normalize(x.name),
+            ),
+        );
+      }
+      function copyPreviousBalances(store) {
+        const rows = previousBalances(store);
+        for (const r of rows)
+          store.data.balance_items.push({
+            ...clone(r),
+            id: uuid(),
+            month: view.month,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            note: r.note || "Saldo inicial copiado del mes anterior",
+          });
+        return rows.length;
+      }
+      function wealthTrend() {
+        const year = view.month.slice(0, 4),
+          rows = Array.from({ length: 12 }, (_, i) => {
+            const month = year + "-" + String(i + 1).padStart(2, "0"),
+              items = db.data.balance_items.filter((x) => x.month === month);
+            return {
+              month,
+              has: items.length > 0,
+              assets: sum(items.filter((x) => x.kind === "Activo")),
+              liabilities: sum(items.filter((x) => x.kind === "Pasivo")),
+            };
+          }),
+          max = Math.max(...rows.map((r) => Math.abs(r.assets - r.liabilities)), 1);
+        return `<div class="wealth-trend">${rows.map((r) => `<button data-act="finance-month" data-id="${r.month}" aria-label="${esc(fmtDate(r.month + "-01", { month: "long" }))}: ${r.has ? "patrimonio neto " + esc(money(r.assets - r.liabilities)) : "sin saldos registrados"}"><div><i style="height:${(100 * Math.abs(r.assets - r.liabilities)) / max}%;background:${r.assets - r.liabilities < 0 ? "#c26491" : "#429489"}"></i></div><strong>${esc(fmtDate(r.month + "-01", { month: "short" }))}</strong><small>${r.has ? money(r.assets - r.liabilities) : "Sin saldo"}</small></button>`).join("")}</div><p class="small muted">Cada mes refleja sus saldos registrados. Verde: patrimonio positivo; rosa: negativo. Los meses sin registro quedan vacíos.</p>`;
+      }
+      function financeWealthView() {
+        const items = db.data.balance_items.filter((x) => x.month === view.month),
+          assets = sum(items.filter((x) => x.kind === "Activo")),
+          liabilities = sum(items.filter((x) => x.kind === "Pasivo"));
+        return `<div class="finance-hero"><div><div class="eyebrow">Tu patrimonio</div><h2>Lo que tenés y lo que debés</h2><p>Registrá activos y pasivos, ajustá sus saldos y conservá el historial de cada cuenta.</p></div><div class="actions">${btn("Agregar activo", "balance", "primary", "Activo", "plus")}${btn("Agregar pasivo", "balance", "outline", "Pasivo", "plus")}${btn("Traer saldos anteriores", "balance-copy", "outline")}</div></div><div class="finance-stats"><div class="asset-stat"><small>Activos</small><strong>${money(assets)}</strong><span>Cuentas, dinero y bienes</span></div><div class="liability-stat"><small>Pasivos</small><strong>${money(liabilities)}</strong><span>Deudas y compromisos</span></div><div class="total-stat"><small>Patrimonio neto</small><strong>${money(amount(cents(assets) - cents(liabilities)))}</strong><span>Activos menos pasivos</span></div></div><div class="finance-chart-grid">${[
+          "Activo",
+          "Pasivo",
+        ]
+          .map(
+            (kind) =>
+              `<section class="card wealth-card ${kind === "Activo" ? "assets" : "liabilities"}"><div class="card-head"><h2>${kind === "Activo" ? "Activos y cuentas" : "Pasivos y deudas"}</h2>${btn("Agregar", "balance", "small outline", kind, "plus")}</div>${
+                items
+                  .filter((x) => x.kind === kind)
+                  .map(
+                    (x) =>
+                      `<button class="wealth-account" data-act="balance-detail" data-id="${esc(x.id)}"><span class="movement-mark">${icon("wallet")}</span><span><strong>${esc(x.name)}</strong><small>${esc(x.note || "Saldo registrado del mes")}</small></span><b>${money(x.amount)}</b>${icon("chevron")}</button>`,
+                  )
+                  .join("") ||
+                empty(
+                  kind === "Activo" ? "Todavía no hay activos" : "Todavía no hay pasivos",
+                  "Agregá los saldos de este período.",
+                  "",
+                  "",
+                  "wallet",
+                )
+              }</section>`,
+          )
+          .join(
+            "",
+          )}</div><section class="card finance-section"><div class="card-head"><h2>Tu patrimonio durante ${esc(view.month.slice(0, 4))}</h2></div>${wealthTrend()}</section><div class="alert info">${icon("wallet")}<span>Son saldos mensuales. Traer el mes anterior copia solo las cuentas que faltan, sin reemplazar las que ya cargaste. Los cobros y gastos pagados nuevos actualizan las cuentas de su medio de pago.</span></div>`;
+      }
+      const previousEconomyView = economyView;
+      economyView = function () {
+        if (view.economyTab === "actividad") return previousEconomyView();
+        const body =
+          view.economyTab === "movimientos" ? financeMovementsView() : financeWealthView();
+        return (
+          heading(
+            "Economía",
+            "Tus gastos y tu patrimonio, claros y a mano.",
+            btn("Nuevo gasto", "expense", "primary", "", "plus"),
+          ) +
+          `<div class="toolbar"><input type="month" class="input" style="width:180px" id="economy-month" value="${view.month}" aria-label="Período económico"><div class="segmented">${[
+            ["actividad", "Actividad"],
+            ["movimientos", "Movimientos"],
+            ["patrimonio", "Patrimonio"],
+          ]
+            .map(
+              ([v, t]) =>
+                `<button class="${view.economyTab === v ? "active" : ""}" data-economy-tab="${v}" aria-pressed="${view.economyTab === v}">${t}</button>`,
+            )
+            .join(
+              "",
+            )}</div>${btn("Exportar CSV", "csv-economy", "outline", "", "download")}</div>${body}`
+        );
+      };
+      const previousBalanceDetail = balanceDetail;
+      balanceDetail = function (id) {
+        previousBalanceDetail(id);
+        const item = db.data.balance_items.find((x) => x.id === id);
+        if (!item) return;
+        const section = document.querySelector("#modal-body .detail-section");
+        const rows = db.data.balance_movements
+          .filter((x) => x.balance_item_id === id)
+          .slice()
+          .reverse();
+        if (rows.length)
+          section.innerHTML = `<h3>Movimientos y ajustes</h3>${rows
+            .map((x) => {
+              const signed =
+                x.signed_delta ??
+                (x.movement_type === "Egreso" ? -Number(x.amount) : Number(x.amount));
+              return `<div class="ledger-row"><div class="ledger-left"><strong>${esc(x.description || x.movement_type || "Movimiento")}</strong><small>${esc(fmtDate(x.date))}${x.reversed ? " · Anulado" : ""}</small></div><span class="ledger-amount ${x.reversed ? "muted" : signed < 0 ? "negative" : "positive"}">${signed < 0 ? "−" : "+"} ${money(Math.abs(signed))}</span></div>`;
+            })
+            .join("")}`;
+      };
+      Object.assign(actions, {
+        category() {
+          expenseCategoryDraft = null;
+          categoryForm();
+        },
+        "category-edit": (el) => {
+          expenseCategoryDraft = null;
+          categoryForm(el.dataset.id);
+        },
+        categories: categoryManager,
+        "category-from-expense"() {
+          const f = document.querySelector('form[data-form="expense"]');
+          expenseCategoryDraft = { id: f.dataset.id, values: Object.fromEntries(new FormData(f)) };
+          categoryForm();
+        },
+        "category-archive"(el) {
+          if (
+            mutate((s) => {
+              const c = s.data.categories.find((x) => x.id === el.dataset.id);
+              c.active = c.active === 0 ? 1 : 0;
+            }, "Categoría actualizada; su historial se conserva.")
+          )
+            categoryManager();
+        },
+        "expense-filter"(el) {
+          view.financeCategory = el.dataset.id;
+          view.economyType = "expense";
+          render();
+          document
+            .getElementById("finance-records")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        },
+        "finance-clear"() {
+          view.financeCategory = "";
+          view.financeStatus = "";
+          view.financeQuery = "";
+          view.economyType = "all";
+          render();
+        },
+        "finance-month"(el) {
+          view.month = el.dataset.id;
+          render();
+        },
+        "balance-copy"() {
+          const rows = previousBalances();
+          if (!rows.length) {
+            toast("No hay cuentas nuevas para traer del mes anterior.");
+            return;
+          }
+          confirmModal(
+            "Traer saldos del mes anterior",
+            `Se agregarán ${rows.length} cuentas a ${esc(fmtDate(view.month + "-01", { month: "long", year: "numeric" }))}. Revisá estos saldos iniciales:`,
+            "confirm-balance-copy",
+            "",
+            `<div>${rows.map((r) => `<div class="summary-line"><span>${esc(r.kind)} · ${esc(r.name)}</span><strong>${money(r.amount)}</strong></div>`).join("")}</div>`,
+          );
+        },
+        "confirm-balance-copy"() {
+          if (
+            mutate(
+              (s) => copyPreviousBalances(s),
+              "Saldos iniciales copiados sin reemplazar cuentas.",
+            )
+          )
+            closeModal();
+        },
+      });
+      document.addEventListener("submit", (event) => {
+        const f = event.target;
+        if (f.dataset.form !== "finance-category") return;
+        event.preventDefault();
+        if (!f.reportValidity()) return;
+        const values = Object.fromEntries(new FormData(f)),
+          draft = expenseCategoryDraft;
+        let category;
+        if (
+          mutate((s) => {
+            category = saveExpenseCategory(s, values, f.dataset.id);
+          }, "Categoría guardada.")
+        ) {
+          expenseCategoryDraft = null;
+          closeModal();
+          if (draft) {
+            formRecord("expense", draft.id);
+            const restored = document.querySelector('form[data-form="expense"]');
+            for (const [key, value] of Object.entries(draft.values))
+              if (restored.elements[key]) restored.elements[key].value = value;
+            restored.elements.category.value = category.name;
+          }
+        }
+      });
+      document.addEventListener("change", (event) => {
+        const el = event.target;
+        if (el.id === "finance-category") {
+          view.financeCategory = el.value;
+          if (el.value) view.economyType = "expense";
+          render();
+        }
+        if (el.id === "finance-status") {
+          view.financeStatus = el.value;
+          if (el.value) view.economyType = "expense";
+          render();
+        }
+        if (el.id === "finance-search") {
+          view.financeQuery = el.value;
+          render();
+        }
+      });
+      let financeSearchTimer;
+      document.addEventListener("input", (event) => {
+        if (event.target.id === "finance-search") {
+          view.financeQuery = event.target.value;
+          clearTimeout(financeSearchTimer);
+          financeSearchTimer = setTimeout(() => render(), 180);
+        }
+      });
+      document.addEventListener("change", (event) => {
+        if (
+          event.target.id === "economy-type" &&
+          !["all", "expense"].includes(event.target.value)
+        ) {
+          view.financeCategory = "";
+          view.financeStatus = "";
+          render();
+        }
+      });
+
+      // All columns share one scale; overlap lanes preserve both sessions.
+      function clockMinutes(value) {
+        const n = Math.round(value);
+        return String(Math.floor(n / 60)).padStart(2, "0") + ":" + String(n % 60).padStart(2, "0");
+      }
+      function scheduleRange(rows) {
+        return {
+          start: Math.min(480, ...rows.map((a) => Math.floor(minutes(a.start_time) / 60) * 60)),
+          end: Math.max(
+            1260,
+            ...rows.map(
+              (a) => Math.ceil((minutes(a.start_time) + Number(a.duration_minutes)) / 60) * 60,
+            ),
+          ),
+        };
+      }
+      function occupiedMinutes(rows) {
+        const intervals = rows
+          .filter((a) => a.appointment_status !== "Cancelado")
+          .map((a) => [minutes(a.start_time), minutes(a.start_time) + Number(a.duration_minutes)])
+          .sort((a, b) => a[0] - b[0]);
+        let total = 0,
+          end = -1;
+        for (const [start, stop] of intervals) {
+          total += Math.max(0, stop - Math.max(start, end));
+          end = Math.max(end, stop);
+        }
+        return total;
+      }
+      function durationLabel(value) {
+        const h = Math.floor(value / 60),
+          m = value % 60;
+        return (h ? h + " h" : "") + (h && m ? " " : "") + (m ? m + " min" : "") || "0 min";
+      }
+      function scheduleLanes(rows) {
+        const layouts = [];
+        let active = [],
+          cluster = [];
+        for (const a of [...rows].sort(
+          (a, b) =>
+            minutes(a.start_time) - minutes(b.start_time) ||
+            Number(b.duration_minutes) - Number(a.duration_minutes),
+        )) {
+          const start = minutes(a.start_time),
+            end = start + Number(a.duration_minutes);
+          active = active.filter((x) => x.end > start);
+          if (!active.length) cluster = [];
+          let lane = 0;
+          while (active.some((x) => x.lane === lane)) lane++;
+          const item = { a, start, end, lane, columns: 1 };
+          cluster.push(item);
+          active.push(item);
+          for (const x of cluster) x.columns = Math.max(x.columns, lane + 1);
+          layouts.push(item);
+        }
+        return layouts;
+      }
+      function agendaBlockColor(a) {
+        return a.appointment_status === "Cancelado"
+          ? "#86818e"
+          : a.appointment_status === "Ausente"
+            ? "#bf6e61"
+            : a.appointment_status === "Realizado"
+              ? "#429489"
+              : a.modality === "Virtual"
+                ? "#438dbc"
+                : "#8b65b3";
+      }
+      function daySummary(rows) {
+        const active = rows.filter((a) => a.appointment_status !== "Cancelado"),
+          morning = active.filter((a) => minutes(a.start_time) < 780).length;
+        return {
+          count: active.length,
+          morning,
+          afternoon: active.length - morning,
+          occupied: occupiedMinutes(rows),
+        };
+      }
+      function timeGrid(dates, rows, range = scheduleRange(rows)) {
+        const hours = (range.end - range.start) / 60,
+          scale = 76,
+          height = hours * scale,
+          axis = Array.from(
+            { length: hours + 1 },
+            (_, i) =>
+              `<span style="top:${i * scale}px">${clockMinutes(range.start + i * 60)}</span>`,
+          ).join("");
+        return `<div class="time-scroll" tabindex="0" aria-label="Agenda por horas; desplazá hacia los costados para ver todos los días" data-range="${dates.join(",")}"><div class="time-grid" style="--days:${dates.length};--grid-height:${height}px;--hour-height:${scale}px"><div class="time-corner">Hora</div>${dates
+          .map((date) => {
+            const day = rows.filter((a) => a.date === date),
+              summary = daySummary(day);
+            return `<button class="time-heading ${date === view.date ? "selected" : ""}" data-act="month-day" data-date="${date}" data-drop-date="${date}"><strong>${esc(fmtDate(date, { weekday: "short" }))} ${Number(date.slice(-2))}</strong><small>${summary.count} turnos · ${durationLabel(summary.occupied)}</small></button>`;
+          })
+          .join("")}<div class="time-axis" style="height:${height}px">${axis}</div>${dates
+          .map((date) => {
+            const day = rows.filter((a) => a.date === date);
+            return `<div class="time-day" data-drop-date="${date}" style="height:${height}px">${Array.from({ length: hours }, (_, i) => `<button class="time-slot" style="top:${i * scale}px;height:${scale}px" data-act="appointment-slot" data-date="${date}" data-time="${clockMinutes(range.start + i * 60)}" aria-label="Crear turno el ${esc(fmtDate(date))} a las ${clockMinutes(range.start + i * 60)}"></button>`).join("")}${scheduleLanes(
+              day,
+            )
+              .map((x) => {
+                const a = x.a,
+                  color = agendaBlockColor(a),
+                  name = patient(a.patient_id)?.name || "Paciente sin ficha";
+                return `<button class="time-event ${a.appointment_status === "Cancelado" ? "cancelled" : ""} ${hasScheduleConflict(a) ? "overlap" : ""}" data-act="session" data-id="${esc(a.id)}" data-drag-id="${esc(a.id)}" draggable="true" style="top:${((x.start - range.start) * scale) / 60}px;height:${((x.end - x.start) * scale) / 60}px;left:calc(${(100 * x.lane) / x.columns}% + 3px);width:calc(${100 / x.columns}% - 6px);--event-color:${color};background:${color}25" aria-label="${esc(name)}, ${esc(fmtDate(date))}, ${a.start_time} a ${clockMinutes(x.end)}, ${a.duration_minutes} minutos${hasScheduleConflict(a) ? ", revisar superposición" : ""}"><strong>${esc(name)}</strong><span>${a.start_time}–${clockMinutes(x.end)}</span><small>${esc(a.modality || "Modalidad por completar")}</small></button>`;
+              })
+              .join("")}</div>`;
+          })
+          .join("")}</div></div>`;
+      }
+      function weekOverview(dates, rows, range) {
+        const span = range.end - range.start;
+        return `<div class="week-occupancy">${dates
+          .map((date) => {
+            const day = rows.filter((a) => a.date === date),
+              s = daySummary(day);
+            return `<button class="occupancy-day ${date === view.date ? "selected" : ""}" data-act="month-day" data-date="${date}" data-drop-date="${date}" aria-label="${esc(fmtDate(date, { weekday: "long", day: "numeric" }))}, ${s.count} turnos, ${durationLabel(s.occupied)} ocupadas"><strong>${esc(fmtDate(date, { weekday: "short" }))}</strong><span>${Number(date.slice(-2))}</span><div class="occupancy-mini">${day
+              .filter((a) => a.appointment_status !== "Cancelado")
+              .map(
+                (a) =>
+                  `<i style="top:${(100 * (minutes(a.start_time) - range.start)) / span}%;height:${(100 * Number(a.duration_minutes)) / span}%;background:${agendaBlockColor(a)}"></i>`,
+              )
+              .join("")}</div><small>${s.count || "Libre"}</small></button>`;
+          })
+          .join("")}</div>`;
+      }
+      function agendaDayDetails(rows, date) {
+        const day = rows.filter((a) => a.date === date),
+          s = daySummary(day);
+        return `<section class="card selected-day-card"><div class="card-head"><div><h2>${esc(fmtDate(date, { weekday: "long", day: "numeric", month: "long" }))}</h2><p class="small muted">${s.count ? `${s.count} turnos · ${durationLabel(s.occupied)} ocupadas · ${s.morning} por la mañana / ${s.afternoon} por la tarde` : "Sin turnos activos: día libre"}</p></div>${btn("Turno", "appointment", "small outline", "", "plus").replace('data-act="appointment"', `data-act="appointment" data-date="${date}"`)}</div>${day.length ? day.map((a) => sessionRow(a)).join("") : empty("Un día con espacio", "Tocá un horario de la grilla para crear un turno.", "", "", "calendar")}</section>`;
+      }
+      const originalAgendaView = agendaView;
+      agendaView = function () {
+        if (view.agendaMode === "list") return originalAgendaView();
+        const rows = filteredAgenda(),
+          date = view.date,
+          mode = view.agendaMode,
+          range = scheduleRange(
+            rows.filter((a) =>
+              mode === "month"
+                ? monthOf(a.date) === monthOf(date)
+                : mode === "week"
+                  ? a.date >= weekStart(date) && a.date <= addDays(weekStart(date), 6)
+                  : a.date === date,
+            ),
+          ),
+          dates =
+            mode === "week"
+              ? Array.from({ length: 7 }, (_, i) => addDays(weekStart(date), i))
+              : [date],
+          original = originalAgendaView(),
+          head = original.slice(0, original.indexOf('<section class="card">'));
+        let content = "";
+        const legend = `<div class="finance-legend agenda-colors"><span><i style="background:#8b65b3"></i>Agendado</span><span><i style="background:#438dbc"></i>Virtual</span><span><i style="background:#429489"></i>Realizado</span><span><i style="background:#bf6e61"></i>Ausente</span></div>`;
+        if (mode === "week")
+          content = `<section class="card schedule-card"><div class="card-head"><div><h2>Tu semana, por horarios</h2><p class="small muted">Cada bloque ocupa su duración real. Los espacios vacíos quedan libres.</p></div></div>${weekOverview(dates, rows, range)}<p class="scroll-hint">Deslizá a los costados para recorrer los siete días. Bajá para ver la tarde.</p>${timeGrid(
+            dates,
+            rows.filter((a) => dates.includes(a.date)),
+            range,
+          )}${legend}</section>${agendaDayDetails(rows, date)}`;
+        if (mode === "day")
+          content = `<section class="card schedule-card"><div class="card-head"><h2>El día, por horarios</h2></div>${timeGrid(
+            [date],
+            rows.filter((a) => a.date === date),
+            range,
+          )}${legend}</section>${agendaDayDetails(rows, date)}`;
+        if (mode === "month") {
+          const month = monthOf(date),
+            first = month + "-01",
+            start = weekStart(first),
+            next = addMonths(first, 1),
+            weeks = Math.ceil((dateObj(next) - dateObj(start)) / 86400000 / 7),
+            span = range.end - range.start;
+          content = `<section class="card month-occupancy-card"><h2>El mes, de un vistazo</h2><p class="small muted">Cada miniatura muestra el día de ${clockMinutes(range.start)} a ${clockMinutes(range.end)}. Arriba, la mañana; abajo, la tarde. Tocá una fecha para ampliarla.</p><div class="calendar occupancy-calendar">${["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d) => `<div class="calendar-label">${d}</div>`).join("")}${Array.from(
+            { length: weeks * 7 },
+            (_, i) => {
+              const d = addDays(start, i),
+                day = rows.filter((a) => a.date === d && a.appointment_status !== "Cancelado"),
+                s = daySummary(day);
+              return `<div class="month-cell ${monthOf(d) !== month ? "outside" : ""} ${d === date ? "selected" : ""} ${d === today() ? "today" : ""}" data-drop-date="${d}"><button class="day-number" data-act="month-day" data-date="${d}" aria-label="Ver ${esc(fmtDate(d))}: ${s.count} turnos, ${durationLabel(s.occupied)} ocupadas">${Number(d.slice(-2))}${s.count ? `<small>${s.count}</small>` : ""}</button><button class="month-timeline" data-act="month-day" data-date="${d}" aria-label="Ampliar horarios del ${esc(fmtDate(d))}">${day.map((a) => `<i style="top:${(100 * (minutes(a.start_time) - range.start)) / span}%;height:${(100 * Number(a.duration_minutes)) / span}%;background:${agendaBlockColor(a)}"></i>`).join("")}<b style="top:${(100 * (780 - range.start)) / span}%"></b></button></div>`;
+            },
+          ).join(
+            "",
+          )}</div>${legend}</section><section class="card schedule-card selected-day-card"><div class="card-head"><h2>${esc(fmtDate(date, { weekday: "long", day: "numeric", month: "long" }))} · horarios</h2></div>${timeGrid(
+            [date],
+            rows.filter((a) => a.date === date),
+            range,
+          )}</section>${agendaDayDetails(rows, date)}`;
+        }
+        return head + content;
+      };
+      actions["appointment-slot"] = (el) => {
+        formAppointment("", el.dataset.date);
+        const f = document.querySelector('form[data-form="appointment"]');
+        if (f) f.elements.start_time.value = el.dataset.time;
+      };
+      const renderBeforeTimeGrid = render;
+      render = function () {
+        const scroller = main.querySelector(".time-scroll"),
+          left = scroller?.scrollLeft || 0,
+          key = scroller?.dataset.range,
+          focused = document.activeElement?.id;
+        renderBeforeTimeGrid();
+        const updated = main.querySelector(".time-scroll");
+        if (updated) {
+          if (updated.dataset.range === key) updated.scrollLeft = left;
+          else {
+            const days = updated.dataset.range.split(","),
+              index = days.indexOf(view.date),
+              column = updated.querySelector(".time-heading")?.getBoundingClientRect().width || 0;
+            updated.scrollLeft = Math.max(0, index - 1) * column;
+          }
+        }
+        if (focused === "finance-search") document.getElementById(focused)?.focus();
+      };
 
       // Patient files are read locally. This module never sends their contents to a server.
       function feeLabel(value) {

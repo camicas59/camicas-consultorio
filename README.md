@@ -4,7 +4,7 @@ Agenda, pacientes y economía para un consultorio individual. Versión violeta, 
 
 **Abrir desde el celular:** https://camicas59.github.io/camicas-consultorio/
 
-El diseño prioriza el uso táctil: navegación inferior, formularios de una columna, controles cómodos, márgenes para la zona segura del teléfono y gráfico anual distribuido en cuatro columnas. Se verificó desde 320 píxeles de ancho.
+El diseño prioriza el uso táctil: navegación inferior, formularios de una columna, controles cómodos y márgenes para la zona segura del teléfono. Los gráficos se adaptan al ancho disponible. Se verificó desde 320 píxeles de ancho.
 
 ## Archivos
 
@@ -31,11 +31,12 @@ Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras
 ## Funciones
 
 - Inicio con próximos turnos, indicadores, cobros y recordatorios administrativos.
-- Agenda diaria, semanal, mensual y de próximos turnos; filtros, recurrencias y duplicación.
+- Agenda diaria y semanal con bloques proporcionales al horario y duración, espacios libres y turnos superpuestos en columnas separadas. El mes muestra miniaturas de ocupación; cada fecha se puede ampliar. Incluye filtros, recurrencias y duplicación.
 - Reprogramación por arrastre en computadora o edición de fecha y hora en cualquier dispositivo.
 - Fichas con historial de sesiones y pagos, honorarios, deuda y saldos a favor.
 - Cobros parciales, asistencia, bonificaciones, cancelaciones y anulación de cobros.
-- Economía con gráfico anual, gastos, otros ingresos, activos, pasivos, ahorros y traspasos.
+- Gestor de gastos con categorías editables, colores, búsqueda y filtros por categoría y estado; gráficos por categoría, tramo del mes y año debajo de los movimientos.
+- Patrimonio con activos, pasivos, patrimonio neto, historial de ajustes, evolución anual y copia de saldos anteriores sin reemplazar cuentas existentes.
 - Buscador general, borradores para WhatsApp, navegación móvil y modo oscuro.
 - Importación y respaldo JSON; informes CSV.
 - Carga adicional de fichas y turnos mediante archivos privados, sin borrar registros existentes.
@@ -50,6 +51,20 @@ Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras
 3. Agendá su sesión, o una serie con cantidad definida.
 4. Registrá asistencia y cobro por separado. Se admiten pagos parciales.
 5. Descargá respaldos JSON regularmente desde **Más**.
+
+## Gastos y patrimonio
+
+En **Economía → Movimientos**, elegí **Nuevo gasto** y completá concepto, importe, fecha, categoría, estado y medio de pago. Podés crear una categoría desde el formulario sin perder los campos escritos. En **Categorías y colores**, cambiá nombres y colores o archivá categorías; sus gastos anteriores se conservan.
+
+Los totales y gráficos por categoría y tramo del mes distinguen los gastos pagados de los pendientes y planificados. Tocá una categoría del gráfico para filtrar sus movimientos. El gráfico anual compara ingresos registrados con gastos efectivamente pagados; tocá un mes para abrirlo. Los gráficos están en la misma pestaña: desplazate hacia abajo.
+
+En **Patrimonio**, agregá activos y pasivos, abrí una cuenta para editar su saldo y consultar los ajustes, y usá **Traer saldos anteriores** para iniciar un nuevo período. Esa acción muestra los saldos antes de copiarlos y conserva las cuentas ya cargadas. El patrimonio neto es activos menos pasivos. Los pagos y gastos nuevos afectan la cuenta de su medio de pago; los gastos a pagar y planificados no descuentan dinero.
+
+## Agenda por bloques
+
+En **Semana**, las siete miniaturas permiten reconocer rápidamente días libres, mañanas y tardes ocupadas. Debajo, deslizá la grilla hacia los costados para recorrer los días y bajá para ver la tarde. Todos comparten la misma escala horaria. Los bloques tienen su duración real y los huecos quedan visibles; tocar un bloque abre el turno. Tocar un horario libre abre un turno con esa fecha y hora.
+
+En **Mes**, cada día muestra sus bloques en miniatura sobre una escala común. La línea punteada señala las 13:00. Tocá una fecha para ver su grilla ampliada debajo. Los feriados conservan sus colores y nombres. Los turnos cancelados no cuentan como tiempo ocupado.
 
 ## Cargar fichas y agenda sin borrar lo anterior
 
