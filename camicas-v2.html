@@ -5181,6 +5181,9 @@
       function saveFormLink() {
         localStorage.setItem(FORM_LINK_STORE, JSON.stringify(formLink));
       }
+      function formConnectionActive() {
+        return Boolean(formAccessToken) && Date.now() < formTokenUntil;
+      }
       function formLinkModal() {
         openModal(
           "Conectar Google Forms",
@@ -5343,6 +5346,8 @@
       async function syncForm() {
         if (formSyncBusy || !formLink.enabled) return;
         if (!formAccessToken || Date.now() >= formTokenUntil) {
+          formAccessToken = null;
+          render();
           toast("Tocá Autorizar y sincronizar para leer respuestas nuevas.", true);
           return;
         }
@@ -5377,11 +5382,19 @@
             )
               return;
           }
+          formLink.lastResponseCount = responses.length;
           formLink.lastSync = new Date().toISOString();
           saveFormLink();
           render();
-          toast("Formulario actualizado: " + report.patients + " fichas nuevas.");
+          toast(
+            "Formulario actualizado: " +
+              responses.length +
+              " respuestas leídas · " +
+              report.patients +
+              " fichas nuevas.",
+          );
         } catch (error) {
+          if (!formConnectionActive()) render();
           toast(error.message, true);
         } finally {
           formSyncBusy = false;
@@ -5414,13 +5427,15 @@
       const renderBeforeForms = render;
       render = function () {
         renderBeforeForms();
-        if (view.page === "mas")
+        if (view.page === "mas") {
+          const active = formConnectionActive();
           main
             .querySelector(".settings-grid")
             .insertAdjacentHTML(
               "beforeend",
-              `<section class="card"><h2>Formulario de pacientes</h2><p class="small muted" style="margin:14px 0">${formLink.enabled ? "Conexión configurada. Google pide autorizar la lectura de respuestas en este celular." : "La sincronización automática necesita configurar y autorizar la cuenta de Google."}</p>${formLink.lastSync ? `<p class="small muted">Última lectura: ${esc(new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short" }).format(new Date(formLink.lastSync)))}</p>` : ""}<div class="download-list">${btn("Configurar conexión", "form-link", "outline")}${formLink.enabled ? btn("Autorizar y sincronizar", "form-authorize", "primary") + btn("Desconectar", "form-disconnect", "outline") : ""}</div></section>`,
+              `<section class="card"><h2>Formulario de pacientes</h2><p class="small muted" style="margin:14px 0">${active ? "Conectado con Google. Las respuestas se revisan cada cinco minutos mientras la app está abierta y visible." : formLink.enabled ? "Conexión configurada. Tocá Autorizar y sincronizar para leer respuestas en este celular." : "La sincronización automática necesita configurar y autorizar la cuenta de Google."}</p>${formLink.lastSync ? `<p class="small muted">Última lectura: ${esc(new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short" }).format(new Date(formLink.lastSync)))}${Number.isInteger(formLink.lastResponseCount) ? " · " + formLink.lastResponseCount + " respuestas leídas" : ""}</p>` : ""}<div class="download-list">${btn("Configurar conexión", "form-link", "outline")}${formLink.enabled ? (active ? btn("Actualizar respuestas", "form-sync", "primary") : btn("Autorizar y sincronizar", "form-authorize", "primary")) + btn("Desconectar", "form-disconnect", "outline") : ""}</div></section>`,
             );
+        }
       };
 
       if (formLink.enabled && formLink.clientId) loadGoogleIdentity().catch(() => {});

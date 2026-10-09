@@ -1,5 +1,6 @@
 # Respaldos y datos personales: no publicar en el repositorio.
 camicas-respaldo-*.json
+Camicas-datos-privados-*.json
 *.csv
 .env
 .env.*
