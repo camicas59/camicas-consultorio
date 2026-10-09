@@ -10,6 +10,8 @@ El diseño prioriza el uso táctil: navegación inferior, formularios de una col
 
 - `index.html`: aplicación completa como página inicial.
 - `camicas-v2.html`: la misma aplicación en un archivo HTML independiente.
+- `manifest.webmanifest`, íconos PNG y SVG: nombre, apariencia e ícono para la pantalla de inicio de iPhone y Android.
+- `welcome-sources.md`: fuentes y distinción entre citas y recordatorios propios.
 - `.nojekyll`: sirve el HTML como sitio estático sin procesamiento adicional.
 - `.gitignore`: excluye respaldos, CSV y archivos locales de trabajo.
 
@@ -21,12 +23,17 @@ La paleta combina violeta suave y lavanda. El modo oscuro mantiene esa familia d
 
 Al abrirse o volver a la aplicación, puede aparecer una bienvenida encima de la pantalla. Hay que cerrarla con la X o **Entrar a Camicas**. Se muestra como máximo dos veces por día y con al menos seis horas entre mensajes; no queda como una tarjeta del inicio. El cartel muestra la cita y su autor, con la X y **Entrar a Camicas** como únicas acciones. El límite se cuenta en el navegador del celular. La preferencia general se administra desde **Más**.
 
-Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras. Las citas originalmente en inglés se presentan en español. Sus fuentes se conservan aquí; el cartel muestra solamente el autor:
+La biblioteca incluye **80 mensajes: 20 citas breves verificadas y 60 recordatorios originales de Camicas** sobre psicología, logoterapia, psicotrauma y atención al presente. Las citas muestran el autor y comillas; los recordatorios llevan la firma Camicas y no usan comillas. Las citas originalmente en inglés se presentan en español, con una traducción cercana. Las [fuentes y los criterios de selección](welcome-sources.md) se conservan en la guía, sin recargar el cartel.
 
-- [Kristin Neff · Self-Compassion](https://self-compassion.org/).
-- [Tara Brach · Judgment, Acceptance and Freedom](https://www.tarabrach.com/judgment-acceptance-freedom-retreat/).
-- [Thich Nhat Hanh · Calming the Breath Gatha, Plum Village](https://web.plumvillage.app/item/calming-the-breath-gatha).
-- [Thich Nhat Hanh · Teachings on True Transmission, Plum Village](https://plumvillage.org/articles/teachings-on-true-transmission).
+La biblioteca se mezcla en rondas: ningún mensaje vuelve a salir hasta completar la ronda. La selección pendiente se conserva al cerrar la aplicación.
+
+## Ícono en el celular
+
+El ícono propio combina violeta, una c blanca y una flor discreta. Se incluyen los tamaños de iPhone y Android, incluido el formato adaptable.
+
+En iPhone: abrí el enlace en Safari, elegí **Compartir → Agregar a la pantalla de inicio** y activá **Abrir como app web** si aparece. En Android: abrí el enlace en Chrome y elegí **Agregar a la pantalla principal** o **Instalar** si el navegador ofrece esa opción.
+
+Agregá primero el acceso nuevo y comprobá tus registros. Si el acceso anterior tiene datos cargados, exportá una copia desde Más antes de quitarlo; distintos modos del navegador pueden usar almacenamientos separados. El ícono no agrega sincronización ni funcionamiento sin internet a la conexión de Forms.
 
 ## Funciones
 

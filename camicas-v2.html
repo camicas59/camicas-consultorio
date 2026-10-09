@@ -10,6 +10,28 @@
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Camicas" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link
+      rel="manifest"
+      href="https://camicas59.github.io/camicas-consultorio/manifest.webmanifest"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://camicas59.github.io/camicas-consultorio/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="https://camicas59.github.io/camicas-consultorio/favicon-32.png"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https://camicas59.github.io/camicas-consultorio/camicas-icon.svg"
+    />
     <title>Camicas · Consultorio</title>
     <style>
       :root {
@@ -7525,34 +7547,690 @@
 
       if (formLink.enabled && formLink.clientId) loadGoogleIdentity().catch(() => {});
 
-      // Short, sourced quotations. Sources are documented in the guide; the popup shows only the author.
+      // Verified short excerpts and original Camicas reminders. See welcome-sources.md.
       const welcomeQuotes = [
         {
           text: "Con la autocompasión, nos damos la misma amabilidad y apoyo que le daríamos a un buen amigo.",
           author: "Kristin Neff",
           source: "https://self-compassion.org/",
           sourceTitle: "Self-Compassion · sitio de Kristin Neff",
+          kind: "quote",
+          topic: "mindfulness",
         },
         {
           text: "El límite de lo que aceptamos es el límite de nuestra libertad.",
           author: "Tara Brach",
           source: "https://www.tarabrach.com/judgment-acceptance-freedom-retreat/",
           sourceTitle: "Judgment, Acceptance and Freedom · Tara Brach",
+          kind: "quote",
+          topic: "mindfulness",
         },
         {
           text: "Al habitar el momento presente, sé que este es un momento maravilloso.",
           author: "Thich Nhat Hanh",
           source: "https://web.plumvillage.app/item/calming-the-breath-gatha",
           sourceTitle: "Calming the Breath Gatha · Plum Village",
+          kind: "quote",
+          topic: "mindfulness",
         },
         {
           text: "No hay un camino hacia la felicidad; la felicidad es el camino.",
           author: "Thich Nhat Hanh",
           source: "https://plumvillage.org/articles/teachings-on-true-transmission",
           sourceTitle: "Teachings on True Transmission · Plum Village",
+          kind: "quote",
+          topic: "mindfulness",
+        },
+        {
+          text: "¿Qué necesito ahora?",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/what-is-self-compassion/",
+          sourceTitle: "What is Self-Compassion? · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "¿Quién dijo que tenías que ser perfecta?",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/what-is-self-compassion/",
+          sourceTitle: "What is Self-Compassion? · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Que pueda tratarme con amabilidad.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/exercises/exercise-2-self-compassion-break/",
+          sourceTitle: "Self-Compassion Break · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "No estoy sola.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/exercises/exercise-2-self-compassion-break/",
+          sourceTitle: "Self-Compassion Break · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Que pueda tener paciencia.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/exercises/exercise-2-self-compassion-break/",
+          sourceTitle: "Self-Compassion Break · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Que pueda darme la compasión que necesito.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/exercises/exercise-2-self-compassion-break/",
+          sourceTitle: "Self-Compassion Break · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Date permiso para atender tus propias necesidades.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/exercises/exercise-8-taking-care-of-the-caregiver/",
+          sourceTitle: "Taking care of the caregiver · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Estoy acá para vos.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/exercises/exercise-8-taking-care-of-the-caregiver/",
+          sourceTitle: "Taking care of the caregiver · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "El amor es más poderoso que el miedo.",
+          author: "Kristin Neff",
+          source:
+            "https://self-compassion.org/exercises/exercise-7-identifying-what-we-really-want/",
+          sourceTitle: "Identifying what we really want · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Hacete saber que te importás.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/exercises/exercise-6-self-compassion-journal/",
+          sourceTitle: "Self-Compassion Journal · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Todos reaccionamos de más alguna vez; es humano.",
+          author: "Kristin Neff",
+          source: "https://self-compassion.org/exercises/exercise-6-self-compassion-journal/",
+          sourceTitle: "Self-Compassion Journal · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Hacé lo que funcione para vos.",
+          author: "Kristin Neff",
+          source:
+            "https://self-compassion.org/exercises/exercise-5-changing-your-critical-self-talk/",
+          sourceTitle: "Changing your critical self-talk · Kristin Neff",
+          topic: "psicologia",
+          kind: "quote",
+        },
+        {
+          text: "Cada ser humano es único tanto en su esencia como en su existencia.",
+          author: "Viktor Frankl",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "quote",
+        },
+        {
+          text: "Soy suficiente tal como soy.",
+          author: "Arielle Schwartz",
+          source: "https://drarielleschwartz.com/embodied-self-compassion/",
+          sourceTitle: "Embodied Self-Compassion · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "quote",
+        },
+        {
+          text: "Todos necesitamos sentirnos conectados con otros.",
+          author: "Arielle Schwartz",
+          source: "https://drarielleschwartz.com/embodied-self-compassion/",
+          sourceTitle: "Embodied Self-Compassion · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "quote",
+        },
+        {
+          text: "Sanar del trauma invita a hacerte amiga de tu cuerpo, a un ritmo que respete tus necesidades particulares.",
+          author: "Arielle Schwartz",
+          source: "https://drarielleschwartz.com/applied-polyvagal-theory-in-yoga/",
+          sourceTitle: "Applied Polyvagal Theory in Yoga · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "quote",
+        },
+        {
+          text: "Hoy también podés estar de tu lado.",
+          author: "Camicas",
+          source: "https://self-compassion.org/what-is-self-compassion/",
+          sourceTitle: "What is Self-Compassion? · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Podés cuidarte mientras aprendés algo nuevo.",
+          author: "Camicas",
+          source: "https://self-compassion.org/what-is-self-compassion/",
+          sourceTitle: "What is Self-Compassion? · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Una emoción puede estar presente sin definirte por completo.",
+          author: "Camicas",
+          source: "https://self-compassion.org/what-is-self-compassion/",
+          sourceTitle: "What is Self-Compassion? · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Tus necesidades también merecen un lugar en la agenda.",
+          author: "Camicas",
+          source: "https://self-compassion.org/what-is-self-compassion/",
+          sourceTitle: "What is Self-Compassion? · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Ser humana incluye tener días difíciles.",
+          author: "Camicas",
+          source: "https://self-compassion.org/what-is-self-compassion/",
+          sourceTitle: "What is Self-Compassion? · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Un límite claro también puede ser una forma de cuidado.",
+          author: "Camicas",
+          source: "https://self-compassion.org/what-is-self-compassion/",
+          sourceTitle: "What is Self-Compassion? · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "En un día de escuchar a otros, también hay lugar para escucharte.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-8-taking-care-of-the-caregiver/",
+          sourceTitle: "Taking care of the caregiver · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Cuidar tu energía forma parte de cuidar tu trabajo.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-8-taking-care-of-the-caregiver/",
+          sourceTitle: "Taking care of the caregiver · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Entre una sesión y otra, tus necesidades siguen contando.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-8-taking-care-of-the-caregiver/",
+          sourceTitle: "Taking care of the caregiver · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Tu descanso merece espacio, aunque queden cosas pendientes.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-8-taking-care-of-the-caregiver/",
+          sourceTitle: "Taking care of the caregiver · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Acompañar no exige olvidarte de vos misma.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-8-taking-care-of-the-caregiver/",
+          sourceTitle: "Taking care of the caregiver · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Podés animarte sin tratarte con dureza.",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-7-identifying-what-we-really-want/",
+          sourceTitle: "Identifying what we really want · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Elegí una palabra amable para acompañar tu próximo paso.",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-7-identifying-what-we-really-want/",
+          sourceTitle: "Identifying what we really want · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Cambiar algo no requiere estar en guerra con vos.",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-7-identifying-what-we-really-want/",
+          sourceTitle: "Identifying what we really want · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Hoy podés acercarte a lo que querés con paciencia.",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-7-identifying-what-we-really-want/",
+          sourceTitle: "Identifying what we really want · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "¿Qué te diría alguien que te quiere y desea verte bien?",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-7-identifying-what-we-really-want/",
+          sourceTitle: "Identifying what we really want · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Si te sirve, una línea puede darle lugar a lo que sentís.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-6-self-compassion-journal/",
+          sourceTitle: "Self-Compassion Journal · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Mirar lo ocurrido con contexto abre espacio para comprenderte.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-6-self-compassion-journal/",
+          sourceTitle: "Self-Compassion Journal · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Podés reconocer un error sin convertirlo en tu identidad.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-6-self-compassion-journal/",
+          sourceTitle: "Self-Compassion Journal · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Tu historia de hoy admite una mirada más amable.",
+          author: "Camicas",
+          source: "https://self-compassion.org/exercises/exercise-6-self-compassion-journal/",
+          sourceTitle: "Self-Compassion Journal · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Prestá atención a cómo te hablás; también merecés buen trato.",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-5-changing-your-critical-self-talk/",
+          sourceTitle: "Changing your critical self-talk · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Podés corregirte con la voz de una amiga.",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-5-changing-your-critical-self-talk/",
+          sourceTitle: "Changing your critical self-talk · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Una pregunta curiosa puede abrir más que un reproche.",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-5-changing-your-critical-self-talk/",
+          sourceTitle: "Changing your critical self-talk · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "Buscá una forma de acompañarte que tenga sentido para vos.",
+          author: "Camicas",
+          source:
+            "https://self-compassion.org/exercises/exercise-5-changing-your-critical-self-talk/",
+          sourceTitle: "Changing your critical self-talk · Kristin Neff",
+          topic: "psicologia",
+          kind: "reminder",
+        },
+        {
+          text: "¿Qué merece tu atención hoy?",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Un gesto pequeño puede expresar algo profundamente valioso.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Hay sentido en lo que hacés y en lo que compartís.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Un encuentro también puede darle sentido al día.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Lo valioso puede aparecer en una tarea cotidiana.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Tu manera de acompañar lleva una huella propia.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Hoy podés elegir un gesto acorde con tus valores.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Una conversación merece atención por la persona que la habita.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "La belleza también puede tener lugar en un día común.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "¿Qué querés cuidar en este momento?",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Crear algo sencillo también puede ser significativo.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "No necesitás una respuesta para toda la vida hoy.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Lo que importa puede cambiar de un momento a otro.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "El sentido puede descubrirse de a poco.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Tu próximo paso puede orientarse hacia alguien que querés.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Una tarea hecha con cuidado puede llevar tu sello.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Dale lugar a aquello que vuelve valioso este día.",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "¿Qué vínculo querés alimentar hoy?",
+          author: "Camicas",
+          source: "https://viktorfranklamerica.com/meaning-from-a-logotherapy-perspective/",
+          sourceTitle:
+            "Meaning from a Logotherapy Perspective · Viktor Frankl Institute of America",
+          topic: "logoterapia",
+          kind: "reminder",
+        },
+        {
+          text: "Hoy podés pedir una ayuda concreta.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Una persona de confianza puede acompañar este momento.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Tu comodidad importa al elegir dónde estar.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Podés preguntar qué necesitás antes de seguir.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "No hace falta enfrentar cada dificultad en soledad.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Una necesidad práctica también merece atención.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Buscar apoyo puede ser parte de cuidarte.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Elegí una compañía que respete tus tiempos.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Podés acercarte a alguien sin contar todo de golpe.",
+          author: "Camicas",
+          source:
+            "https://www.nctsn.org/treatments-and-practices/psychological-first-aid-and-skills-for-psychological-recovery/about-pfa",
+          sourceTitle: "About Psychological First Aid · NCTSN",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Podés avanzar a un ritmo que te resulte llevadero.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/applied-polyvagal-theory-in-yoga/",
+          sourceTitle: "Applied Polyvagal Theory in Yoga · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Hacer espacio para sentirte segura también cuenta.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/applied-polyvagal-theory-in-yoga/",
+          sourceTitle: "Applied Polyvagal Theory in Yoga · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Un entorno amable puede acompañar tu día.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/applied-polyvagal-theory-in-yoga/",
+          sourceTitle: "Applied Polyvagal Theory in Yoga · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Tus tiempos merecen respeto, incluso cuando son distintos.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/applied-polyvagal-theory-in-yoga/",
+          sourceTitle: "Applied Polyvagal Theory in Yoga · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "No necesitás apurarte para demostrar que estás avanzando.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/embodied-self-compassion/",
+          sourceTitle: "Embodied Self-Compassion · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Podés reconocer lo que te sostuvo y elegir nuevos apoyos.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/embodied-self-compassion/",
+          sourceTitle: "Embodied Self-Compassion · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Hoy hay lugar para una elección que te cuide.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/embodied-self-compassion/",
+          sourceTitle: "Embodied Self-Compassion · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Tu necesidad de compañía merece una respuesta amable.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/embodied-self-compassion/",
+          sourceTitle: "Embodied Self-Compassion · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
+        },
+        {
+          text: "Un paso sostenible vale más que exigirte hasta agotarte.",
+          author: "Camicas",
+          source: "https://drarielleschwartz.com/embodied-self-compassion/",
+          sourceTitle: "Embodied Self-Compassion · Arielle Schwartz",
+          topic: "psicotrauma",
+          kind: "reminder",
         },
       ];
       const WELCOME_STORE = "camicas.v2.welcome";
+      const WELCOME_BANK_VERSION = 2;
       let welcomePrefs = {
           enabled: true,
           seen: false,
@@ -7560,6 +8238,8 @@
           lastIndex: -1,
           day: "",
           count: 0,
+          remaining: [],
+          bankVersion: 0,
         },
         welcomeVisible = false,
         welcomeIndex = 0;
@@ -7585,9 +8265,35 @@
           (!prefs.lastShown || now - Number(prefs.lastShown) >= 6 * 60 * 60 * 1000)
         );
       }
+      function welcomeDraw(prefs, random = Math.random) {
+        let remaining =
+          prefs.bankVersion === WELCOME_BANK_VERSION && Array.isArray(prefs.remaining)
+            ? prefs.remaining.slice()
+            : [];
+        if (
+          remaining.some((i) => !Number.isInteger(i) || i < 0 || i >= welcomeQuotes.length) ||
+          new Set(remaining).size !== remaining.length
+        )
+          remaining = [];
+        if (!remaining.length) {
+          remaining = welcomeQuotes.map((_, i) => i);
+          for (let i = remaining.length - 1; i > 0; i--) {
+            const j = Math.floor(random() * (i + 1));
+            [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+          }
+          if (remaining.length > 1 && remaining[remaining.length - 1] === prefs.lastIndex)
+            [remaining[0], remaining[remaining.length - 1]] = [
+              remaining[remaining.length - 1],
+              remaining[0],
+            ];
+        }
+        return { index: remaining.pop(), remaining, bankVersion: WELCOME_BANK_VERSION };
+      }
       function chooseWelcome() {
-        const choices = welcomeQuotes.map((_, i) => i).filter((i) => i !== welcomePrefs.lastIndex);
-        welcomeIndex = choices[Math.floor(Math.random() * choices.length)];
+        const draw = welcomeDraw(welcomePrefs);
+        welcomeIndex = draw.index;
+        welcomePrefs.remaining = draw.remaining;
+        welcomePrefs.bankVersion = draw.bankVersion;
         const now = Date.now(),
           day = welcomeDay(now);
         welcomePrefs.count = welcomePrefs.day === day ? (Number(welcomePrefs.count) || 0) + 1 : 1;
@@ -7610,8 +8316,9 @@
       });
       function renderWelcome() {
         if (welcomeVisible && welcomePrefs.enabled && !welcomeDialog.open) {
-          const q = welcomeQuotes[welcomeIndex];
-          welcomeDialog.innerHTML = `<div class="welcome-popup"><button class="icon-button welcome-close" data-act="welcome-dismiss" aria-label="Cerrar mensaje de bienvenida">×</button><span class="welcome-flower" aria-hidden="true">✿</span><h2 id="welcome-title">Un momento para vos</h2><blockquote>«${esc(q.text)}»</blockquote><div class="welcome-credit">${esc(q.author)}</div><button class="btn primary" data-act="welcome-dismiss" autofocus>Entrar a Camicas</button></div>`;
+          const q = welcomeQuotes[welcomeIndex],
+            text = q.kind === "reminder" ? esc(q.text) : `«${esc(q.text)}»`;
+          welcomeDialog.innerHTML = `<div class="welcome-popup"><button class="icon-button welcome-close" data-act="welcome-dismiss" aria-label="Cerrar mensaje de bienvenida">×</button><span class="welcome-flower" aria-hidden="true">✿</span><h2 id="welcome-title">Un momento para vos</h2><blockquote>${text}</blockquote><div class="welcome-credit">${esc(q.author)}</div><button class="btn primary" data-act="welcome-dismiss" autofocus>Entrar a Camicas</button></div>`;
           welcomeDialog.showModal();
         }
         if (!welcomeVisible && welcomeDialog.open) welcomeDialog.close();

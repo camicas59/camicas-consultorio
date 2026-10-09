@@ -1,0 +1,32 @@
+{
+  "id": "/camicas-consultorio/",
+  "name": "Camicas · Consultorio",
+  "short_name": "Camicas",
+  "description": "Agenda, pacientes y economía de tu consultorio.",
+  "lang": "es-AR",
+  "start_url": "/camicas-consultorio/",
+  "scope": "/camicas-consultorio/",
+  "display": "standalone",
+  "background_color": "#f7f5fa",
+  "theme_color": "#8760ad",
+  "icons": [
+    {
+      "src": "camicas-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "camicas-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "camicas-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
