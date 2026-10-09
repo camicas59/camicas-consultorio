@@ -2789,6 +2789,170 @@
         overflow-wrap: anywhere;
         margin-top: 2px;
       }
+
+      :root {
+        --paid-bg: #d9eee3;
+        --paid-ink: #17613f;
+        --unpaid-bg: #f9e0e4;
+        --unpaid-ink: #9d273a;
+        --personal-bg: #dcecf7;
+        --personal-ink: #225e86;
+        --waived-bg: #e9def4;
+        --waived-ink: #765397;
+        --cancelled-bg: #e8e6eb;
+        --cancelled-ink: #66616e;
+      }
+      [data-theme="dark"] {
+        --paid-bg: #1c4031;
+        --paid-ink: #a6e0bc;
+        --unpaid-bg: #4b2630;
+        --unpaid-ink: #f6b5bf;
+        --personal-bg: #20394b;
+        --personal-ink: #acd6f3;
+        --waived-bg: #3d2d50;
+        --waived-ink: #d7b9f0;
+        --cancelled-bg: #333039;
+        --cancelled-ink: #c2bdcb;
+      }
+      .payment-paid {
+        --payment-bg: var(--paid-bg);
+        --payment-ink: var(--paid-ink);
+        --payment-border: #26805a;
+      }
+      .payment-unpaid {
+        --payment-bg: var(--unpaid-bg);
+        --payment-ink: var(--unpaid-ink);
+        --payment-border: #c64d5d;
+      }
+      .payment-personal {
+        --payment-bg: var(--personal-bg);
+        --payment-ink: var(--personal-ink);
+        --payment-border: #438dbc;
+      }
+      .payment-waived {
+        --payment-bg: var(--waived-bg);
+        --payment-ink: var(--waived-ink);
+        --payment-border: #8b65b3;
+      }
+      .payment-cancelled {
+        --payment-bg: var(--cancelled-bg);
+        --payment-ink: var(--cancelled-ink);
+        --payment-border: #86818e;
+      }
+      .payment-row {
+        background: var(--payment-bg);
+        border: 1px solid var(--payment-border);
+        border-left-width: 4px;
+        border-radius: 12px;
+        padding: 12px 9px;
+        margin: 9px 0;
+      }
+      .payment-row .session-name,
+      .payment-row .session-time {
+        color: var(--payment-ink);
+      }
+      .payment-label {
+        display: inline-block;
+        background: var(--payment-bg);
+        color: var(--payment-ink);
+        font-size: 0.7rem;
+        font-weight: 700;
+        border: 1px solid var(--payment-border);
+        border-radius: 6px;
+        padding: 3px 7px;
+      }
+      .time-event.payment-paid,
+      .time-event.payment-unpaid,
+      .time-event.payment-personal,
+      .time-event.payment-waived,
+      .time-event.payment-cancelled {
+        background: var(--payment-bg) !important;
+        color: var(--payment-ink);
+      }
+      .time-event small {
+        color: inherit;
+        font-weight: 650;
+      }
+      .month-event.payment-paid,
+      .month-event.payment-unpaid,
+      .month-event.payment-personal,
+      .month-event.payment-waived,
+      .month-event.payment-cancelled {
+        background: var(--payment-bg);
+        color: var(--payment-ink);
+        border-left: 3px solid var(--payment-border);
+      }
+      .month-payment-summary {
+        display: grid;
+        gap: 3px;
+        margin-top: 4px;
+      }
+      .month-payment-count {
+        display: block;
+        width: 100%;
+        min-height: 23px;
+        border-radius: 4px;
+        background: var(--payment-bg);
+        color: var(--payment-ink);
+        border-left: 3px solid var(--payment-border);
+        font-size: 0.62rem;
+        font-weight: 700;
+        padding: 2px 0;
+        white-space: nowrap;
+      }
+      .month-cell .mobile-count {
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .personal-detail h3 {
+        margin: 13px 0;
+        font-size: 1.3rem;
+      }
+      .personal-detail p {
+        margin: 10px 0;
+      }
+      .personal-hint {
+        grid-column: 1/-1;
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--personal-bg);
+        color: var(--personal-ink);
+      }
+      .appointment-kind {
+        grid-column: 1/-1;
+      }
+      .personal-today {
+        margin-top: 20px;
+      }
+      .month-color-key {
+        margin: 0 0 15px;
+      }
+      .month-color-key .payment-legend {
+        margin: 0;
+        padding: 0;
+      }
+      @media (max-width: 539px) {
+        .month-cell {
+          padding: 3px 2px;
+          min-height: 88px;
+        }
+        .month-cell .mobile-count {
+          font-size: 0.68rem;
+        }
+        .month-cell .text-button {
+          display: none;
+        }
+        .month-payment-count {
+          font-size: 0.625rem;
+          border-left-width: 2px;
+        }
+        .calendar-detail .payment-row {
+          padding: 12px 8px;
+        }
+        .payment-legend {
+          gap: 8px 12px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -2876,6 +3040,7 @@
         "settings",
         "tasks",
         "calendar_days",
+        "personal_events",
       ];
       const uuid = () =>
         globalThis.crypto?.randomUUID?.() ||
@@ -3293,6 +3458,19 @@
             (a.fee == null && a.fee_pending !== true)
           )
             throw Error("Hay un turno con datos inválidos o paciente inexistente.");
+        for (const e of result.data.personal_events)
+          if (
+            typeof e.title !== "string" ||
+            !e.title.trim() ||
+            !validDate(e.date) ||
+            !validTime(e.start_time) ||
+            !Number.isInteger(Number(e.duration_minutes)) ||
+            Number(e.duration_minutes) < 5 ||
+            Number(e.duration_minutes) > 480 ||
+            minutes(e.start_time) + Number(e.duration_minutes) > 1440 ||
+            !["Agendado", "Cancelado"].includes(e.appointment_status)
+          )
+            throw Error("Hay un evento personal con datos inválidos.");
         for (const p of result.data.payments)
           if (
             !pid.has(p.patient_id) ||
@@ -3693,17 +3871,14 @@
                 items = rows.filter((a) => a.date === d);
               return `<div class="month-cell ${monthOf(d) !== month ? "outside" : ""} ${d === today() ? "today" : ""} ${d === date ? "selected" : ""}" data-drop-date="${d}"><button class="day-number" data-act="month-day" data-date="${d}" aria-label="Ver turnos del ${esc(fmtDate(d, { day: "numeric", month: "long" }))}">${Number(d.slice(-2))}</button>${items
                 .slice(0, 3)
-                .map(
-                  (a) =>
-                    `<button draggable="true" class="month-event ${a.appointment_status} ${a.appointment_status === "Realizado" && pending(a) > 0 ? "pending" : ""}" data-drag-id="${esc(a.id)}" data-act="session" data-id="${esc(a.id)}" title="${esc(a.start_time + " " + patient(a.patient_id)?.name)}">${a.start_time} ${esc(patient(a.patient_id)?.name)}</button>`,
-                )
+                .map((a) => monthEvent(a))
                 .join(
                   "",
-                )}${items.length ? `<button class="mobile-count" data-act="month-day" data-date="${d}">${items.length} ${items.length === 1 ? "turno" : "turnos"}</button>` : ""}${items.length > 3 ? `<button class="text-button small" data-act="month-day" data-date="${d}">+${items.length - 3}</button>` : ""}</div>`;
+                )}${items.length ? `<button class="mobile-count" data-act="month-day" data-date="${d}">${monthCountLabel(items)}</button>` : ""}${monthPaymentSummary(items, d)}${items.length > 3 ? `<button class="text-button small" data-act="month-day" data-date="${d}">+${items.length - 3}</button>` : ""}</div>`;
             },
           ).join(
             "",
-          )}</div><div class="calendar-detail"><div class="card-head"><h2>${esc(fmtDate(date, { weekday: "long", day: "numeric", month: "long" }))}</h2>${btn("Turno", "appointment", "small", "", "plus").replace('data-act="appointment"', `data-act="appointment" data-date="${date}"`)}</div>${list(rows.filter((a) => a.date === date))}</div></section>`;
+          )}</div><div class="calendar-detail"><div class="card-head"><h2>${esc(fmtDate(date, { weekday: "long", day: "numeric", month: "long" }))}</h2>${btn("Turno", "appointment", "small", "", "plus").replace('data-act="appointment"', `data-act="appointment" data-date="${date}"`)}</div>${paymentLegend()}${list(rows.filter((a) => a.date === date))}</div></section>`;
         }
         const period =
           mode === "week"
@@ -5001,7 +5176,7 @@
             mutate((s) => {
               const a = appointment(el.dataset.id, s),
                 updated = { ...a, appointment_status: "Agendado" };
-              const conflict = collision([updated], appointments(s), new Set([a.id]));
+              const conflict = collision([updated], scheduleItems(s), new Set([a.id]));
               if (conflict)
                 throw Error(
                   "Ese horario se superpone con otra sesión. Editá primero la fecha o la hora.",
@@ -5258,7 +5433,11 @@
       });
       document.addEventListener("submit", (event) => {
         const f = event.target;
-        if (!f.dataset.form || ["form-link", "finance-category"].includes(f.dataset.form)) return;
+        if (
+          !f.dataset.form ||
+          ["form-link", "finance-category", "personal-event"].includes(f.dataset.form)
+        )
+          return;
         event.preventDefault();
         if (!f.reportValidity()) return;
         const values = Object.fromEntries(new FormData(f)),
@@ -5372,7 +5551,7 @@
                   created_at: new Date().toISOString(),
                 }));
               }
-              const conflict = collision(proposed, appointments(s), exclude);
+              const conflict = collision(proposed, scheduleItems(s), exclude);
               if (conflict)
                 throw Error(
                   "Se superpone una sesión del " +
@@ -5642,7 +5821,7 @@
           mutate((s) => {
             const a = appointment(el.dataset.id, s),
               updated = { ...a, date };
-            const conflict = collision([updated], appointments(s), new Set([a.id]));
+            const conflict = collision([updated], scheduleItems(s), new Set([a.id]));
             if (conflict)
               throw Error(
                 "Ese horario se superpone con otra sesión. Editá el turno para elegir otra hora.",
@@ -6331,15 +6510,7 @@
         return layouts;
       }
       function agendaBlockColor(a) {
-        return a.appointment_status === "Cancelado"
-          ? "#86818e"
-          : a.appointment_status === "Ausente"
-            ? "#bf6e61"
-            : a.appointment_status === "Realizado"
-              ? "#429489"
-              : a.modality === "Virtual"
-                ? "#438dbc"
-                : "#8b65b3";
+        return agendaPaymentState(a).color;
       }
       function daySummary(rows) {
         const active = rows.filter((a) => a.appointment_status !== "Cancelado"),
@@ -6364,7 +6535,7 @@
           .map((date) => {
             const day = rows.filter((a) => a.date === date),
               summary = daySummary(day);
-            return `<button class="time-heading ${date === view.date ? "selected" : ""}" data-act="month-day" data-date="${date}" data-drop-date="${date}"><strong>${esc(fmtDate(date, { weekday: "short" }))} ${Number(date.slice(-2))}</strong><small>${summary.count} turnos · ${durationLabel(summary.occupied)}</small></button>`;
+            return `<button class="time-heading ${date === view.date ? "selected" : ""}" data-act="month-day" data-date="${date}" data-drop-date="${date}"><strong>${esc(fmtDate(date, { weekday: "short" }))} ${Number(date.slice(-2))}</strong><small>${agendaSummaryText(day)} · ${durationLabel(summary.occupied)}</small></button>`;
           })
           .join("")}<div class="time-axis" style="height:${height}px">${axis}</div>${dates
           .map((date) => {
@@ -6375,8 +6546,8 @@
               .map((x) => {
                 const a = x.a,
                   color = agendaBlockColor(a),
-                  name = patient(a.patient_id)?.name || "Paciente sin ficha";
-                return `<button class="time-event ${a.appointment_status === "Cancelado" ? "cancelled" : ""} ${hasScheduleConflict(a) ? "overlap" : ""}" data-act="session" data-id="${esc(a.id)}" data-drag-id="${esc(a.id)}" draggable="true" style="top:${((x.start - range.start) * scale) / 60}px;height:${((x.end - x.start) * scale) / 60}px;left:calc(${(100 * x.lane) / x.columns}% + 3px);width:calc(${100 / x.columns}% - 6px);--event-color:${color};background:${color}25" aria-label="${esc(name)}, ${esc(fmtDate(date))}, ${a.start_time} a ${clockMinutes(x.end)}, ${a.duration_minutes} minutos${hasScheduleConflict(a) ? ", revisar superposición" : ""}"><strong>${esc(name)}</strong><span>${a.start_time}–${clockMinutes(x.end)}</span><small>${esc(a.modality || "Modalidad por completar")}</small></button>`;
+                  name = agendaName(a);
+                return `<button class="time-event payment-${agendaPaymentState(a).key} ${a.appointment_status === "Cancelado" ? "cancelled" : ""} ${hasScheduleConflict(a) ? "overlap" : ""}" data-act="${a.event_kind === "personal" ? "personal-detail" : "session"}" data-id="${esc(a.id)}" ${dragAttributes(a)} style="top:${((x.start - range.start) * scale) / 60}px;height:${((x.end - x.start) * scale) / 60}px;left:calc(${(100 * x.lane) / x.columns}% + 3px);width:calc(${100 / x.columns}% - 6px);--event-color:${color};background:${color}25" aria-label="${esc(name)}, ${esc(fmtDate(date))}, ${a.start_time} a ${clockMinutes(x.end)}, ${a.duration_minutes} minutos, ${esc(agendaPaymentState(a).label)}${hasScheduleConflict(a) ? ", revisar superposición" : ""}"><strong>${esc(name)}</strong><span>${a.start_time}–${clockMinutes(x.end)}</span><small>${esc(agendaPaymentState(a).label)}</small></button>`;
               })
               .join("")}</div>`;
           })
@@ -6388,7 +6559,7 @@
           .map((date) => {
             const day = rows.filter((a) => a.date === date),
               s = daySummary(day);
-            return `<button class="occupancy-day ${date === view.date ? "selected" : ""}" data-act="month-day" data-date="${date}" data-drop-date="${date}" aria-label="${esc(fmtDate(date, { weekday: "long", day: "numeric" }))}, ${s.count} turnos, ${durationLabel(s.occupied)} ocupadas"><strong>${esc(fmtDate(date, { weekday: "short" }))}</strong><span>${Number(date.slice(-2))}</span><div class="occupancy-mini">${day
+            return `<button class="occupancy-day ${date === view.date ? "selected" : ""}" data-act="month-day" data-date="${date}" data-drop-date="${date}" aria-label="${esc(fmtDate(date, { weekday: "long", day: "numeric" }))}, ${agendaSummaryText(day)}, ${durationLabel(s.occupied)} ocupadas"><strong>${esc(fmtDate(date, { weekday: "short" }))}</strong><span>${Number(date.slice(-2))}</span><div class="occupancy-mini">${day
               .filter((a) => a.appointment_status !== "Cancelado")
               .map(
                 (a) =>
@@ -6401,11 +6572,11 @@
       function agendaDayDetails(rows, date) {
         const day = rows.filter((a) => a.date === date),
           s = daySummary(day);
-        return `<section class="card selected-day-card"><div class="card-head"><div><h2>${esc(fmtDate(date, { weekday: "long", day: "numeric", month: "long" }))}</h2><p class="small muted">${s.count ? `${s.count} turnos · ${durationLabel(s.occupied)} ocupadas · ${s.morning} por la mañana / ${s.afternoon} por la tarde` : "Sin turnos activos: día libre"}</p></div>${btn("Turno", "appointment", "small outline", "", "plus").replace('data-act="appointment"', `data-act="appointment" data-date="${date}"`)}</div>${day.length ? day.map((a) => sessionRow(a)).join("") : empty("Un día con espacio", "Tocá un horario de la grilla para crear un turno.", "", "", "calendar")}</section>`;
+        return `<section class="card selected-day-card"><div class="card-head"><div><h2>${esc(fmtDate(date, { weekday: "long", day: "numeric", month: "long" }))}</h2><p class="small muted">${s.count ? `${agendaSummaryText(day)} · ${durationLabel(s.occupied)} ocupadas · ${s.morning} por la mañana / ${s.afternoon} por la tarde` : "Sin eventos activos: día libre"}</p></div>${btn("Turno", "appointment", "small outline", "", "plus").replace('data-act="appointment"', `data-act="appointment" data-date="${date}"`)}</div>${day.length ? day.map((a) => sessionRow(a)).join("") : empty("Un día con espacio", "Tocá un horario de la grilla para crear un turno.", "", "", "calendar")}</section>`;
       }
       const originalAgendaView = agendaView;
       agendaView = function () {
-        if (view.agendaMode === "list") return originalAgendaView();
+        if (["list", "month"].includes(view.agendaMode)) return originalAgendaView();
         const rows = filteredAgenda(),
           date = view.date,
           mode = view.agendaMode,
@@ -6425,7 +6596,7 @@
           original = originalAgendaView(),
           head = original.slice(0, original.indexOf('<section class="card">'));
         let content = "";
-        const legend = `<div class="finance-legend agenda-colors"><span><i style="background:#8b65b3"></i>Agendado</span><span><i style="background:#438dbc"></i>Virtual</span><span><i style="background:#429489"></i>Realizado</span><span><i style="background:#bf6e61"></i>Ausente</span></div>`;
+        const legend = paymentLegend();
         if (mode === "week")
           content = `<section class="card schedule-card"><div class="card-head"><div><h2>Tu semana, por horarios</h2><p class="small muted">Cada bloque ocupa su duración real. Los espacios vacíos quedan libres.</p></div></div>${weekOverview(dates, rows, range)}<p class="scroll-hint">Deslizá a los costados para recorrer los siete días. Bajá para ver la tarde.</p>${timeGrid(
             dates,
@@ -6438,29 +6609,6 @@
             rows.filter((a) => a.date === date),
             range,
           )}${legend}</section>${agendaDayDetails(rows, date)}`;
-        if (mode === "month") {
-          const month = monthOf(date),
-            first = month + "-01",
-            start = weekStart(first),
-            next = addMonths(first, 1),
-            weeks = Math.ceil((dateObj(next) - dateObj(start)) / 86400000 / 7),
-            span = range.end - range.start;
-          content = `<section class="card month-occupancy-card"><h2>El mes, de un vistazo</h2><p class="small muted">Cada miniatura muestra el día de ${clockMinutes(range.start)} a ${clockMinutes(range.end)}. Arriba, la mañana; abajo, la tarde. Tocá una fecha para ampliarla.</p><div class="calendar occupancy-calendar">${["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((d) => `<div class="calendar-label">${d}</div>`).join("")}${Array.from(
-            { length: weeks * 7 },
-            (_, i) => {
-              const d = addDays(start, i),
-                day = rows.filter((a) => a.date === d && a.appointment_status !== "Cancelado"),
-                s = daySummary(day);
-              return `<div class="month-cell ${monthOf(d) !== month ? "outside" : ""} ${d === date ? "selected" : ""} ${d === today() ? "today" : ""}" data-drop-date="${d}"><button class="day-number" data-act="month-day" data-date="${d}" aria-label="Ver ${esc(fmtDate(d))}: ${s.count} turnos, ${durationLabel(s.occupied)} ocupadas">${Number(d.slice(-2))}${s.count ? `<small>${s.count}</small>` : ""}</button><button class="month-timeline" data-act="month-day" data-date="${d}" aria-label="Ampliar horarios del ${esc(fmtDate(d))}">${day.map((a) => `<i style="top:${(100 * (minutes(a.start_time) - range.start)) / span}%;height:${(100 * Number(a.duration_minutes)) / span}%;background:${agendaBlockColor(a)}"></i>`).join("")}<b style="top:${(100 * (780 - range.start)) / span}%"></b></button></div>`;
-            },
-          ).join(
-            "",
-          )}</div>${legend}</section><section class="card schedule-card selected-day-card"><div class="card-head"><h2>${esc(fmtDate(date, { weekday: "long", day: "numeric", month: "long" }))} · horarios</h2></div>${timeGrid(
-            [date],
-            rows.filter((a) => a.date === date),
-            range,
-          )}</section>${agendaDayDetails(rows, date)}`;
-        }
         return head + content;
       };
       actions["appointment-slot"] = (el) => {
@@ -6657,6 +6805,339 @@
                 `<p class="small muted" style="margin-bottom:18px">${provisional.length} fichas conservan el nombre abreviado de la agenda. Podés completarlas cuando confirmes a quién corresponden.</p>`,
               );
         }
+      };
+
+      // Personal events stay separate from clinical appointments and money records.
+      function personalEvents(store = db) {
+        return (store.data.personal_events || [])
+          .filter((e) => !e.deleted)
+          .map((e) => ({ ...e, event_kind: "personal" }));
+      }
+      function scheduleItems(store = db) {
+        return [...appointments(store), ...personalEvents(store)];
+      }
+      function agendaName(a) {
+        return a.event_kind === "personal"
+          ? a.title
+          : patient(a.patient_id)?.name || "Paciente sin ficha";
+      }
+      function agendaPaymentState(a, store = db) {
+        if (a.appointment_status === "Cancelado")
+          return { key: "cancelled", color: "#86818e", label: "Cancelado" };
+        if (a.event_kind === "personal")
+          return { key: "personal", color: "#438dbc", label: "Evento personal" };
+        if (a.financial_status === "Bonificado")
+          return { key: "waived", color: "#8b65b3", label: "Bonificado" };
+        if (a.fee == null)
+          return { key: "unpaid", color: "#c64d5d", label: "Sin pago · honorario por completar" };
+        if (charge(a) === 0) return { key: "waived", color: "#8b65b3", label: "Sin cargo" };
+        if (pending(a, store) <= 0) return { key: "paid", color: "#26805a", label: "Pagado" };
+        return {
+          key: "unpaid",
+          color: "#c64d5d",
+          label: paid(a, store) > 0 ? "Pago parcial · saldo pendiente" : "Pendiente de pago",
+        };
+      }
+      function paymentLegend() {
+        return `<div class="finance-legend agenda-colors payment-legend"><span><i style="background:#26805a"></i>Pagado</span><span><i style="background:#c64d5d"></i>Pendiente de pago</span><span><i style="background:#438dbc"></i>Personal</span><span><i style="background:#8b65b3"></i>Sin cargo / bonificado</span></div>`;
+      }
+      function dragAttributes(a) {
+        return a.event_kind === "personal" ? "" : `data-drag-id="${esc(a.id)}" draggable="true"`;
+      }
+      function agendaSummaryText(rows) {
+        const active = rows.filter((a) => a.appointment_status !== "Cancelado"),
+          sessions = active.filter((a) => a.event_kind !== "personal").length,
+          personal = active.length - sessions;
+        return `${sessions} ${sessions === 1 ? "turno" : "turnos"}${personal ? " + " + personal + " " + (personal === 1 ? "personal" : "personales") : ""}`;
+      }
+      function monthEvent(a) {
+        const state = agendaPaymentState(a);
+        return `<button class="month-event payment-${state.key}" ${dragAttributes(a)} data-act="${a.event_kind === "personal" ? "personal-detail" : "session"}" data-id="${esc(a.id)}" title="${esc(a.start_time + " " + agendaName(a) + " · " + state.label)}" aria-label="${esc(agendaName(a))}, ${a.start_time}, ${esc(state.label)}"><b>${a.start_time}</b> ${esc(agendaName(a))}</button>`;
+      }
+      function monthPaymentSummary(rows, date) {
+        const states = ["paid", "unpaid", "personal", "waived", "cancelled"],
+          labels = {
+            paid: "pago",
+            unpaid: "pend.",
+            personal: "pers.",
+            waived: "s/c",
+            cancelled: "canc.",
+          },
+          full = {
+            paid: "pagados",
+            unpaid: "pendientes de pago",
+            personal: "personales",
+            waived: "sin cargo o bonificados",
+            cancelled: "cancelados",
+          };
+        return `<div class="month-payment-summary">${states
+          .map((key) => {
+            const count = rows.filter((a) => agendaPaymentState(a).key === key).length;
+            return count
+              ? `<button class="month-payment-count payment-${key}" data-act="month-day" data-date="${date}" aria-label="${count} ${full[key]} el ${esc(fmtDate(date))}">${count} ${labels[key]}</button>`
+              : "";
+          })
+          .join("")}</div>`;
+      }
+      function monthCountLabel(rows) {
+        const total = rows.length;
+        return (
+          total +
+          " " +
+          (rows.some((a) => a.event_kind === "personal")
+            ? total === 1
+              ? "evento"
+              : "eventos"
+            : total === 1
+              ? "turno"
+              : "turnos")
+        );
+      }
+      const agendaBeforeMonthLegend = agendaView;
+      agendaView = function () {
+        const html = agendaBeforeMonthLegend();
+        return view.agendaMode === "month"
+          ? html.replace(
+              '<section class="card"><div class="calendar">',
+              `<section class="card"><div class="month-color-key">${paymentLegend()}</div><div class="calendar">`,
+            )
+          : html;
+      };
+      const agendaFilterBeforePersonal = filteredAgenda;
+      filteredAgenda = function () {
+        const clinical = agendaFilterBeforePersonal();
+        if (view.agendaPatient || ["debt", "overdue"].includes(view.agendaStatus)) return clinical;
+        return sorted([
+          ...clinical,
+          ...personalEvents().filter(
+            (e) => !view.agendaStatus || e.appointment_status === view.agendaStatus,
+          ),
+        ]);
+      };
+      hasScheduleConflict = function (a, store = db) {
+        return (
+          a.appointment_status !== "Cancelado" &&
+          scheduleItems(store).some(
+            (b) =>
+              b.id !== a.id &&
+              b.appointment_status !== "Cancelado" &&
+              b.date === a.date &&
+              minutes(a.start_time) < minutes(b.start_time) + Number(b.duration_minutes) &&
+              minutes(b.start_time) < minutes(a.start_time) + Number(a.duration_minutes),
+          )
+        );
+      };
+      const rowBeforePaymentColors = sessionRow;
+      sessionRow = function (a, options = {}) {
+        const state = agendaPaymentState(a);
+        if (a.event_kind !== "personal")
+          return rowBeforePaymentColors(a, options)
+            .replace('class="session-row"', `class="session-row payment-row payment-${state.key}"`)
+            .replace(
+              '<div class="session-status">',
+              `<div class="session-status"><span class="payment-label payment-${state.key}">${esc(state.label)}</span>`,
+            );
+        return `<article class="session-row payment-row payment-personal"><div class="session-time">${esc(a.start_time)}<small>${options.date ? esc(fmtDate(a.date)) : a.duration_minutes + " min"}</small></div><div class="session-main"><button class="session-name" data-act="personal-detail" data-id="${esc(a.id)}">${esc(a.title)}</button><div class="session-info">Evento personal${a.note ? " · " + esc(a.note) : ""}</div><div class="session-status"><span class="payment-label payment-personal">Personal</span>${a.appointment_status === "Cancelado" ? badge("Cancelado") : ""}${hasScheduleConflict(a) ? badge("Revisar superposición", "pending") : ""}</div></div><button class="icon-button" data-act="personal-detail" data-id="${esc(a.id)}" aria-label="Opciones de ${esc(a.title)}">${icon("more")}</button></article>`;
+      };
+      function agendaKindSelect(value = "session") {
+        return select(
+          "Qué querés agendar",
+          "agenda_kind",
+          [
+            ["session", "Sesión con paciente"],
+            ["personal", "Evento personal (médico, trámites, etc.)"],
+          ],
+          value,
+        );
+      }
+      const appointmentFormBeforePersonal = formAppointment;
+      formAppointment = function (id = "", date = "", patientId = "", duplicate = false) {
+        appointmentFormBeforePersonal(id, date, patientId, duplicate);
+        if (id && !duplicate) return;
+        const grid = document.querySelector('form[data-form="appointment"] .form-grid');
+        if (grid)
+          grid.insertAdjacentHTML(
+            "afterbegin",
+            `<div class="field full appointment-kind">${agendaKindSelect()}</div>`,
+          );
+        else
+          document
+            .querySelector("#modal-body")
+            ?.insertAdjacentHTML("afterbegin", agendaKindSelect());
+      };
+      function formPersonalEvent(id = "", draft = {}) {
+        const event = personalEvents().find((e) => e.id === id) || {},
+          values = { ...event, ...draft };
+        openModal(
+          id ? "Editar evento personal" : "Agendar evento personal",
+          formShell(
+            "personal-event",
+            (!id
+              ? `<div class="field full appointment-kind">${agendaKindSelect("personal")}</div>`
+              : "") +
+              field(
+                "Título",
+                "title",
+                values.title,
+                "text",
+                'required maxlength="160" placeholder="Por ejemplo, médico"',
+              ) +
+              field(
+                "Fecha",
+                "date",
+                values.date || (view.page === "agenda" ? view.date : today()),
+                "date",
+                "required",
+              ) +
+              field("Hora", "start_time", values.start_time || "10:00", "time", "required") +
+              field(
+                "Duración en minutos",
+                "duration_minutes",
+                values.duration_minutes || 60,
+                "number",
+                'required min="5" max="480" step="5"',
+              ) +
+              field("Nota (opcional)", "note", values.note || "", "text", 'maxlength="400"') +
+              `<p class="small personal-hint">Se verá en azul en la agenda. No genera honorarios, deudas ni cobros.</p>`,
+            { id, submit: id ? "Guardar cambios" : "Guardar evento" },
+          ),
+          "personal-event",
+        );
+      }
+      function savePersonalEvent(store, values, id = "") {
+        const duration = Number(values.duration_minutes),
+          title = String(values.title || "").trim();
+        if (!title) throw Error("Escribí el título del evento.");
+        if (
+          !validDate(values.date) ||
+          !validTime(values.start_time) ||
+          !Number.isInteger(duration) ||
+          duration < 5 ||
+          duration > 480 ||
+          minutes(values.start_time) + duration > 1440
+        )
+          throw Error(
+            "Revisá la fecha, la hora y la duración. El evento debe terminar dentro del día.",
+          );
+        let event = store.data.personal_events.find((e) => e.id === id);
+        if (id && (!event || event.deleted)) throw Error("Ese evento ya no está disponible.");
+        const proposed = {
+          ...event,
+          id: event?.id || uuid(),
+          title,
+          date: values.date,
+          start_time: values.start_time,
+          duration_minutes: duration,
+          note: String(values.note || "").trim(),
+          appointment_status: event?.appointment_status || "Agendado",
+          event_kind: "personal",
+          deleted: false,
+          updated_at: new Date().toISOString(),
+        };
+        const conflict = collision([proposed], scheduleItems(store), new Set([proposed.id]));
+        if (conflict)
+          throw Error("Ese horario se superpone con otro evento o sesión. Elegí otro horario.");
+        if (event) Object.assign(event, proposed);
+        else store.data.personal_events.push({ ...proposed, created_at: new Date().toISOString() });
+        return proposed;
+      }
+      function personalDetail(id) {
+        const e = personalEvents().find((e) => e.id === id);
+        if (!e) return;
+        openModal(
+          "Evento personal",
+          `<div class="personal-detail"><span class="payment-label payment-personal">Personal</span><h3>${esc(e.title)}</h3><p>${esc(fmtDate(e.date, { weekday: "long", day: "numeric", month: "long" }))} · ${e.start_time}–${clockMinutes(minutes(e.start_time) + e.duration_minutes)}</p><p class="small muted">${e.duration_minutes} minutos · ${esc(e.appointment_status)}</p>${e.note ? `<p>${esc(e.note)}</p>` : ""}</div><div class="actions">${btn("Editar evento", "personal-edit", "primary", id, "edit")}${btn(e.appointment_status === "Cancelado" ? "Reactivar evento" : "Cancelar evento", "personal-toggle", "outline", id)}${btn("Eliminar evento", "personal-delete", "danger", id)}</div>`,
+          "personal-detail",
+        );
+      }
+      Object.assign(actions, {
+        "personal-detail": (el) => personalDetail(el.dataset.id),
+        "personal-edit": (el) => formPersonalEvent(el.dataset.id),
+        "personal-toggle"(el) {
+          if (
+            mutate((s) => {
+              const e = s.data.personal_events.find((x) => x.id === el.dataset.id);
+              if (e.appointment_status === "Cancelado") {
+                const conflict = collision(
+                  [{ ...e, appointment_status: "Agendado" }],
+                  scheduleItems(s),
+                  new Set([e.id]),
+                );
+                if (conflict)
+                  throw Error(
+                    "Ese horario se superpone con otro evento o sesión. Editá el evento para elegir otra hora.",
+                  );
+              }
+              e.appointment_status =
+                e.appointment_status === "Cancelado" ? "Agendado" : "Cancelado";
+            }, "Evento actualizado")
+          )
+            closeModal();
+        },
+        "personal-delete"(el) {
+          confirmModal(
+            "Eliminar evento personal",
+            "Se quitará este evento de la agenda. No cambia pacientes ni cobros.",
+            "confirm-personal-delete",
+            el.dataset.id,
+          );
+        },
+        "confirm-personal-delete"(el) {
+          if (
+            mutate((s) => {
+              s.data.personal_events.find((e) => e.id === el.dataset.id).deleted = true;
+            }, "Evento quitado de la agenda")
+          )
+            closeModal();
+        },
+      });
+      document.addEventListener("change", (event) => {
+        const el = event.target;
+        if (el.name !== "agenda_kind") return;
+        const f = el.closest("form"),
+          values = f ? Object.fromEntries(new FormData(f)) : {};
+        if (el.value === "personal")
+          formPersonalEvent("", {
+            date: values.date || view.date,
+            start_time: values.start_time,
+            duration_minutes: values.duration_minutes,
+            note: values.administrative_note,
+          });
+        else {
+          formAppointment("", values.date);
+          const restored = document.querySelector('form[data-form="appointment"]');
+          if (restored)
+            for (const key of ["date", "start_time", "duration_minutes"])
+              if (values[key]) restored.elements[key].value = values[key];
+        }
+      });
+      document.addEventListener("submit", (event) => {
+        const f = event.target;
+        if (f.dataset.form !== "personal-event") return;
+        event.preventDefault();
+        if (!f.reportValidity()) return;
+        if (
+          mutate(
+            (s) => savePersonalEvent(s, Object.fromEntries(new FormData(f)), f.dataset.id),
+            "Evento personal guardado",
+          )
+        )
+          closeModal();
+      });
+      const todayBeforePersonal = todayView;
+      todayView = function () {
+        const html = todayBeforePersonal(),
+          rows = personalEvents().filter((e) => e.date === today());
+        return (
+          html +
+          (rows.length
+            ? `<section class="card personal-today"><div class="card-head"><h2>Tus eventos personales de hoy</h2></div>${sorted(
+                rows,
+              )
+                .map((e) => sessionRow(e))
+                .join("")}</section>`
+            : "")
+        );
       };
 
       const holidayLaw = "https://www.argentina.gob.ar/normativa/nacional/ley-27399-281835/texto";

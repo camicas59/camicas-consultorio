@@ -31,7 +31,8 @@ Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras
 ## Funciones
 
 - Inicio con próximos turnos, indicadores, cobros y recordatorios administrativos.
-- Agenda diaria y semanal con bloques proporcionales al horario y duración, espacios libres y turnos superpuestos en columnas separadas. El mes muestra miniaturas de ocupación; cada fecha se puede ampliar. Incluye filtros, recurrencias y duplicación.
+- Agenda diaria y semanal con bloques proporcionales al horario y duración, espacios libres y turnos superpuestos en columnas separadas. El mes mantiene el calendario por fechas con detalle del día. Incluye filtros, recurrencias y duplicación.
+- Colores por cobro: verde para pagado completo, rojo para pendiente o pago parcial, azul para eventos personales. Bonificados y sin cargo en violeta, cancelados en gris.
 - Reprogramación por arrastre en computadora o edición de fecha y hora en cualquier dispositivo.
 - Fichas con historial de sesiones y pagos, honorarios, deuda y saldos a favor.
 - Cobros parciales, asistencia, bonificaciones, cancelaciones y anulación de cobros.
@@ -64,7 +65,11 @@ En **Patrimonio**, agregá activos y pasivos, abrí una cuenta para editar su sa
 
 En **Semana**, las siete miniaturas permiten reconocer rápidamente días libres, mañanas y tardes ocupadas. Debajo, deslizá la grilla hacia los costados para recorrer los días y bajá para ver la tarde. Todos comparten la misma escala horaria. Los bloques tienen su duración real y los huecos quedan visibles; tocar un bloque abre el turno. Tocar un horario libre abre un turno con esa fecha y hora.
 
-En **Mes**, cada día muestra sus bloques en miniatura sobre una escala común. La línea punteada señala las 13:00. Tocá una fecha para ver su grilla ampliada debajo. Los feriados conservan sus colores y nombres. Los turnos cancelados no cuentan como tiempo ocupado.
+En **Mes**, se conserva el calendario por fechas. Cada día muestra su cantidad y un resumen con colores: pagados en verde, pendientes en rojo y personales en azul. Tocá la fecha o su resumen para consultar los nombres, horarios y estado de cobro debajo. Los feriados conservan sus colores y nombres. Los turnos cancelados no cuentan como tiempo ocupado.
+
+El color del turno depende del cobro, separado de la asistencia y la modalidad: pasa a verde al registrar el pago completo. Si el pago es parcial queda rojo; anular un cobro devuelve el turno a rojo cuando corresponde. Los honorarios por completar también quedan rojos con una indicación específica. Los turnos bonificados o sin cargo se distinguen en violeta.
+
+Al elegir **Nuevo turno**, desplegá **Qué querés agendar → Evento personal** para agregar médico, trámites u otras actividades. Completá título, fecha, hora y duración. El evento aparece en azul en las vistas de agenda y puede editarse, cancelarse o quitarse. Se controla que no se superponga con sesiones u otros eventos. No genera pacientes, honorarios, deudas ni cobros; se incluye en el respaldo completo.
 
 ## Cargar fichas y agenda sin borrar lo anterior
 
