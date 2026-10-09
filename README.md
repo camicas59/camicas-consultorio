@@ -2,6 +2,10 @@
 
 Agenda, pacientes y economía para un consultorio individual. Versión violeta, con detalles florales discretos y mensajes de bienvenida opcionales.
 
+**Abrir desde el celular:** https://camicas59.github.io/camicas-consultorio/
+
+El diseño prioriza el uso táctil: navegación inferior, formularios de una columna, controles cómodos, márgenes para la zona segura del teléfono y gráfico anual distribuido en cuatro columnas. Se verificó desde 320 píxeles de ancho.
+
 ## Archivos
 
 - `index.html`: aplicación completa como página inicial.
@@ -37,7 +41,7 @@ Las citas se verificaron en fuentes de sus autores o de sus comunidades editoras
 
 ## Primeros pasos
 
-1. Abrí el HTML en un navegador moderno. No uses una previsualización que desactive JavaScript.
+1. Abrí el enlace en Chrome o Safari desde el celular. También podés abrir el HTML descargado en un navegador moderno.
 2. Creá un paciente y elegí su honorario y modalidad.
 3. Agendá su sesión, o una serie con cantidad definida.
 4. Registrá asistencia y cobro por separado. Se admiten pagos parciales.
@@ -63,7 +67,7 @@ Los cobros nuevos actualizan la cuenta de su medio de pago. La edición de gasto
 
 ## Publicación
 
-El repositorio contiene la página inicial lista para alojar como sitio estático. Crear el repositorio y cargar los archivos no publica automáticamente una dirección de la aplicación. La publicación requiere configurar un servicio de alojamiento por separado.
+El sitio se publica con GitHub Pages desde la rama `main`, carpeta raíz `/`. El repositorio público contiene únicamente el código y esta guía. Los registros administrativos permanecen en el navegador del dispositivo; no se suben con las actualizaciones del sitio.
 
 ## Verificación
 
