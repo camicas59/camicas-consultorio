@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es-AR">
   <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Z9v/z1oB1FqEcA6mv0kR1qxN4yyYWvFqjZ+CaBnr+tw=' https://accounts.google.com/gsi/client; script-src-attr 'none'; style-src 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: https://camicas59.github.io; connect-src https://forms.googleapis.com https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; manifest-src 'self' https://camicas59.github.io; base-uri 'none'; object-src 'none'; form-action 'none'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-B4v9ChNc9sCiAh2jQGRG2HSOCqb7gRjaNOAz0V0mBrE=' https://accounts.google.com/gsi/client; script-src-attr 'none'; style-src 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: https://camicas59.github.io; connect-src https://forms.googleapis.com https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; manifest-src 'self' https://camicas59.github.io; base-uri 'none'; object-src 'none'; form-action 'none'" />
     <meta name="referrer" content="no-referrer" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -2988,6 +2988,43 @@
       body.security-locked > #notices {
         display: none !important;
       }
+      .security-password-dialog {
+        max-height: calc(100dvh - 36px);
+        overflow: auto;
+        color: var(--ink, #30233e);
+        background: var(--surface, #fff);
+        border: 1px solid var(--border, #e4dbea);
+        border-radius: 20px;
+      }
+      .security-password-dialog label {
+        display: block;
+        font-size: 14px;
+        margin-top: 14px;
+      }
+      .security-password-dialog input[type="password"] {
+        color: inherit;
+        background: var(--bg, #f7f5fa);
+        border: 1px solid var(--border, #ddd);
+        border-radius: 12px;
+      }
+      .security-password-dialog input[type="checkbox"] {
+        width: auto;
+        min-height: 0;
+        margin: 3px 0 0;
+      }
+      .security-password-dialog .security-check {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        line-height: 1.45;
+      }
+      .security-password-dialog button {
+        min-height: 44px;
+      }
+      .security-password-dialog .security-error {
+        color: #ae354c;
+        line-height: 1.4;
+      }
       .security-gate {
         position: fixed;
         inset: 0;
@@ -3152,7 +3189,7 @@
     <div id="notices" role="status" aria-live="polite"></div>
     <script>
       (async () => {
-        // Web Crypto only. Keys and decrypted fields live in this page session, never in persistent storage.
+        // Web Crypto helpers for reading earlier encrypted copies. The current build restores direct access.
         const VAULT_KEY = "camicas.v3.vault",
           VAULT_ITERATIONS = 600000;
         const LEGACY_KEYS = [
@@ -3377,25 +3414,89 @@
           };
         }
 
-        const securityState = {
-          key: null,
-          salt: null,
-          store: null,
-          locking: false,
-          lastActivity: Date.now(),
-        };
-        document.body.classList.add("security-locked");
-        const securityGate = document.createElement("section");
-        securityGate.className = "security-gate";
-        securityGate.setAttribute("aria-label", "Acceso protegido a Camicas");
-        document.body.append(securityGate);
-        function secureEscape(s) {
+        const DIRECT_ACCESS_KEY = "camicas.v3.direct-access";
+        function directSnapshot(native) {
+          return Object.fromEntries(
+            LEGACY_KEYS.map((k) => [k, native.getItem(k)]).filter(([, v]) => v !== null),
+          );
+        }
+        function directUnchanged(native, expected) {
+          const now = directSnapshot(native);
+          return LEGACY_KEYS.every((k) => (now[k] ?? null) === (expected[k] ?? null));
+        }
+        function directPlan(fields, existing) {
+          if (
+            existing["camicas.v2.data"] != null &&
+            fields["camicas.v2.data"] != null &&
+            existing["camicas.v2.data"] !== fields["camicas.v2.data"]
+          )
+            throw Error(
+              "Hay otro guardado en este navegador. Conservamos ambas versiones: podés entrar con los registros existentes y recuperar la copia anterior desde Más.",
+            );
+          // Preserve preferences and older local backups already present; never silently replace a database.
+          return { ...fields, ...existing };
+        }
+        function directCommit(native, { vault, fields, expected }) {
+          if (native.getItem(VAULT_KEY) !== vault || !directUnchanged(native, expected))
+            throw Error(
+              "Los registros cambiaron en otra pestaña. Cerrá las otras pestañas y volvé a intentar.",
+            );
+          const merged = directPlan(fields, expected),
+            written = [];
+          try {
+            for (const k of LEGACY_KEYS) {
+              if (merged[k] != null && merged[k] !== expected[k]) {
+                native.setItem(k, merged[k]);
+                written.push(k);
+              }
+            }
+            if (
+              !LEGACY_KEYS.every((k) => (native.getItem(k) ?? null) === (merged[k] ?? null)) ||
+              native.getItem(VAULT_KEY) !== vault
+            )
+              throw Error("No se pudo verificar la recuperación.");
+            native.setItem(DIRECT_ACCESS_KEY, "direct");
+            if (native.getItem(DIRECT_ACCESS_KEY) !== "direct")
+              throw Error("No se pudo guardar el acceso directo.");
+          } catch (error) {
+            // The encrypted source remains untouched even if quota or readback verification fails.
+            try {
+              if (native.getItem(DIRECT_ACCESS_KEY) === "direct")
+                native.removeItem(DIRECT_ACCESS_KEY);
+            } catch {}
+            for (const k of written.reverse()) {
+              try {
+                if (native.getItem(k) === merged[k]) {
+                  if (expected[k] != null) native.setItem(k, expected[k]);
+                  else native.removeItem(k);
+                }
+              } catch {}
+            }
+            throw Error(
+              "No se pudo completar la recuperación. El guardado cifrado anterior se conserva. " +
+                error.message,
+            );
+          }
+          return merged;
+        }
+
+        function directEscape(s) {
           return String(s ?? "").replace(
             /[&<>"']/g,
             (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
           );
         }
-        function securityDownload(name, text) {
+        function directSummary(fields) {
+          try {
+            const d = JSON.parse(fields["camicas.v2.data"] || "null")?.data;
+            return d
+              ? `${d.patients?.length || 0} pacientes · ${d.appointments?.length || 0} turnos · ${d.payments?.length || 0} cobros · ${d.expenses?.length || 0} gastos`
+              : "Sin registros en esta copia.";
+          } catch {
+            return "Guardado anterior pendiente de revisar.";
+          }
+        }
+        function directDownload(name, text) {
           const url = URL.createObjectURL(new Blob([text], { type: "application/json" })),
             a = document.createElement("a");
           a.href = url;
@@ -3405,356 +3506,120 @@
           a.remove();
           setTimeout(() => URL.revokeObjectURL(url), 2000);
         }
-        function securityDate() {
-          return new Intl.DateTimeFormat("en-CA", {
-            timeZone: "America/Argentina/Cordoba",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          }).format(new Date());
-        }
-        function securityGateContent(body) {
-          securityGate.innerHTML = `<div class="security-box"><span class="security-symbol" aria-hidden="true">✿</span>${body}</div>`;
-          securityGate.querySelector("input")?.focus();
-        }
-        function securitySummary(fields) {
+        async function beginDirectAccess() {
+          let vault, mode;
           try {
-            const d = JSON.parse(fields["camicas.v2.data"] || "null")?.data;
-            return d
-              ? `${d.patients?.length || 0} pacientes · ${d.appointments?.length || 0} turnos · ${d.payments?.length || 0} cobros · ${d.expenses?.length || 0} gastos`
-              : "Todavía no hay registros en este navegador.";
+            vault = localStorage.getItem(VAULT_KEY);
+            mode = localStorage.getItem(DIRECT_ACCESS_KEY);
           } catch {
-            return "El guardado anterior se conservará protegido para que puedas recuperarlo.";
+            return;
           }
-        }
-        function securityLegacy() {
-          return Object.fromEntries(
-            LEGACY_KEYS.map((k) => [k, localStorage.getItem(k)]).filter(([, v]) => v !== null),
-          );
-        }
-        function securityLegacyUnchanged(fields) {
-          const live = securityLegacy();
-          return LEGACY_KEYS.every((k) => (live[k] ?? null) === (fields[k] ?? null));
-        }
-        function securityLegacySubset(fields) {
-          return Object.entries(securityLegacy()).every(([k, v]) => fields[k] === v);
-        }
-        async function securityMigrationReview(fields, key, salt, raw, finish, priorRaw = null) {
-          const legacyAtReview = securityLegacy();
-          const backup = JSON.stringify(
-            await secureEncrypt(
-              { format: "camicas-private-storage", version: 1, fields },
-              key,
-              salt,
-              "camicas-encrypted-backup",
-            ),
-            null,
-            2,
-          );
-          let downloaded = false;
-          securityGateContent(
-            `<h1>${priorRaw ? "Restaurar la copia" : "Tu protección está preparada"}</h1><p>${secureEscape(securitySummary(fields))}</p><p>${priorRaw ? "La copia elegida reemplazará el guardado de este navegador. Primero descargá una copia protegida del guardado actual." : "Comprobamos que el guardado cifrado se puede abrir sin cambiar tus registros. Descargá una copia protegida y guardala antes de continuar."}</p><button class="btn primary" id="security-download">${priorRaw ? "Guardar copia del estado anterior" : "Descargar copia protegida"}</button><label class="security-check"><input id="security-copy-check" type="checkbox">Guardé la copia y conservo su contraseña en un lugar seguro.</label><p class="small muted">Si olvidás la contraseña, no podremos abrir estos datos ni la copia. La protección corresponde a este navegador; no sincroniza otros dispositivos.</p><p class="security-error" role="alert"></p><button class="btn outline" id="security-finish" disabled>${priorRaw ? "Restaurar y entrar" : "Entrar con protección"}</button>`,
-          );
-          const check = securityGate.querySelector("#security-copy-check"),
-            button = securityGate.querySelector("#security-finish");
-          const shareFile =
-            typeof File === "function"
-              ? new File(
-                  [priorRaw || backup],
-                  "camicas-respaldo-protegido-" + securityDate() + ".json",
-                  { type: "application/json" },
-                )
-              : null;
-          if (shareFile && navigator.canShare?.({ files: [shareFile] })) {
-            const share = document.createElement("button");
-            share.className = "btn outline";
-            share.textContent = "Guardar con el menú del iPhone";
-            share.type = "button";
-            securityGate.querySelector("#security-download").after(share);
-            share.onclick = async () => {
-              try {
-                await navigator.share({ files: [shareFile], title: "Copia protegida de Camicas" });
-                downloaded = true;
-                button.disabled = !check.checked;
-              } catch (error) {
-                if (error.name !== "AbortError")
-                  securityGate.querySelector(".security-error").textContent =
-                    "No se pudo guardar por ese menú. Probá Descargar copia protegida.";
-              }
-            };
-          }
-          securityGate.querySelector("#security-download").onclick = () => {
-            securityDownload(
-              "camicas-" +
-                (priorRaw ? "estado-anterior-protegido" : "respaldo-protegido") +
-                "-" +
-                securityDate() +
-                ".json",
-              priorRaw || backup,
-            );
-            downloaded = true;
-            button.disabled = !check.checked;
-          };
-          check.onchange = () => {
-            button.disabled = !downloaded || !check.checked;
-          };
-          button.onclick = async () => {
-            button.disabled = true;
-            try {
-              if (priorRaw) {
-                if (localStorage.getItem(VAULT_KEY) !== priorRaw)
-                  throw Error("El guardado cambió en otra pestaña. Volvé a abrir Camicas.");
-                localStorage.setItem(VAULT_KEY, raw);
-              } else if (
-                localStorage.getItem(VAULT_KEY) !== raw ||
-                !securityLegacyUnchanged(legacyAtReview)
-              )
-                throw Error(
-                  "Los datos cambiaron en otra pestaña. Conservamos ambas copias. Cerrá las otras pestañas y volvé a abrir Camicas.",
-                );
-              if (localStorage.getItem(VAULT_KEY) !== raw)
-                throw Error("No se pudo comprobar el guardado protegido.");
-              const checked = secureFields(await secureDecrypt(JSON.parse(raw), key));
-              if (JSON.stringify(checked) !== JSON.stringify(fields))
-                throw Error("La comprobación del guardado no coincidió.");
-              if (
-                localStorage.getItem(VAULT_KEY) !== raw ||
-                (!priorRaw && !securityLegacyUnchanged(legacyAtReview)) ||
-                (priorRaw && Object.keys(securityLegacy()).length)
-              )
-                throw Error(
-                  "El guardado cambió durante la comprobación. Conservamos las copias. Volvé a abrir Camicas.",
-                );
-              // The recoverable encrypted copy exists and the user has saved their backup before removing old fields.
-              for (const k of LEGACY_KEYS) localStorage.removeItem(k);
-              finish(fields, key, salt, raw);
-            } catch (e) {
-              securityGate.querySelector(".security-error").textContent = e.message;
-              button.disabled = false;
-            }
-          };
-        }
-        async function beginSecurity() {
-          if (!globalThis.isSecureContext || !crypto?.subtle) {
-            securityGateContent(
-              "<h1>No se puede activar la protección</h1><p>Abrí Camicas desde su enlace HTTPS en un navegador actualizado. El guardado anterior se conserva.</p>",
-            );
-            return new Promise(() => {});
-          }
+          if (!vault || mode === "direct") return;
+          document.body.classList.add("security-locked");
+          const gate = document.createElement("section");
+          gate.className = "security-gate";
+          gate.setAttribute("aria-label", "Recuperar registros anteriores");
+          document.body.append(gate);
           return new Promise((resolve) => {
-            let restoring = null;
-            const finish = (fields, key, salt, raw) => {
-              securityState.key = key;
-              securityState.salt = salt;
-              const store = createVaultStorage({
-                native: localStorage,
-                key,
-                salt,
-                fields,
-                persisted: raw,
-                onStatus: securitySaveStatus,
-              });
-              securityState.store = store;
-              securityGate.hidden = true;
+            const finish = () => {
+              gate.remove();
               document.body.classList.remove("security-locked");
-              resolve(store);
+              resolve();
             };
-            function show() {
-              let existing;
+            const show = (html) => {
+              gate.innerHTML =
+                '<div class="security-box"><span class="security-symbol" aria-hidden="true">✿</span>' +
+                html +
+                "</div>";
+            };
+            const keepExisting = () => {
               try {
-                existing = localStorage.getItem(VAULT_KEY);
-              } catch {
-                securityGateContent(
-                  "<h1>El guardado está bloqueado</h1><p>Permití el almacenamiento del navegador para abrir Camicas. Tus archivos anteriores no se reemplazaron.</p>",
-                );
-                return;
+                if (localStorage.getItem(VAULT_KEY) !== vault)
+                  throw Error("El guardado cambió en otra pestaña. Volvé a abrir Camicas.");
+                localStorage.setItem(DIRECT_ACCESS_KEY, "direct");
+                if (localStorage.getItem(DIRECT_ACCESS_KEY) !== "direct")
+                  throw Error("No se pudo guardar el acceso directo.");
+                finish();
+              } catch (error) {
+                gate.querySelector(".security-error").textContent = error.message;
               }
-              const setup = !existing && !restoring;
-              securityGateContent(
-                `<h1>${restoring ? "Abrir la copia" : setup ? "Protegé tu Camicas" : "Abrir Camicas"}</h1><p>${setup ? "Elegí una contraseña de al menos 12 caracteres. Usá varias palabras y guardala en tu gestor de contraseñas. La contraseña protege pacientes, agenda y economía en este navegador." : restoring ? "Ingresá la contraseña con la que se guardó esta copia. Revisarás sus registros antes de reemplazar el guardado." : "Ingresá tu contraseña para abrir los registros de este navegador."}</p>${setup ? `<p>${secureEscape(securitySummary(securityLegacy()))}</p>` : ""}<form id="security-form"><label for="security-password">Contraseña</label><input id="security-password" name="password" type="password" autocomplete="${setup ? "new-password" : "current-password"}" required ${setup ? 'minlength="12"' : ""}>${setup ? '<label for="security-repeat">Repetí la contraseña</label><input id="security-repeat" type="password" autocomplete="new-password" required minlength="12"><p>Guardá la contraseña: si la olvidás, no podremos recuperar los registros protegidos.</p>' : ""}<p class="security-error" role="alert"></p><button class="btn primary" type="submit">${setup ? "Preparar protección" : "Desbloquear"}</button></form><label class="text-button" for="security-restore-file">Abrir una copia protegida</label><input id="security-restore-file" type="file" accept=".json,application/json" class="hidden"><p class="small muted">Bloqueo al salir de la app o tras cinco minutos sin actividad. La contraseña se usa en este dispositivo y no se envía a ningún servicio.</p>`,
+            };
+            function opening() {
+              const existing = directSnapshot(localStorage),
+                hasData = !!existing["camicas.v2.data"];
+              show(
+                `<h1>Volver al acceso directo</h1><p>Camicas ya no pedirá una contraseña para entrar. Tu guardado anterior está cifrado: ingresá su contraseña <strong>una sola vez</strong> para recuperar los registros.</p><form><label for="direct-old-password">Contraseña anterior de Camicas</label><input id="direct-old-password" type="password" autocomplete="current-password" required><p class="security-error" role="alert"></p><button class="btn primary" type="submit">Recuperar mis registros</button></form><button class="btn outline" id="direct-save-old">Guardar copia cifrada anterior</button>${hasData ? `<p>Registros existentes sin cifrar: ${directEscape(directSummary(existing))}</p><button class="btn outline" id="direct-use-existing">Entrar con esos registros</button>` : '<p>Si no necesitás recuperar ese guardado y tenés tus datos en otro JSON, podés entrar y cargarlo desde Más. Conservaremos la copia cifrada anterior.</p><button class="btn outline" id="direct-empty">Entrar y cargar mi JSON</button>'}`,
               );
-              const form = securityGate.querySelector("form");
+              gate.querySelector("#direct-save-old").onclick = () =>
+                directDownload("camicas-guardado-cifrado-anterior.json", vault);
+              gate.querySelector("#direct-use-existing,#direct-empty").onclick = keepExisting;
+              const form = gate.querySelector("form");
               form.onsubmit = async (e) => {
                 e.preventDefault();
-                const input = form.querySelector("#security-password");
+                const input = form.querySelector("input"),
+                  button = form.querySelector("button");
                 let password = input.value;
-                const button = form.querySelector("button");
                 button.disabled = true;
-                form.querySelector(".security-error").textContent = "Comprobando…";
                 try {
-                  if (setup) {
-                    if (
-                      password.length < 12 ||
-                      password !== form.querySelector("#security-repeat").value
-                    )
-                      throw Error("Usá al menos 12 caracteres y repetí la misma contraseña.");
-                    const fields = securityLegacy(),
-                      salt = secureBase64(crypto.getRandomValues(new Uint8Array(16))),
-                      key = await secureDerive(password, salt);
-                    password = "";
-                    form.reset();
-                    const raw = JSON.stringify(
-                      await secureEncrypt(
-                        { format: "camicas-private-storage", version: 1, fields },
-                        key,
-                        salt,
-                      ),
-                    );
-                    const checked = secureFields(await secureDecrypt(JSON.parse(raw), key));
-                    if (JSON.stringify(checked) !== JSON.stringify(fields))
-                      throw Error("No se pudo comprobar la protección.");
-                    if (
-                      localStorage.getItem(VAULT_KEY) !== null ||
-                      !securityLegacyUnchanged(fields)
-                    )
-                      throw Error(
-                        "El guardado cambió durante la preparación. Volvé a abrir Camicas.",
-                      );
-                    localStorage.setItem(VAULT_KEY, raw);
-                    if (localStorage.getItem(VAULT_KEY) !== raw)
-                      throw Error(
-                        "No se pudo guardar la protección. Tus datos anteriores se conservan.",
-                      );
-                    await securityMigrationReview(fields, key, salt, raw, finish);
-                  } else {
-                    const raw = restoring || existing,
-                      envelope = secureValidateEnvelope(JSON.parse(raw)),
-                      key = await secureDerive(password, envelope.salt);
-                    password = "";
-                    form.reset();
-                    const payload = await secureDecrypt(envelope, key);
-                    let fields;
-                    if (
-                      envelope.kind === "camicas-encrypted-backup" &&
-                      payload.app === "camicas" &&
-                      payload.data
-                    )
-                      fields = { "camicas.v2.data": JSON.stringify(payload) };
-                    else fields = secureFields(payload);
-                    if (restoring) {
-                      if (Object.keys(securityLegacy()).length)
-                        throw Error(
-                          "Ya hay registros sin protección en este navegador. Protegelos primero y después importá esta copia desde Más.",
-                        );
-                      const newRaw = JSON.stringify(
-                        await secureEncrypt(
-                          { format: "camicas-private-storage", version: 1, fields },
-                          key,
-                          envelope.salt,
-                        ),
-                      );
-                      if (existing)
-                        await securityMigrationReview(
-                          fields,
-                          key,
-                          envelope.salt,
-                          newRaw,
-                          finish,
-                          existing,
-                        );
-                      else {
-                        localStorage.setItem(VAULT_KEY, newRaw);
-                        await securityMigrationReview(fields, key, envelope.salt, newRaw, finish);
-                      }
-                    } else {
-                      if (localStorage.getItem(VAULT_KEY) !== existing)
-                        throw Error("El guardado cambió en otra pestaña. Volvé a abrir Camicas.");
-                      if (Object.keys(securityLegacy()).length) {
-                        if (!securityLegacySubset(fields))
-                          throw Error(
-                            "Hay cambios en el guardado anterior. Conservamos ambas versiones. Cerrá otras pestañas y revisá tu copia antes de continuar.",
-                          );
-                        await securityMigrationReview(fields, key, envelope.salt, raw, finish);
-                      } else finish(fields, key, envelope.salt, raw);
+                  const expected = directSnapshot(localStorage),
+                    envelope = secureValidateEnvelope(JSON.parse(vault)),
+                    key = await secureDerive(password, envelope.salt);
+                  password = "";
+                  input.value = "";
+                  const fields = secureFields(await secureDecrypt(envelope, key));
+                  if (
+                    localStorage.getItem(VAULT_KEY) !== vault ||
+                    !directUnchanged(localStorage, expected)
+                  )
+                    throw Error("Los datos cambiaron. Cerrá otras pestañas y volvé a intentar.");
+                  directPlan(fields, expected);
+                  show(
+                    `<h1>Tu guardado está listo</h1><p>${directEscape(directSummary(fields))}</p><p>Estos registros volverán a estar disponibles sin contraseña propia de Camicas. No se subirán a GitHub. Conservaremos el guardado cifrado anterior como respaldo.</p><p class="security-error" role="alert"></p><button id="direct-finish" class="btn primary">Recuperar y entrar sin contraseña</button><button id="direct-back" class="btn outline">Volver</button>`,
+                  );
+                  gate.querySelector("#direct-back").onclick = opening;
+                  gate.querySelector("#direct-finish").onclick = () => {
+                    try {
+                      directCommit(localStorage, { vault, fields, expected });
+                      finish();
+                    } catch (error) {
+                      gate.querySelector(".security-error").textContent = error.message;
                     }
-                  }
+                  };
                 } catch (error) {
-                  form
-                    .querySelector(".security-error")
-                    ?.replaceChildren(
-                      document.createTextNode(error.message || "No se pudo abrir el guardado."),
-                    );
+                  form.querySelector(".security-error").textContent =
+                    error.message || "No se pudo recuperar el guardado. Tus copias se conservan.";
                   button.disabled = false;
                 } finally {
                   password = "";
                   input.value = "";
                 }
               };
-              securityGate.querySelector("#security-restore-file").onchange = async (e) => {
-                try {
-                  const file = e.target.files[0];
-                  if (!file) return;
-                  if (file.size > 40 * 1024 * 1024) throw Error("La copia es demasiado grande.");
-                  const raw = await file.text();
-                  secureValidateEnvelope(JSON.parse(raw));
-                  restoring = raw;
-                  show();
-                } catch (error) {
-                  form.querySelector(".security-error").textContent = error.message;
-                }
-              };
             }
-            show();
+            opening();
           });
         }
-        function securitySaveStatus(state, error) {
-          let el = document.getElementById("security-status");
-          if (!el) {
-            el = document.createElement("div");
-            el.id = "security-status";
-            el.className = "security-status";
-            el.setAttribute("role", "status");
-            document.querySelector(".workspace")?.append(el);
-          }
-          el.classList.toggle("failed", state === "failed");
-          if (state === "failed") {
-            el.innerHTML =
-              '<strong>No se pudo guardar. Los cambios de esta sesión siguen disponibles.</strong><br><button class="btn outline" data-act="secure-emergency-export">Descargar copia protegida</button><button class="btn outline" data-act="secure-retry">Reintentar guardado</button>';
-            el.title = error?.message || "";
-          } else
-            el.textContent =
-              state === "pending"
-                ? "Guardando con protección…"
-                : "Guardado cifrado en este navegador";
-        }
-        const appStorage = await beginSecurity();
-        async function securityFlush() {
-          await appStorage.flush();
-        }
-        async function protectExport(snapshot) {
-          if (!securityState.key) throw Error("Desbloqueá Camicas para descargar la copia.");
-          const fields = { ...appStorage.snapshot(), "camicas.v2.data": JSON.stringify(snapshot) };
-          const envelope = await secureEncrypt(
-            { format: "camicas-private-storage", version: 1, fields },
-            securityState.key,
-            securityState.salt,
-            "camicas-encrypted-backup",
-          );
-          securityDownload(
-            "camicas-respaldo-protegido-" + securityDate() + ".json",
-            JSON.stringify(envelope, null, 2),
-          );
-        }
+        await beginDirectAccess();
         async function decodeProtectedImport(raw) {
           if (!["camicas-encrypted-backup", "camicas-encrypted-vault"].includes(raw?.kind))
             return raw;
           secureValidateEnvelope(raw);
-          let key = securityState.key;
-          if (raw.salt !== securityState.salt) key = await securityBackupKey(raw);
-          const payload = await secureDecrypt(raw, key);
+          const payload = await directOpenProtectedCopy(raw);
           return payload.format === "camicas-private-storage"
             ? JSON.parse(secureFields(payload)["camicas.v2.data"] || "null")
             : payload;
         }
-        function securityBackupKey(envelope) {
+        function directOpenProtectedCopy(envelope) {
           return new Promise((resolve, reject) => {
             const d = document.createElement("dialog");
             d.className = "security-password-dialog";
-            d.setAttribute("aria-label", "Contraseña de la copia");
+            d.setAttribute("aria-label", "Abrir copia anterior");
             d.innerHTML =
-              '<form><h2>Abrir copia protegida</h2><p>Ingresá la contraseña usada para guardar este archivo.</p><label>Contraseña<input type="password" autocomplete="current-password" required></label><p class="security-error" role="alert"></p><div class="form-actions"><button type="button" class="btn outline">Cancelar</button><button class="btn primary" type="submit">Abrir copia</button></div></form>';
+              '<form><h2>Abrir copia cifrada anterior</h2><p>Esta copia conserva su contraseña anterior. Se pide solo para leer el archivo; Camicas seguirá sin contraseña de acceso.</p><label>Contraseña de la copia<input type="password" autocomplete="current-password" required></label><p class="security-error" role="alert"></p><div class="form-actions"><button type="button" class="btn outline">Cancelar</button><button class="btn primary" type="submit">Abrir copia</button></div></form>';
             document.body.append(d);
+            let closed = false;
             const cancel = () => {
+              closed = true;
+              d.querySelector("input").value = "";
               d.remove();
               reject(Error("La importación se canceló."));
             };
@@ -3762,20 +3627,25 @@
             d.querySelector("button[type=button]").onclick = cancel;
             d.querySelector("form").onsubmit = async (e) => {
               e.preventDefault();
-              const input = d.querySelector("input");
+              const input = d.querySelector("input"),
+                button = d.querySelector("button[type=submit]");
               let password = input.value;
+              button.disabled = true;
               try {
                 const key = await secureDerive(password, envelope.salt);
                 password = "";
                 input.value = "";
-                await secureDecrypt(envelope, key);
+                const payload = await secureDecrypt(envelope, key);
+                if (closed) return;
                 d.close();
                 d.remove();
-                resolve(key);
+                resolve(payload);
               } catch (error) {
                 d.querySelector(".security-error").textContent = error.message;
+                button.disabled = false;
               } finally {
                 password = "";
+                input.value = "";
               }
             };
             d.showModal();
@@ -3789,7 +3659,7 @@
           VERSION = 2;
         const storageGet = (k) => {
           try {
-            return appStorage.getItem(k);
+            return localStorage.getItem(k);
           } catch {
             return null;
           }
@@ -4356,7 +4226,7 @@
         let db = emptyData(),
           loadError = null;
         try {
-          const saved = appStorage.getItem(STORE);
+          const saved = localStorage.getItem(STORE);
           if (saved) db = assertImport(JSON.parse(saved));
         } catch (e) {
           loadError =
@@ -4373,7 +4243,7 @@
               throw Error(
                 "Los datos cambiaron desde que abriste esta ventana. Cerrala y volvé a abrirla para guardar sobre la versión actual.",
               );
-            const saved = appStorage.getItem(STORE);
+            const saved = localStorage.getItem(STORE);
             if (saved) {
               const live = JSON.parse(saved);
               if (live.revision !== db.revision) {
@@ -4391,7 +4261,7 @@
             next.revision = db.revision + 1;
             next.updatedAt = new Date().toISOString();
             const checked = assertImport(next);
-            appStorage.setItem(STORE, JSON.stringify(checked));
+            localStorage.setItem(STORE, JSON.stringify(checked));
             db = checked;
             render();
             if (typeof securityFlush === "function") {
@@ -4877,7 +4747,7 @@
         function moreView() {
           return (
             heading("Más", "Preferencias, recordatorios y copias de tus datos.") +
-            `<div class="settings-grid"><section class="card"><div class="card-head"><h2>Tu consultorio</h2>${btn("Editar", "settings", "small outline", "", "edit")}</div><div class="setting-line"><span>Nombre</span><strong>${esc(getSetting("app_name"))}</strong></div><div class="setting-line"><span>Duración habitual</span><strong>${esc(getSetting("default_duration"))} min</strong></div><div class="setting-line"><span>Honorario inicial</span><strong>${money(getSetting("default_fee"))}</strong></div><div class="setting-line"><span>Medios de pago</span><span style="text-align:right">${esc(listSetting("payment_methods").join(", "))}</span></div><div class="setting-line"><span>Moneda y zona horaria</span><strong>ARS · Córdoba</strong></div><button class="text-button" data-act="category">Agregar categoría de gasto</button></section><section class="card"><div class="card-head"><h2>Datos y respaldo</h2>${icon("download")}</div><p class="muted small">Los datos se guardan en este navegador. La conexión privada con Google puede incorporar respuestas del formulario; la agenda y los cobros no se sincronizan entre dispositivos.</p><div class="download-list">${btn("Descargar copia completa", "export", "primary", "", "download")}${btn("Importar una copia de Camicas", "import", "outline", "", "upload")}${btn("Cargar fichas y agenda", "intake", "outline", "", "upload")}${btn("Exportar pacientes CSV", "csv-patients", "outline", "", "download")}${btn("Exportar sesiones CSV", "csv-sessions", "outline", "", "download")}</div><p class="muted small" style="margin-top:17px">Última copia descargada: ${db.lastBackup ? esc(new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short" }).format(new Date(db.lastBackup))) : "todavía no registrada"}.</p>${storageGet(PREVIOUS) ? btn("Recuperar copia anterior a la importación", "restore", "outline") : ""}</section><section class="card"><div class="card-head"><h2>Recordatorios administrativos</h2>${btn("Agregar", "task", "small outline", "", "plus")}</div><label class="small muted"><input type="checkbox" id="show-done" ${view.showDone ? "checked" : ""}> Mostrar completados</label>${taskRows()}</section><section class="card"><div class="card-head"><h2>Acerca de esta versión</h2></div><p class="small muted">Archivo HTML independiente. La conexión opcional con Google utiliza su servicio de autorización para leer respuestas; los registros del consultorio se guardan en este navegador y no se suben a GitHub.</p><div class="alert">${icon("bell")}<span>El guardado y las copias completas están cifrados con tu contraseña. Conservá respaldos fuera del teléfono: borrar los datos del navegador puede eliminar tus registros.</span></div><p class="small muted">Para migrar desde el sitio original, descargá «Exportar copia completa» en Más e importá ese JSON acá. Cada archivo o dirección puede tener su propio guardado.</p><button class="text-button" data-act="help">Ver ayuda de uso y compatibilidad</button></section></div>`
+            `<div class="settings-grid"><section class="card"><div class="card-head"><h2>Tu consultorio</h2>${btn("Editar", "settings", "small outline", "", "edit")}</div><div class="setting-line"><span>Nombre</span><strong>${esc(getSetting("app_name"))}</strong></div><div class="setting-line"><span>Duración habitual</span><strong>${esc(getSetting("default_duration"))} min</strong></div><div class="setting-line"><span>Honorario inicial</span><strong>${money(getSetting("default_fee"))}</strong></div><div class="setting-line"><span>Medios de pago</span><span style="text-align:right">${esc(listSetting("payment_methods").join(", "))}</span></div><div class="setting-line"><span>Moneda y zona horaria</span><strong>ARS · Córdoba</strong></div><button class="text-button" data-act="category">Agregar categoría de gasto</button></section><section class="card"><div class="card-head"><h2>Datos y respaldo</h2>${icon("download")}</div><p class="muted small">Los datos se guardan en este navegador. La conexión privada con Google puede incorporar respuestas del formulario; la agenda y los cobros no se sincronizan entre dispositivos.</p><div class="download-list">${btn("Descargar copia completa", "export", "primary", "", "download")}${btn("Importar una copia de Camicas", "import", "outline", "", "upload")}${btn("Cargar fichas y agenda", "intake", "outline", "", "upload")}${btn("Exportar pacientes CSV", "csv-patients", "outline", "", "download")}${btn("Exportar sesiones CSV", "csv-sessions", "outline", "", "download")}</div><p class="muted small" style="margin-top:17px">Última copia descargada: ${db.lastBackup ? esc(new Intl.DateTimeFormat("es-AR", { dateStyle: "short", timeStyle: "short" }).format(new Date(db.lastBackup))) : "todavía no registrada"}.</p>${storageGet(PREVIOUS) ? btn("Recuperar copia anterior a la importación", "restore", "outline") : ""}</section><section class="card"><div class="card-head"><h2>Recordatorios administrativos</h2>${btn("Agregar", "task", "small outline", "", "plus")}</div><label class="small muted"><input type="checkbox" id="show-done" ${view.showDone ? "checked" : ""}> Mostrar completados</label>${taskRows()}</section><section class="card"><div class="card-head"><h2>Acerca de esta versión</h2></div><p class="small muted">Archivo HTML independiente. La conexión opcional con Google utiliza su servicio de autorización para leer respuestas; los registros del consultorio se guardan en este navegador y no se suben a GitHub.</p><div class="alert">${icon("bell")}<span>Conservá respaldos en un lugar privado fuera del teléfono: borrar los datos del navegador puede eliminar tus registros. Camicas abre sin contraseña propia.</span></div><p class="small muted">Para migrar desde el sitio original, descargá «Exportar copia completa» en Más e importá ese JSON acá. Cada archivo o dirección puede tener su propio guardado.</p><button class="text-button" data-act="help">Ver ayuda de uso y compatibilidad</button></section></div>`
           );
         }
         function render() {
@@ -5591,7 +5461,7 @@
             if (track && !storageBlocked)
               mutate((s) => {
                 s.lastBackup = new Date().toISOString();
-              }, "Copia protegida descargada. Conservá el archivo y su contraseña.");
+              }, "Copia descargada. Conservá el archivo en un lugar privado.");
           } catch (e) {
             toast(e.message || "No se pudo descargar la copia.", true);
           }
@@ -5671,7 +5541,7 @@
         function importModal() {
           openModal(
             "Importar una copia",
-            `<p class="small muted">Elegí una copia JSON completa de la versión original o de Camicas 2.0. Se revisará antes de reemplazar el guardado de este navegador.</p><label class="field" style="margin-top:20px">Copia completa de Camicas<input id="import-file" type="file" accept=".json,application/json"></label><div class="form-error" id="form-error" role="alert" tabindex="-1"></div><div id="import-preview"></div>`,
+            `<p class="small muted">Elegí una copia JSON completa de Camicas, con o sin cifrado. Las copias cifradas anteriores necesitan su contraseña para abrirse. Se revisará antes de reemplazar el guardado de este navegador.</p><label class="field" style="margin-top:20px">Copia completa de Camicas<input id="import-file" type="file" accept=".json,application/json"></label><div class="form-error" id="form-error" role="alert" tabindex="-1"></div><div id="import-preview"></div>`,
             "import",
           );
         }
@@ -5684,7 +5554,7 @@
             stagedImport = assertImport(raw);
             const d = stagedImport.data;
             document.getElementById("import-preview").innerHTML =
-              `<div class="import-report"><strong>Copia válida</strong><br>${d.patients.length} pacientes · ${d.appointments.length} turnos<br>${d.payments.length} cobros · ${d.expenses.length} gastos<br>${d.balance_items.length} cuentas · ${d.savings.length} ahorros / traspasos</div><div class="alert">Esta acción reemplaza los registros locales. Antes se descargará una copia protegida del guardado actual y se conservará una copia recuperable en este navegador.</div><p class="small muted">Los saldos patrimoniales se conservan sin volver a sumar sus movimientos. No se modifica el sitio original.</p><div class="form-actions">${btn("Volver", "close", "outline")}${btn("Importar y reemplazar", "confirm-import", "primary")}</div>`;
+              `<div class="import-report"><strong>Copia válida</strong><br>${d.patients.length} pacientes · ${d.appointments.length} turnos<br>${d.payments.length} cobros · ${d.expenses.length} gastos<br>${d.balance_items.length} cuentas · ${d.savings.length} ahorros / traspasos</div><div class="alert">Esta acción reemplaza los registros locales. Antes se descargará una copia del guardado actual y se conservará una copia recuperable en este navegador.</div><p class="small muted">Los saldos patrimoniales se conservan sin volver a sumar sus movimientos. No se modifica el sitio original.</p><div class="form-actions">${btn("Volver", "close", "outline")}${btn("Importar y reemplazar", "confirm-import", "primary")}</div>`;
             document.getElementById("form-error").textContent = "";
           } catch (e) {
             stagedImport = null;
@@ -5700,18 +5570,18 @@
               );
             if (!candidate) throw Error("Primero elegí una copia válida.");
             const next = assertImport(candidate),
-              oldRaw = appStorage.getItem(STORE) || JSON.stringify(db),
-              previousRaw = appStorage.getItem(PREVIOUS);
+              oldRaw = localStorage.getItem(STORE) || JSON.stringify(db),
+              previousRaw = localStorage.getItem(PREVIOUS);
             next.revision = db.revision + 1;
             next.updatedAt = new Date().toISOString();
             next.lastBackup = null;
             const newRaw = JSON.stringify(next);
-            appStorage.setItem(PREVIOUS, oldRaw);
+            localStorage.setItem(PREVIOUS, oldRaw);
             try {
-              appStorage.setItem(STORE, newRaw);
+              localStorage.setItem(STORE, newRaw);
             } catch (e) {
-              if (previousRaw) appStorage.setItem(PREVIOUS, previousRaw);
-              else appStorage.removeItem(PREVIOUS);
+              if (previousRaw) localStorage.setItem(PREVIOUS, previousRaw);
+              else localStorage.removeItem(PREVIOUS);
               throw e;
             }
             exportData(db, false);
@@ -5761,7 +5631,7 @@
             const dark = document.documentElement.dataset.theme !== "dark";
             document.documentElement.dataset.theme = dark ? "dark" : "light";
             try {
-              appStorage.setItem("camicas.v2.theme", dark ? "dark" : "light");
+              localStorage.setItem("camicas.v2.theme", dark ? "dark" : "light");
             } catch {}
             document.querySelector("meta[name=theme-color]").content = dark ? "#1e1927" : "#f7f5fa";
             render();
@@ -6096,7 +5966,7 @@
           "confirm-import": () => commitImport(stagedImport),
           restore() {
             try {
-              stagedImport = assertImport(JSON.parse(appStorage.getItem(PREVIOUS)));
+              stagedImport = assertImport(JSON.parse(localStorage.getItem(PREVIOUS)));
               confirmModal(
                 "Recuperar copia anterior",
                 "Se reemplazará el guardado actual por el respaldo anterior a la última importación. Se descargará una copia del actual.",
@@ -6658,10 +6528,24 @@
             render();
           }
         });
-
+        window.addEventListener("storage", (e) => {
+          if (e.key === STORE && e.newValue) {
+            try {
+              db = assertImport(JSON.parse(e.newValue));
+              render();
+              if (modal.open)
+                toast(
+                  "Cambió el guardado desde otra pestaña. Revisá el formulario antes de guardar.",
+                );
+              else toast("Datos actualizados desde otra pestaña");
+            } catch {
+              toast("No se pudo leer el cambio de otra pestaña.", true);
+            }
+          }
+        });
         try {
           document.documentElement.dataset.theme =
-            appStorage.getItem("camicas.v2.theme") ||
+            localStorage.getItem("camicas.v2.theme") ||
             (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
         } catch {
           document.documentElement.dataset.theme = "light";
@@ -8059,7 +7943,7 @@
           if (saved && typeof saved === "object") formLink = { ...formLink, ...saved };
         } catch {}
         function saveFormLink() {
-          appStorage.setItem(FORM_LINK_STORE, JSON.stringify(formLink));
+          localStorage.setItem(FORM_LINK_STORE, JSON.stringify(formLink));
         }
         function formConnectionActive() {
           return Boolean(formAccessToken) && Date.now() < formTokenUntil;
@@ -9042,7 +8926,7 @@
         } catch {}
         function saveWelcomePrefs() {
           try {
-            appStorage.setItem(WELCOME_STORE, JSON.stringify(welcomePrefs));
+            localStorage.setItem(WELCOME_STORE, JSON.stringify(welcomePrefs));
           } catch {}
         }
         function welcomeDay(now) {
@@ -9165,218 +9049,44 @@
         };
         render();
 
-        // Gate UI and encrypted persistence surround the existing app. No remote database is introduced.
-        const insecureCSVExport = exportCSV;
+        const directOriginalCSV = exportCSV;
         exportCSV = function (kind) {
           confirmModal(
-            "Descargar informe sin cifrado",
-            "Los CSV pueden leerse sin contraseña e incluyen datos personales o económicos. Para una copia protegida, usá Descargar copia completa.",
-            "secure-csv-confirm",
+            "Descargar informe",
+            "Este archivo incluye datos personales o económicos sin cifrado. Guardalo en un lugar privado.",
+            "direct-csv-confirm",
             kind,
           );
         };
-        actions["secure-csv-confirm"] = (el) => {
-          insecureCSVExport(el.dataset.id);
+        actions["direct-csv-confirm"] = (el) => {
+          directOriginalCSV(el.dataset.id);
           closeModal();
         };
-        actions["secure-emergency-export"] = () => exportData(db, false);
-        actions["secure-retry"] = async () => {
+        actions["direct-recover-old"] = async () => {
           try {
-            await appStorage.retry();
-            storageBlocked = false;
-            render();
-            toast("Guardado protegido recuperado.");
-          } catch (e) {
-            toast(e.message, true);
-          }
-        };
-        commitImport = async function (candidate) {
-          try {
-            await securityFlush();
-            if (!storageBlocked && modalRevision !== db.revision)
-              throw Error("Los datos cambiaron. Volvé a seleccionar la copia.");
-            if (!candidate) throw Error("Primero elegí una copia válida.");
-            const next = assertImport(candidate),
-              before = clone(db);
-            next.revision = db.revision + 1;
-            next.updatedAt = new Date().toISOString();
-            next.lastBackup = null;
-            await protectExport({ ...before, exportedAt: new Date().toISOString() });
-            appStorage.setItem(PREVIOUS, JSON.stringify(before));
-            appStorage.setItem(STORE, JSON.stringify(next));
-            await securityFlush();
-            db = next;
-            storageBlocked = false;
-            loadError = null;
-            closeModal();
-            render();
-            toast("Copia importada y guardada con protección.");
-          } catch (e) {
-            showError(e.message || "No se pudo importar. La copia anterior se conserva.");
-          }
-        };
-        function securityScrub() {
-          db = emptyData();
-          stagedImport = null;
-          stagedIntake = null;
-          formAccessToken = null;
-          formTokenUntil = 0;
-          view.searchQuery = "";
-          view.patientQuery = "";
-          main.replaceChildren();
-          document.getElementById("modal-body").replaceChildren();
-          document.getElementById("notices").replaceChildren();
-        }
-        async function securityLock() {
-          if (securityState.locking) return;
-          securityState.locking = true;
-          document.body.classList.add("security-locked");
-          securityGate.hidden = false;
-          for (const d of document.querySelectorAll("dialog[open]")) d.close();
-          formAccessToken = null;
-          formTokenUntil = 0;
-          securityGateContent(
-            "<h1>Camicas bloqueada</h1><p>Comprobando el guardado protegido…</p>",
-          );
-          try {
-            await securityFlush();
-            securityScrub();
-            appStorage.clear();
-            securityState.key = null;
-            if (!document.hidden) location.reload();
+            const raw = localStorage.getItem(VAULT_KEY);
+            if (!raw) throw Error("No hay una copia cifrada anterior en este navegador.");
+            const candidate = assertImport(await decodeProtectedImport(JSON.parse(raw)));
+            importModal();
+            stagedImport = candidate;
+            const data = candidate.data;
+            document.getElementById("import-preview").innerHTML =
+              `<div class="import-report"><strong>Copia cifrada anterior</strong><br>${data.patients.length} pacientes · ${data.appointments.length} turnos<br>${data.payments.length} cobros · ${data.expenses.length} gastos</div><div class="alert">Esta copia es anterior a la vuelta al acceso directo. Importarla reemplaza los registros actuales. Antes se descargará un respaldo del estado actual y quedará disponible en Más.</div><div class="form-actions">${btn("Cancelar", "close", "outline")}${btn("Importar y reemplazar", "confirm-import", "primary")}</div>`;
           } catch (error) {
-            // On failure, preserve unsaved changes as an encrypted downloadable envelope before clearing the session.
-            const encrypted = JSON.stringify(
-              await secureEncrypt(
-                { format: "camicas-private-storage", version: 1, fields: appStorage.snapshot() },
-                securityState.key,
-                securityState.salt,
-                "camicas-encrypted-backup",
-              ),
-              null,
-              2,
-            );
-            securityState.recoveryRequired = true;
-            securityScrub();
-            appStorage.clear();
-            securityState.key = null;
-            securityGateContent(
-              '<h1>Guardá los cambios de esta sesión</h1><p>El navegador no pudo completar el guardado. Preparamos una copia protegida con tus últimos cambios. Descargala antes de volver a abrir Camicas.</p><button id="security-last-copy" class="btn primary">Descargar últimos cambios protegidos</button><button id="security-reopen" class="btn outline" disabled>Volver a abrir Camicas</button><p>Después podés importar esa copia desde Más con tu contraseña.</p>',
-            );
-            securityGate.querySelector("#security-last-copy").onclick = () => {
-              securityDownload(
-                "camicas-ultimos-cambios-protegidos-" + securityDate() + ".json",
-                encrypted,
-              );
-              securityGate.querySelector("#security-reopen").disabled = false;
-            };
-            securityGate.querySelector("#security-reopen").onclick = () => location.reload();
+            toast(error.message, true);
           }
-        }
-        actions["secure-lock"] = securityLock;
-        function securityAuthorizationMask() {
-          securityState.needsAuthorizationUnlock = true;
-          document.body.classList.add("security-locked");
-          securityGate.hidden = false;
-          for (const d of document.querySelectorAll("dialog[open]")) d.close();
-          securityGateContent(
-            "<h1>Camicas está protegida</h1><p>Terminá la autorización en Google. Al volver, Camicas te pedirá tu contraseña.</p>",
-          );
-        }
-        function securityAuthorizationUnlock() {
-          securityGateContent(
-            '<h1>Volver a Camicas</h1><p>Ingresá tu contraseña para ver los registros después de la autorización.</p><form><label>Contraseña<input type="password" autocomplete="current-password" required></label><p class="security-error" role="alert"></p><button class="btn primary" type="submit">Desbloquear</button></form>',
-          );
-          const form = securityGate.querySelector("form");
-          form.onsubmit = async (e) => {
-            e.preventDefault();
-            const input = form.querySelector("input");
-            let password = input.value;
-            try {
-              const envelope = JSON.parse(localStorage.getItem(VAULT_KEY)),
-                key = await secureDerive(password, envelope.salt);
-              password = "";
-              input.value = "";
-              await secureDecrypt(envelope, key);
-              if (securityState.locking) return;
-              securityState.needsAuthorizationUnlock = false;
-              securityState.lastActivity = Date.now();
-              securityGate.hidden = true;
-              document.body.classList.remove("security-locked");
-              render();
-            } catch (error) {
-              form.querySelector(".security-error").textContent = error.message;
-            } finally {
-              password = "";
-            }
-          };
-        }
-        const profile = document.querySelector(".profile-button");
-        profile.removeAttribute("data-nav");
-        profile.dataset.act = "secure-lock";
-        profile.setAttribute("aria-label", "Bloquear Camicas");
-        profile.title = "Bloquear Camicas";
-        profile.textContent = "🔒";
-        for (const type of ["pointerdown", "keydown", "input", "scroll"])
-          document.addEventListener(
-            type,
-            () => {
-              securityState.lastActivity = Date.now();
-            },
-            { passive: true },
-          );
-        setInterval(() => {
-          if (
-            Date.now() - securityState.lastActivity >= 5 * 60 * 1000 ||
-            (securityState.authorizing &&
-              Date.now() - securityState.authorizationStarted >= 2 * 60 * 1000)
-          )
-            securityLock();
-        }, 10000);
-        document.addEventListener("visibilitychange", () => {
-          if (document.hidden) {
-            if (securityState.authorizing && !securityState.locking) securityAuthorizationMask();
-            else securityLock();
-          } else if (securityState.locking && !securityState.key && !securityState.recoveryRequired)
-            location.reload();
-          else if (securityState.needsAuthorizationUnlock) {
-            if (Date.now() - securityState.lastActivity >= 5 * 60 * 1000) securityLock();
-            else securityAuthorizationUnlock();
-          }
-        });
-        window.addEventListener("pagehide", () => {
-          if (!securityState.locking) securityLock();
-        });
-        window.addEventListener("pageshow", (e) => {
-          if (e.persisted) {
-            if (securityState.locking && !securityState.key && !securityState.recoveryRequired)
-              location.reload();
-            else securityLock();
-          }
-        });
-        window.addEventListener("beforeunload", (e) => {
-          if (appStorage.pending) {
-            e.preventDefault();
-            e.returnValue = "";
-          }
-        });
-        window.addEventListener("storage", (e) => {
-          if (e.key === VAULT_KEY && e.newValue !== appStorage.persisted) securityLock();
-        });
-        const renderBeforeSecurity = render;
+        };
+        const renderBeforeDirectAccess = render;
         render = function () {
-          renderBeforeSecurity();
+          renderBeforeDirectAccess();
           if (view.page === "mas") {
-            const grid = main.querySelector(".settings-grid");
-            grid?.insertAdjacentHTML(
-              "afterbegin",
-              `<section class="card"><h2>Privacidad y acceso</h2><p class="small muted">Pacientes, agenda y economía se guardan cifrados en este navegador. Camicas se bloquea al salir o tras cinco minutos sin actividad.</p><p class="small muted">Las copias completas están protegidas con la misma contraseña. Los CSV se descargan sin cifrado. Guardá tu contraseña: no hay recuperación si la olvidás.</p><div class="download-list">${btn("Bloquear ahora", "secure-lock", "primary")}${btn("Descargar copia protegida", "export", "outline")}</div><p class="small muted">La protección no sincroniza otros dispositivos ni reemplaza las copias de respaldo. Los archivos antiguos que ya descargaste conservan su formato anterior.</p></section>`,
-            );
+            main
+              .querySelector(".settings-grid")
+              ?.insertAdjacentHTML(
+                "afterbegin",
+                `<section class="card"><h2>Acceso y respaldo</h2><p class="small muted">Camicas abre directamente. Los registros se guardan en este navegador, sin contraseña propia ni cifrado local de Camicas, y no se suben a GitHub.</p><p class="small muted">Usá el bloqueo del celular y conservá copias en un lugar privado. Los respaldos nuevos son JSON sin contraseña; las copias cifradas anteriores siguen necesitando su clave anterior.</p><div class="download-list">${btn("Descargar copia completa", "export", "primary")}${localStorage.getItem(VAULT_KEY) ? btn("Revisar copia cifrada anterior", "direct-recover-old", "outline") : ""}</div></section>`,
+              );
           }
-          securitySaveStatus(
-            appStorage.failure ? "failed" : appStorage.pending ? "pending" : "saved",
-            appStorage.failure,
-          );
         };
         render();
       })().catch((error) => {
