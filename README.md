@@ -35,6 +35,22 @@ En iPhone: abrí el enlace en Safari, elegí **Compartir → Agregar a la pantal
 
 Agregá primero el acceso nuevo y comprobá tus registros. Si el acceso anterior tiene datos cargados, exportá una copia desde Más antes de quitarlo; distintos modos del navegador pueden usar almacenamientos separados. El ícono no agrega sincronización ni funcionamiento sin internet a la conexión de Forms.
 
+## Protección local y acceso
+
+Camicas pide una contraseña de al menos 12 caracteres antes de abrir los registros. La contraseña se usa en el dispositivo y no se envía al servidor. La base, la copia anterior, las preferencias y la configuración de Forms se guardan en un único contenedor cifrado. Los permisos de acceso a Google permanecen solo en memoria.
+
+La primera activación prepara y comprueba el cifrado, solicita descargar una copia protegida y pide confirmar que se guardó antes de retirar las claves anteriores de almacenamiento sin cifrado. La contraseña no se puede recuperar si se olvida. La copia y su contraseña deben conservarse. Cada navegador o dispositivo mantiene un guardado independiente.
+
+El candado permite bloquear manualmente. Camicas oculta los registros al salir de la app o tras cinco minutos sin actividad; termina el guardado pendiente, descarta la sesión y vuelve a pedir la contraseña. Un aviso diferencia el guardado pendiente del completado. Si falla, ofrece una copia protegida de los cambios pendientes. Se controlan escrituras desde otras pestañas para no reemplazar cambios inadvertidamente.
+
+Las copias completas JSON están cifradas; los CSV siguen siendo legibles y requieren confirmación antes de exportar. Se pueden importar copias cifradas o antiguas, y abrir una copia protegida desde la pantalla de acceso. Antes de reemplazar el guardado se descarga una copia protegida del anterior. Los archivos antiguos ya descargados no se cifran automáticamente.
+
+Se agregó una política de seguridad del contenido con hash del único script propio, bloqueo de atributos ejecutables, conexiones limitadas a Google Forms e Identity, ausencia de objetos externos y política de referencia no-referrer. La política no impide a quien controla GitHub cambiar el código; protegé Google y GitHub con verificación en dos pasos.
+
+El cifrado usa Web Crypto: AES-GCM de 256 bits, IV aleatorio de 12 bytes, salt de 16 bytes y PBKDF2-SHA-256 con 600.000 iteraciones. El encabezado forma parte de los datos autenticados. La clave no se exporta ni se guarda junto al contenedor. Protege el contenido persistente frente a lectura sin la contraseña; no elimina riesgos de scripts maliciosos mientras la aplicación está desbloqueada.
+
+Esta protección no agrega un servidor privado, sincronización de turnos o cobros, copias automáticas remotas, autenticación por Face ID de la app ni una certificación de seguridad o cumplimiento. [Paso a paso para el celular y las cuentas](security-guide.md).
+
 ## Funciones
 
 - Inicio con próximos turnos, indicadores, cobros y recordatorios administrativos.
@@ -106,7 +122,7 @@ El formato se verificó con una copia original. Su tabla de gastos y ahorros est
 
 ## Datos y límites
 
-Los registros se guardan **en el navegador y dispositivo utilizados**, sin contraseña ni cifrado. No se envían a GitHub ni al servidor del sitio. GitHub almacena el código; no contiene la base de pacientes del consultorio.
+Los registros se guardan **cifrados en el navegador y dispositivo utilizados**, con la contraseña que se elige al activar la protección. No se envían a GitHub ni al servidor del sitio. GitHub almacena el código; no contiene la base de pacientes del consultorio.
 
 La conexión opcional de Google Forms incorpora fichas nuevas y completa campos vacíos; conserva los cambios manuales. Necesita una configuración inicial y la autorización de Google en cada sesión. Consulta respuestas cada cinco minutos mientras la app está abierta, visible y autorizada; al vencer el permiso, hay que renovarlo con el botón. No funciona con la app cerrada.
 
@@ -118,7 +134,7 @@ Los cobros nuevos actualizan la cuenta de su medio de pago. La edición de gasto
 
 ## Publicación
 
-El sitio se publica con GitHub Pages desde la rama `main`, carpeta raíz `/`. El repositorio público contiene únicamente el código y esta guía. Los registros administrativos permanecen en el navegador del dispositivo; no se suben con las actualizaciones del sitio.
+El sitio se publica con GitHub Pages desde la rama `main`, carpeta raíz `/`. El repositorio público contiene únicamente el código, los íconos y las guías. Los registros administrativos permanecen en el navegador del dispositivo; no se suben con las actualizaciones del sitio.
 
 ## Verificación
 

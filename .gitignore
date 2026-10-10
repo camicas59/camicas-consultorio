@@ -2,6 +2,10 @@
 camicas-respaldo-*.json
 Camicas-datos-privados-*.json
 *.csv
+*.json
+*.xlsx
+*.sqlite
+*.db
 .env
 .env.*
 node_modules/
